@@ -45,7 +45,7 @@ time_modify(){
         echo -e "${OK} ntpdate 时间同步服务安装成功"
     fi
 
-    service ntp stop
+    service ntp stop &>/dev/null
 
     echo -e "${Info} 正在进行时间同步"
     ntpdate time.nist.gov
@@ -61,6 +61,14 @@ time_modify(){
 dependency_install(){
     apt-get update
     apt-get install wget curl -y
+    apt-get install net-tools
+    if [[ $? -eq 0 ]];then
+        echo -e "${OK} ${GreenBG} net-tools 安装完成 ${Font}"
+        sleep 1
+    else
+        echo -e "${Error} ${RedBG} net-tools 安装失败 ${Font}"
+        exit 1
+    fi
     apt-get install bc
     if [[ $? -eq 0 ]];then
         echo -e "${OK} ${GreenBG} bc 安装完成 ${Font}"
@@ -134,16 +142,28 @@ ssl_install(){
 }
 domain_check(){
     stty erase '^H' && read -p "请输入你的域名信息(eg:www.wulabing.com):" domain
+    ## ifconfig
+    ## stty erase '^H' && read -p "请输入公网 IP 所在网卡名称(default:eth0):" broadcast
+    ## [[ -z ${broadcast} ]] && broadcast="eth0"
     domain_ip=`ping ${domain} -c 1 | sed '1{s/[^(]*(//;s/).*//;q}'`
-    local_ip=`ifconfig eth0 | grep 'inet ' | sed s/^.*addr://g | sed s/Bcast.*$//g`
+    local_ip=`ifconfig -a|grep inet|grep -v 127.0.0.1|grep -v inet6 | awk '{print $2}' | tr -d "addr:"`
     echo -e "域名dns解析IP：${domain_ip}"
     echo -e "本机IP: ${local_ip}"
     sleep 2
     if [[ $(echo ${local_ip}|tr '.' '+'|bc) -eq $(echo ${domain_ip}|tr '.' '+'|bc) ]];then
         echo -e "${OK} ${GreenBG} 域名dns解析IP  与 本机IP 匹配 ${Font}"
     else
-        echo -e "${Error} ${RedBG} 域名dns解析IP 与 本机IP 不匹配 安装终止 ${Font}"
-        exit 1
+        echo -e "${Error} ${RedBG} 域名dns解析IP 与 本机IP 不匹配 是否继续安装？（y/n）${Font}" && read install
+        case $install in
+        [yY][eE][sS]|[yY])
+            echo -e "${GreenBG} 继续安装 ${Font}" 
+            sleep 2
+            ;;
+        *)
+            echo -e "${RedBG} 安装终止 ${Font}" 
+            exit 2
+            ;;
+        esac
     fi
 }
 port_exist_check(){
@@ -228,13 +248,30 @@ nginx_conf_add(){
 EOF
 
 modify_nginx
-    if [[ $? -eq 0 ]];then
-        echo -e "${OK} ${GreenBG} Nginx 配置修改成功 ${Font}"
-    else
-        echo -e "${Error} ${RedBG} Nginx 配置修改失败 ${Font}"
-        exit 6
-    fi
+if [[ $? -eq 0 ]];then
+    echo -e "${OK} ${GreenBG} Nginx 配置修改成功 ${Font}"
+else
+    echo -e "${Error} ${RedBG} Nginx 配置修改失败 ${Font}"
+    exit 6
+fi
 
+}
+
+start_process(){
+    systemctl start v2ray
+    if [[ $? -eq 0 ]];then
+        echo -e "${OK} ${GreenBG} V2ray 启动成功 ${Font}"
+    else
+        echo -e "${Error} ${RedBG} V2ray 启动失败 ${Font}"
+        exit 1
+    fi
+    systemctl start nginx
+    if [[ $? -eq 0 ]];then
+        echo -e "${OK} ${GreenBG} Nginx 启动成功 ${Font}"
+    else
+        echo -e "${Error} ${RedBG} Nginx 启动失败 ${Font}"
+        exit 1
+    fi
 }
 
 show_information(){
@@ -251,9 +288,10 @@ show_information(){
     echo -e "${Red} 伪装域名：${Font} ray "
     echo -e "${Red} 底层传输安全：${Font} tls "
 
-
+    start_process
 
 }
+
 main(){
     is_root
     dependency_install
@@ -267,7 +305,9 @@ main(){
     nginx_install
     v2ray_conf_add
     nginx_conf_add
-    echo -e "${OK} ${Green} V2ray+ws+tls 安装成功 ${Font} "
+
+
+
     show_information
 }
 
