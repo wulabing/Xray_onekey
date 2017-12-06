@@ -21,15 +21,30 @@ Font="\033[0m"
 Info="${Green}[信息]${Font}"
 OK="${Green}[OK]${Font}"
 Error="${Red}[错误]${Font}"
-Notification="${Yellow}[注意]${Font}"
 
 v2ray_conf_dir="/etc/v2ray"
 nginx_conf_dir="/etc/nginx/conf.d"
 v2ray_conf="${v2ray_conf_dir}/config.json"
 nginx_conf="${nginx_conf_dir}/v2ray.conf"
+
+check_system(){
+    source /etc/os-release
+    if [[ "${ID}" -eq "centos" && ${VERSION_ID} -ge 7 ]];then
+        echo -e "${OK} ${GreenBG} 当前系统为 ${ID} ${VERSION_ID} ${Font} "
+    elif [[ "${ID}" -eq "debian" && ${VERSION_ID} -ge 8 ]];then
+        echo -e "${OK} ${GreenBG} 当前系统为 ${ID} ${VERSION_ID} ${Font} "
+    elif [[ "${ID}" -eq "ubuntu" && ${VERSION_ID} -ge 16.04 ]];then
+        echo -e "${OK} ${GreenBG} 当前系统为 ${ID} ${VERSION_ID} ${Font} "
+    else
+        echo -e "${Error} ${RedBG} 当前系统为 ${ID} ${VERSION_ID} 不在支持的系统列表内，安装中断 ${Font} "
+        exit 1
+    fi
+}
+
 is_root(){
     if [ `id -u` -eq 0 ]
         then echo -e "${OK} ${GreenBG} 当前用户是root用户，进入安装流程 ${Font} "
+        sleep 3
     else
         echo -e "${Error} ${RedBG} 当前用户不是root用户，请切换到root用户后重新执行脚本 ${Font}" 
         exit 1
@@ -39,15 +54,16 @@ time_modify(){
     apt-get install ntpdate -y
 
     if [[ $? -ne 0 ]];then
-        echo -e "${Error} ${RedBG} ntpdate 时间同步服务安装失败，请根据错误提示进行修复 ${Font}"
+        echo -e "${Error} ${RedBG} NTPdate 时间同步服务安装失败，请根据错误提示进行修复 ${Font}"
         exit 2
     else
-        echo -e "${OK} ntpdate 时间同步服务安装成功"
+        echo -e "${OK} ${GreenBG} NTPdate 时间同步服务安装成功 ${Font}"
+        sleep 1
     fi
 
-    service ntp stop &>/dev/null
+    systemctl stop ntp &>/dev/null
 
-    echo -e "${Info} 正在进行时间同步"
+    echo -e "${Info} ${GreenBG} 正在进行时间同步 ${Font}"
     ntpdate time.nist.gov
 
     if [[ $? -eq 0 ]];then 
@@ -94,20 +110,23 @@ v2ray_install(){
     fi
 
     mkdir -p /root/v2ray && cd /root/v2ray
-    wget https://install.direct/go.sh
+    wget  --no-check-certificate https://install.direct/go.sh
 
+    ## wget http://install.direct/go.sh
+    
     if [[ -f go.sh ]];then
-        source go.sh --force 
+        bash go.sh --force
         if [[ $? -eq 0 ]];then
             echo -e "${OK} ${GreenBG} V2ray 安装成功 ${Font}"
             echo -e "${Green} Port: ${PORT} ${Font}"
             echo -e "${Grenn} UUID: ${UUID} ${Font}"
+            sleep 2
         else 
             echo -e "${Error} ${RedBG} V2ray 安装失败，请检查相关依赖是否正确安装 ${Font}"
             exit 3
         fi
     else
-        echo -e "${OK} ${GreenBG} V2ray 安装文件下载失败，请检查下载地址是否可用 ${Font}"
+        echo -e "${Error} ${RedBG} V2ray 安装文件下载失败，请检查下载地址是否可用 ${Font}"
         exit 4
     fi
 }
@@ -115,6 +134,7 @@ nginx_install(){
     apt-get install nginx -y
     if [[ -d /etc/nginx ]];then
         echo -e "${OK} ${GreenBG} nginx 安装完成 ${Font}"
+        sleep 2
     else
         echo -e "${Error} ${RedBG} nginx 安装失败 ${Font}"
         exit 5
@@ -126,6 +146,7 @@ ssl_install(){
 
     if [[ $? -eq 0 ]];then
         echo -e "${OK} ${GreenBG} SSL 证书生成脚本依赖安装成功 ${Font}"
+        sleep 2
     else
         echo -e "${Error} ${RedBG} SSL 证书生成脚本依赖安装失败 ${Font}"
         exit 6
@@ -133,7 +154,8 @@ ssl_install(){
     curl  https://get.acme.sh | sh
 
     if [[ $? -eq 0 ]];then
-            echo -e "${OK} ${GreenBG} SSL 证书生成脚本安装成功 ${Font}"
+        echo -e "${OK} ${GreenBG} SSL 证书生成脚本安装成功 ${Font}"
+        sleep 2
     else
         echo -e "${Error} ${RedBG} SSL 证书生成脚本安装失败，请检查相关依赖是否正常安装 ${Font}"
         exit 7
@@ -152,6 +174,7 @@ domain_check(){
     sleep 2
     if [[ $(echo ${local_ip}|tr '.' '+'|bc) -eq $(echo ${domain_ip}|tr '.' '+'|bc) ]];then
         echo -e "${OK} ${GreenBG} 域名dns解析IP  与 本机IP 匹配 ${Font}"
+        sleep 2
     else
         echo -e "${Error} ${RedBG} 域名dns解析IP 与 本机IP 不匹配 是否继续安装？（y/n）${Font}" && read install
         case $install in
@@ -169,6 +192,7 @@ domain_check(){
 port_exist_check(){
     if [[ 0 -eq `netstat -tlpn | grep "$1"| wc -l` ]];then
         echo -e "${OK} ${GreenBG} $1 端口未被占用 ${Font}"
+        sleep 1
     else
         echo -e "${Error} ${RedBG} $1 端口被占用，请检查占用进程 结束后重新运行脚本 ${Font}"
         netstat -tlpn | grep "$1"
@@ -179,9 +203,11 @@ acme(){
     ~/.acme.sh/acme.sh --issue -d ${domain} --standalone -k ec-256
     if [[ $? -eq 0 ]];then
         echo -e "${OK} ${GreenBG} SSL 证书生成成功 ${Font}"
+        sleep 2
         ~/.acme.sh/acme.sh --installcert -d ${domain} --fullchainpath /etc/v2ray/v2ray.crt --keypath /etc/v2ray/v2ray.key --ecc
         if [[ $? -eq 0 ]];then
         echo -e "${OK} ${GreenBG} 证书配置成功 ${Font}"
+        sleep 2
         fi
     else
         echo -e "${Error} ${RedBG} SSL 证书生成失败 ${Font}"
@@ -220,6 +246,7 @@ EOF
 modify_port_UUID
     if [[ $? -eq 0 ]];then
         echo -e "${OK} ${GreenBG} V2ray 配置修改成功 ${Font}"
+        sleep 2
     else
         echo -e "${Error} ${RedBG} V2ray 配置修改失败 ${Font}"
         exit 6
@@ -250,6 +277,7 @@ EOF
 modify_nginx
 if [[ $? -eq 0 ]];then
     echo -e "${OK} ${GreenBG} Nginx 配置修改成功 ${Font}"
+    sleep 2
 else
     echo -e "${Error} ${RedBG} Nginx 配置修改失败 ${Font}"
     exit 6
@@ -257,21 +285,46 @@ fi
 
 }
 
-start_process(){
-    systemctl start v2ray
-    if [[ $? -eq 0 ]];then
-        echo -e "${OK} ${GreenBG} V2ray 启动成功 ${Font}"
-    else
-        echo -e "${Error} ${RedBG} V2ray 启动失败 ${Font}"
-        exit 1
-    fi
-    systemctl start nginx
+start_process_systemd(){
+    ### nginx服务在安装完成后会自动启动。需要通过restart或reload重新加载配置
+    systemctl restart nginx 
+
     if [[ $? -eq 0 ]];then
         echo -e "${OK} ${GreenBG} Nginx 启动成功 ${Font}"
+        sleep 2
     else
         echo -e "${Error} ${RedBG} Nginx 启动失败 ${Font}"
-        exit 1
     fi
+
+    systemctl start v2ray
+
+    if [[ $? -eq 0 ]];then
+        echo -e "${OK} ${GreenBG} V2ray 启动成功 ${Font}"
+        sleep 2
+    else
+        echo -e "${Error} ${RedBG} V2ray 启动失败 ${Font}"
+    fi
+}
+start_process_sysv(){
+    service nginx start
+
+    if [[ $? -eq 0 ]];then
+        echo -e "${OK} ${GreenBG} Nginx 启动成功 ${Font}"
+        sleep 2
+    else
+        echo -e "${Error} ${RedBG} Nginx 启动失败 ${Font}"
+    fi
+
+    service v2ray start
+
+    if [[ $? -eq 0 ]];then
+        echo -e "${OK} ${GreenBG} V2ray 启动成功 ${Font}"
+        sleep 2
+    else
+        echo -e "${Error} ${RedBG} V2ray 启动失败 ${Font}"
+    fi
+
+
 }
 
 show_information(){
@@ -280,7 +333,7 @@ show_information(){
     echo -e "${Red} V2ray 配置信息 ${Font}"
     echo -e "${Red} 地址（address）:${Font} ${domain} "
     echo -e "${Red} 端口（port）：${Font} 443 "
-    echo -e "${Red} 用户id（id）：${Font} ${UUID}"
+    echo -e "${Red} 用户id（UUID）：${Font} ${UUID}"
     echo -e "${Red} 额外id（alterId）：${Font} 64"
     echo -e "${Red} 加密方式（security）：${Font} 自适应 "
     echo -e "${Red} 传输协议（network）：${Font} ws "
@@ -288,11 +341,12 @@ show_information(){
     echo -e "${Red} 伪装域名：${Font} ray "
     echo -e "${Red} 底层传输安全：${Font} tls "
 
-    start_process
+    
 
 }
 
 main(){
+    check_system
     is_root
     dependency_install
     time_modify
@@ -305,10 +359,8 @@ main(){
     nginx_install
     v2ray_conf_add
     nginx_conf_add
-
-
-
     show_information
+    start_process_systemd
 }
 
 main
