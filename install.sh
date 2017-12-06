@@ -27,22 +27,29 @@ nginx_conf_dir="/etc/nginx/conf.d"
 v2ray_conf="${v2ray_conf_dir}/config.json"
 nginx_conf="${nginx_conf_dir}/v2ray.conf"
 
+source /etc/os-release
+
 check_system(){
-    source /etc/os-release
-    if [[ "${ID}" -eq "centos" && ${VERSION_ID} -ge 7 ]];then
-        echo -e "${OK} ${GreenBG} 当前系统为 ${ID} ${VERSION_ID} ${Font} "
-    elif [[ "${ID}" -eq "debian" && ${VERSION_ID} -ge 8 ]];then
-        echo -e "${OK} ${GreenBG} 当前系统为 ${ID} ${VERSION_ID} ${Font} "
-    elif [[ "${ID}" -eq "ubuntu" && ${VERSION_ID} -ge 16.04 ]];then
-        echo -e "${OK} ${GreenBG} 当前系统为 ${ID} ${VERSION_ID} ${Font} "
+    
+    if [[ "${ID}" == "centos" && ${VERSION_ID} -ge 7 ]];then
+        echo -e "${OK} ${GreenBG} 当前系统为 Centos ${VERSION_ID} ${Font} "
+        INS="yum"
+        setsebool -P httpd_can_network_connect 1
+    elif [[ "${ID}" == "debian" && ${VERSION_ID} -ge 8 ]];then
+        echo -e "${OK} ${GreenBG} 当前系统为 Debian ${VERSION_ID} ${Font} "
+        INS="apt-get"
+    elif [[ "${ID}" == "ubuntu" && `echo "${VERSION_ID}" | cut -d '.' -f1` -ge 16 ]];then
+        echo -e "${OK} ${GreenBG} 当前系统为 Ubuntu ${VERSION_ID} ${Font} "
+        INS="apt-get"
     else
         echo -e "${Error} ${RedBG} 当前系统为 ${ID} ${VERSION_ID} 不在支持的系统列表内，安装中断 ${Font} "
         exit 1
     fi
+
 }
 
 is_root(){
-    if [ `id -u` -eq 0 ]
+    if [ `id -u` == 0 ]
         then echo -e "${OK} ${GreenBG} 当前用户是root用户，进入安装流程 ${Font} "
         sleep 3
     else
@@ -50,8 +57,13 @@ is_root(){
         exit 1
     fi
 }
-time_modify(){
-    apt-get install ntpdate -y
+ntpdate_install(){
+    if [[ "${ID}" == "centos" ]];then
+        yum install ntpdate -y
+    else
+        apt-get update
+        apt-get install ntpdate -y
+    fi
 
     if [[ $? -ne 0 ]];then
         echo -e "${Error} ${RedBG} NTPdate 时间同步服务安装失败，请根据错误提示进行修复 ${Font}"
@@ -60,6 +72,10 @@ time_modify(){
         echo -e "${OK} ${GreenBG} NTPdate 时间同步服务安装成功 ${Font}"
         sleep 1
     fi
+}
+time_modify(){
+
+    ntpdate_install
 
     systemctl stop ntp &>/dev/null
 
@@ -75,9 +91,8 @@ time_modify(){
     fi 
 }
 dependency_install(){
-    apt-get update
-    apt-get install wget curl -y
-    apt-get install net-tools
+    ${INS} install wget curl -y
+    ${INS} install net-tools -y
     if [[ $? -eq 0 ]];then
         echo -e "${OK} ${GreenBG} net-tools 安装完成 ${Font}"
         sleep 1
@@ -85,7 +100,7 @@ dependency_install(){
         echo -e "${Error} ${RedBG} net-tools 安装失败 ${Font}"
         exit 1
     fi
-    apt-get install bc
+    ${INS} install bc -y
     if [[ $? -eq 0 ]];then
         echo -e "${OK} ${GreenBG} bc 安装完成 ${Font}"
         sleep 1
@@ -93,14 +108,30 @@ dependency_install(){
         echo -e "${Error} ${RedBG} bc 安装失败 ${Font}"
         exit 1
     fi
+    ${INS} install unzip -y
+    if [[ $? -eq 0 ]];then
+        echo -e "${OK} ${GreenBG} unzip 安装完成 ${Font}"
+        sleep 1
+    else
+        echo -e "${Error} ${RedBG} unzip 安装失败 ${Font}"
+        exit 1
+    fi
+}
+port_alterid_set(){
+    stty erase '^H' && read -p "请输入连接端口（default:443）:" port
+    [[ -z ${port} ]] && port="443"
+    stty erase '^H' && read -p "请输入alterID（default:64）:" alterID
+    [[ -z ${alterID} ]] && alterID="64"
 }
 modify_port_UUID(){
     let PORT=$RANDOM+10000
     UUID=$(cat /proc/sys/kernel/random/uuid)
     sed -i "/\"port\"/c  \    \"port\":${PORT}," ${v2ray_conf}
     sed -i "/\"id\"/c \\\t  \"id\":\"${UUID}\"," ${v2ray_conf}
+    sed -i "/\"alterId\"/c \\\t  \"alterId\":${alterID}" ${v2ray_conf}
 }
 modify_nginx(){
+    sed -i "/listen/c \\\tlisten ${port} ssl;" ${nginx_conf}
     sed -i "/server_name/c \\\tserver_name ${domain};" ${nginx_conf}
     sed -i "/proxy_pass/c \\\tproxy_pass http://127.0.0.1:${PORT};" ${nginx_conf}
 }
@@ -118,8 +149,6 @@ v2ray_install(){
         bash go.sh --force
         if [[ $? -eq 0 ]];then
             echo -e "${OK} ${GreenBG} V2ray 安装成功 ${Font}"
-            echo -e "${Green} Port: ${PORT} ${Font}"
-            echo -e "${Grenn} UUID: ${UUID} ${Font}"
             sleep 2
         else 
             echo -e "${Error} ${RedBG} V2ray 安装失败，请检查相关依赖是否正确安装 ${Font}"
@@ -131,7 +160,7 @@ v2ray_install(){
     fi
 }
 nginx_install(){
-    apt-get install nginx -y
+    ${INS} install nginx -y
     if [[ -d /etc/nginx ]];then
         echo -e "${OK} ${GreenBG} nginx 安装完成 ${Font}"
         sleep 2
@@ -141,8 +170,11 @@ nginx_install(){
     fi
 }
 ssl_install(){
-   
-    apt-get install socat netcat -y
+    if [[ "${ID}" == "centos" ]];then
+        ${INS} install socat nc -y        
+    else
+        ${INS} install socat netcat -y
+    fi
 
     if [[ $? -eq 0 ]];then
         echo -e "${OK} ${GreenBG} SSL 证书生成脚本依赖安装成功 ${Font}"
@@ -151,6 +183,7 @@ ssl_install(){
         echo -e "${Error} ${RedBG} SSL 证书生成脚本依赖安装失败 ${Font}"
         exit 6
     fi
+
     curl  https://get.acme.sh | sh
 
     if [[ $? -eq 0 ]];then
@@ -189,6 +222,7 @@ domain_check(){
         esac
     fi
 }
+
 port_exist_check(){
     if [[ 0 -eq `netstat -tlpn | grep "$1"| wc -l` ]];then
         echo -e "${OK} ${GreenBG} $1 端口未被占用 ${Font}"
@@ -232,7 +266,7 @@ v2ray_conf_add(){
     "streamSettings":{
       "network":"ws",
       "wsSettings": {
-      "path": "/ray"
+      "path": "/ray/"
       }
     }
   },
@@ -263,7 +297,7 @@ nginx_conf_add(){
         ssl_protocols         TLSv1 TLSv1.1 TLSv1.2;
         ssl_ciphers           HIGH:!aNULL:!MD5;
         server_name           serveraddr.com;
-        location /ray {
+        location /ray/ {
         proxy_redirect off;
         proxy_pass http://127.0.0.1:10000;
         proxy_http_version 1.1;
@@ -305,40 +339,20 @@ start_process_systemd(){
         echo -e "${Error} ${RedBG} V2ray 启动失败 ${Font}"
     fi
 }
-start_process_sysv(){
-    service nginx start
-
-    if [[ $? -eq 0 ]];then
-        echo -e "${OK} ${GreenBG} Nginx 启动成功 ${Font}"
-        sleep 2
-    else
-        echo -e "${Error} ${RedBG} Nginx 启动失败 ${Font}"
-    fi
-
-    service v2ray start
-
-    if [[ $? -eq 0 ]];then
-        echo -e "${OK} ${GreenBG} V2ray 启动成功 ${Font}"
-        sleep 2
-    else
-        echo -e "${Error} ${RedBG} V2ray 启动失败 ${Font}"
-    fi
-
-
-}
 
 show_information(){
     clear
+
     echo -e "${OK} ${Green} V2ray+ws+tls 安装成功 "
     echo -e "${Red} V2ray 配置信息 ${Font}"
     echo -e "${Red} 地址（address）:${Font} ${domain} "
-    echo -e "${Red} 端口（port）：${Font} 443 "
+    echo -e "${Red} 端口（port）：${Font} ${port} "
     echo -e "${Red} 用户id（UUID）：${Font} ${UUID}"
-    echo -e "${Red} 额外id（alterId）：${Font} 64"
+    echo -e "${Red} 额外id（alterId）：${Font} ${alterID}"
     echo -e "${Red} 加密方式（security）：${Font} 自适应 "
     echo -e "${Red} 传输协议（network）：${Font} ws "
     echo -e "${Red} 伪装类型（type）：${Font} none "
-    echo -e "${Red} 伪装域名：${Font} ray "
+    echo -e "${Red} 伪装域名（不要落下/）：${Font} /ray/ "
     echo -e "${Red} 底层传输安全：${Font} tls "
 
     
@@ -348,12 +362,13 @@ show_information(){
 main(){
     check_system
     is_root
-    dependency_install
     time_modify
+    dependency_install
     domain_check
+    port_alterid_set
     v2ray_install
     port_exist_check 80
-    port_exist_check 443
+    port_exist_check ${port}
     ssl_install
     acme
     nginx_install
