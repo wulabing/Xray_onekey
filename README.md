@@ -41,6 +41,7 @@ bash install.sh | tee v2log.txt
 V2.1（stable）
 * 1.修复 Centos7 找不到 Nginx 安装包的问题
 * 2.完善 SElinux 配置过程提醒标识
+
 V2.0（stable）
 * 1.增加 Centos7 系统支持
 * 2.增加 自定义端口 和 自定义alterID
