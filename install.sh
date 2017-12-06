@@ -4,7 +4,7 @@
 #	System Request:Debian 7+/Ubuntu 14.04+/Centos 6+
 #	Author:	wulabing
 #	Dscription: V2ray ws+tls onekey 
-#	Version: 1.0
+#	Version: 2.1
 #	Blog: https://www.wulabing.com
 #	Official document: www.v2ray.com
 #====================================================
@@ -34,9 +34,11 @@ check_system(){
     if [[ "${ID}" == "centos" && ${VERSION_ID} -ge 7 ]];then
         echo -e "${OK} ${GreenBG} 当前系统为 Centos ${VERSION_ID} ${Font} "
         INS="yum"
-        echo -e "${OK} ${GreenBG} SElinux 设置中 ${Font} "
+        echo -e "${OK} ${GreenBG} SElinux 设置中，请耐心等待，不要进行其他操作${Font} "
         setsebool -P httpd_can_network_connect 1
         echo -e "${OK} ${GreenBG} SElinux 设置完成 ${Font} "
+        rpm -ivh http://nginx.org/packages/centos/7/noarch/RPMS/nginx-release-centos-7-0.el7.ngx.noarch.rpm
+        echo -e "${OK} ${GreenBG} Nginx rpm源 安装完成 ${Font}"
     elif [[ "${ID}" == "debian" && ${VERSION_ID} -ge 8 ]];then
         echo -e "${OK} ${GreenBG} 当前系统为 Debian ${VERSION_ID} ${Font} "
         INS="apt-get"
@@ -236,7 +238,7 @@ port_exist_check(){
     fi
 }
 acme(){
-    ~/.acme.sh/acme.sh --issue -d ${domain} --standalone -k ec-256
+    ~/.acme.sh/acme.sh --issue -d ${domain} --standalone -k ec-256 --force
     if [[ $? -eq 0 ]];then
         echo -e "${OK} ${GreenBG} SSL 证书生成成功 ${Font}"
         sleep 2
@@ -362,8 +364,8 @@ show_information(){
 }
 
 main(){
-    check_system
     is_root
+    check_system
     time_modify
     dependency_install
     domain_check
