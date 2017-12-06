@@ -4,7 +4,7 @@
 #	System Request:Debian 7+/Ubuntu 14.04+/Centos 6+
 #	Author:	wulabing
 #	Dscription: V2ray ws+tls onekey 
-#	Version: 2.0
+#	Version: 1.0
 #	Blog: https://www.wulabing.com
 #	Official document: www.v2ray.com
 #====================================================
@@ -34,7 +34,9 @@ check_system(){
     if [[ "${ID}" == "centos" && ${VERSION_ID} -ge 7 ]];then
         echo -e "${OK} ${GreenBG} 当前系统为 Centos ${VERSION_ID} ${Font} "
         INS="yum"
+        echo -e "${OK} ${GreenBG} SElinux 设置中 ${Font} "
         setsebool -P httpd_can_network_connect 1
+        echo -e "${OK} ${GreenBG} SElinux 设置完成 ${Font} "
     elif [[ "${ID}" == "debian" && ${VERSION_ID} -ge 8 ]];then
         echo -e "${OK} ${GreenBG} 当前系统为 Debian ${VERSION_ID} ${Font} "
         INS="apt-get"
