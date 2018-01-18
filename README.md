@@ -1,4 +1,4 @@
-# V2Ray vmess+ws+tls 一键安装脚本
+# V2Ray 基于 Nginx 的 vmess+ws+tls 一键安装脚本
 
 * V2Ray是一个优秀的开源网络代理工具，可以帮助你畅爽体验互联网，目前已经全平台支持Windows、Mac、Android、IOS、Linux等操作系统的使用。
 
