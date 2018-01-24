@@ -13,7 +13,7 @@
 * Centos 系统用户请预先在防火墙中放行程序相关端口（默认：80，443）
 ## 准备工作
 * 准备一个域名，并将A记录添加好。
-* 阅读[V2ray官方说明](https://www.v2ray.com/)，了解 TLS WebSocket 及 V2ray 相关信息
+* [V2ray官方说明](https://www.v2ray.com/)，了解 TLS WebSocket 及 V2ray 相关信息
 * 安装好 git
 ## 安装方式
 ```
@@ -23,6 +23,13 @@ cd temp
 
 bash install.sh | tee v2log.txt
 ```
+## 更新方式
+执行：
+`bash <(curl -L -s https://install.direct/go.sh)`
+（ 参考 ：[V2ray官方说明](https://www.v2ray.com/chapter_00/install.html)
+* 如果为最新版本，会输出提示并停止安装。否则会自动更新
+* 未来会将相关内容集成到本脚本中并进行交互式操作更新
+
 ### 测试说明
 * 该测试为 V2.0 版本在 Vultr 测试机使用官方模板进行的测试
 * 理论上支持所有具备 Systemd 特性的开发版系统
