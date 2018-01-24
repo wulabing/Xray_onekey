@@ -26,7 +26,8 @@ bash install.sh | tee v2log.txt
 ## 更新方式
 执行：
 `bash <(curl -L -s https://install.direct/go.sh)`
-（ 参考 ：[V2ray官方说明](https://www.v2ray.com/chapter_00/install.html)
+
+（ 来源参考 ：[V2ray官方说明](https://www.v2ray.com/chapter_00/install.html)）
 * 如果为最新版本，会输出提示并停止安装。否则会自动更新
 * 未来会将相关内容集成到本脚本中并进行交互式操作更新
 
