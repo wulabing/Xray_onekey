@@ -243,7 +243,7 @@ domain_check(){
 }
 
 port_exist_check(){
-    if [[ 0 -eq `netstat -tlpn | grep "$1"| wc -l` ]];then
+    if [[ 0 -eq `netstat -lntuap | grep "$1"| wc -l` ]];then
         echo -e "${OK} ${GreenBG} $1 端口未被占用 ${Font}"
         sleep 1
     else
