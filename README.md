@@ -56,6 +56,7 @@ bash install.sh | tee v2log.txt
 ## 2018-01-27
 v2.1.1(stable）
 * 1.修复 部分机型因缺乏 crontab （计划任务）依赖导致的安装失败问题
+* 2.完善 端口占用 判断
 ## 2017-12-06
 V2.1（stable）
 * 1.修复 Centos7 找不到 Nginx 安装包的问题
