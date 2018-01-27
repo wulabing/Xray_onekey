@@ -23,6 +23,14 @@ cd temp
 
 bash install.sh | tee v2log.txt
 ```
+## 启动方式
+
+启动 V2ray：`systemctl start nginx`
+
+启动 Nginx：`systemctl start v2ray`
+
+（其他的应该不用我多说了吧 嘿嘿嘿）
+
 ## 更新方式
 执行：
 `bash <(curl -L -s https://install.direct/go.sh)`
@@ -45,6 +53,9 @@ bash install.sh | tee v2log.txt
 ### 问题反馈
 * 请携带 v2log.txt 文件内容进行反馈
 ### 更新说明
+## 2018-01-27
+v2.1.1(stable）
+* 1.修复 部分机型因缺乏 crontab （计划任务）依赖导致的安装失败问题
 ## 2017-12-06
 V2.1（stable）
 * 1.修复 Centos7 找不到 Nginx 安装包的问题
