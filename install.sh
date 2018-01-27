@@ -96,6 +96,21 @@ time_modify(){
 }
 dependency_install(){
     ${INS} install wget curl -y
+
+    if [[ "${ID}" == "centos" ]];then
+        yum -y install crontabs
+    else
+        apt-get install cron
+    fi
+
+    if [[ $? -eq 0 ]];then
+        echo -e "${OK} ${GreenBG} crontab 安装完成 ${Font}"
+        sleep 1
+    else
+        echo -e "${Error} ${RedBG} crontab 安装失败 ${Font}"
+        exit 1
+    fi
+
     ${INS} install net-tools -y
     if [[ $? -eq 0 ]];then
         echo -e "${OK} ${GreenBG} net-tools 安装完成 ${Font}"
