@@ -25,9 +25,9 @@ bash install.sh | tee v2log.txt
 ```
 ## 启动方式
 
-启动 V2ray：`systemctl start nginx`
+启动 V2ray：`systemctl start v2ray`
 
-启动 Nginx：`systemctl start v2ray`
+启动 Nginx：`systemctl start nginx`
 
 （其他的应该不用我多说了吧 嘿嘿嘿）
 
