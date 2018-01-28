@@ -95,7 +95,7 @@ time_modify(){
     fi 
 }
 dependency_install(){
-    ${INS} install wget curl -y
+    ${INS} install wget curl lsof -y
 
     if [[ "${ID}" == "centos" ]];then
         yum -y install crontabs
