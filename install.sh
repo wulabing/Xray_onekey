@@ -223,7 +223,7 @@ domain_check(){
     ##local_ip=`ifconfig -a|grep inet|grep -v 127.0.0.1|grep -v inet6 | awk '{print $2}' | tr -d "addr:"`
     ##local_ip=`curl ip.sb`
     echo -e "${OK} ${GreenBG} 正在获取 公网ip 信息，请耐心等待 ${Font}"
-    local_ip=`curl ifconfig.me`
+    local_ip=`curl -4 ip.sb`
     echo -e "域名dns解析IP：${domain_ip}"
     echo -e "本机IP: ${local_ip}"
     sleep 2
