@@ -221,7 +221,7 @@ domain_check(){
     ## [[ -z ${broadcast} ]] && broadcast="eth0"
     domain_ip=`ping ${domain} -c 1 | sed '1{s/[^(]*(//;s/).*//;q}'`
     ##local_ip=`ifconfig -a|grep inet|grep -v 127.0.0.1|grep -v inet6 | awk '{print $2}' | tr -d "addr:"`
-    local_ip=`curl ip.sb`
+    local_ip=`curl ifconfig.me`
     echo -e "域名dns解析IP：${domain_ip}"
     echo -e "本机IP: ${local_ip}"
     sleep 2
