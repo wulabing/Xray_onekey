@@ -17,11 +17,7 @@
 * 安装好 git
 ## 安装方式
 ```
-git clone https://github.com/wulabing/V2Ray_ws-tls_bash_onekey.git temp
-
-cd temp
-
-bash install.sh | tee v2log.txt
+git clone https://github.com/wulabing/V2Ray_ws-tls_bash_onekey.git temp && cd temp && bash install.sh | tee v2log.txt
 ```
 ## 启动方式
 
