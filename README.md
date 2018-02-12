@@ -4,6 +4,18 @@
 
 ## 本脚本目前支持 Centos7 + / Debian 8+ / Ubuntu 16.04+ 
 
+* 本脚本默认安装最新版本的V2ray core
+* 本脚本的第一批用户安装的内核为 V2ray core 3.7 版本
+* V2ray core 3.8 修复了一个导致 mKCP 初始速度慢的问题。
+
+## V2ray core 更新方式
+执行：
+`bash <(curl -L -s https://install.direct/go.sh)`
+
+（ 来源参考 ：[V2ray官方说明](https://www.v2ray.com/chapter_00/install.html)）
+* 如果为最新版本，会输出提示并停止安装。否则会自动更新
+* 未来会将相关内容集成到本脚本中并进行交互式操作更新
+
 ## 注意事项
 * 推荐在纯净环境下使用本脚本，如果你是新手，请不要使用Centos系统。
 * 在尝试本脚本确实可用之前，请不要将本程序应用于生产环境中。
@@ -27,13 +39,6 @@ git clone https://github.com/wulabing/V2Ray_ws-tls_bash_onekey.git temp && cd te
 
 （其他的应该不用我多说了吧 嘿嘿嘿）
 
-## 更新方式
-执行：
-`bash <(curl -L -s https://install.direct/go.sh)`
-
-（ 来源参考 ：[V2ray官方说明](https://www.v2ray.com/chapter_00/install.html)）
-* 如果为最新版本，会输出提示并停止安装。否则会自动更新
-* 未来会将相关内容集成到本脚本中并进行交互式操作更新
 
 ### 测试说明
 * 该测试为 V2.0 版本在 Vultr 测试机使用官方模板进行的测试
