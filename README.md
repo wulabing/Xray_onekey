@@ -7,6 +7,7 @@
 * 本脚本默认安装最新版本的V2ray core
 * 本脚本的第一批用户安装的内核为 V2ray core 3.7 版本
 * V2ray core 3.8 修复了一个导致 mKCP 初始速度慢的问题。
+* V2ray core 目前最新版本为 3.10
 
 ## V2ray core 更新方式
 执行：
