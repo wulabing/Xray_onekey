@@ -250,9 +250,13 @@ port_exist_check(){
         echo -e "${OK} ${GreenBG} $1 端口未被占用 ${Font}"
         sleep 1
     else
-        echo -e "${Error} ${RedBG} $1 端口被占用，请检查占用进程 结束后重新运行脚本 ${Font}"
-        netstat -tlpn | grep "$1"
-        exit 1
+        echo -e "${Error} ${RedBG} 检测到 $1 端口被占用，以下为 $1 端口占用信息 ${Font}"
+        lsof -i:"$1"
+        echo -e "${OK} ${GreenBG} 5s 后将尝试自动 kill 占用进程 ${Font}"
+        sleep 5
+        lsof -i:"$1" | awk '{print $2}'| grep -v "PID" | xargs kill -9
+        echo -e "${OK} ${GreenBG} kill 完成 ${Font}"
+        sleep 1
     fi
 }
 acme(){
