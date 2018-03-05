@@ -58,6 +58,10 @@ git clone https://github.com/wulabing/V2Ray_ws-tls_bash_onekey.git temp && cd te
 ### 更新说明
 ## 2018-02-04
 V2.1.1(stable)
+* 1.变更 检测到端口占用后，尝试自动kill相关进程
+* 2.尝试修复 GCE 默认纯净模板80端口占用问题（等待更多反馈）
+## 2018-02-04
+V2.1.1(stable)
 * 1.变更 local_ip 判断方式，从 本地网卡获取 变更至 命令获取 公网IP。
 * 1.修复 域名dns解析IP 与 本机IP 不匹配 误报问题
 ## 2018-01-28
