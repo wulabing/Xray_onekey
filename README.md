@@ -56,7 +56,7 @@ git clone https://github.com/wulabing/V2Ray_ws-tls_bash_onekey.git temp && cd te
 ### 问题反馈
 * 请携带 v2log.txt 文件内容进行反馈
 ### 更新说明
-## 2018-02-04
+## 2018-03-05
 V2.1.1(stable)
 * 1.变更 检测到端口占用后，尝试自动kill相关进程
 * 2.尝试修复 GCE 默认纯净模板80端口占用问题（等待更多反馈）
