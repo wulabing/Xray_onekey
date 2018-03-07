@@ -1,6 +1,7 @@
-# V2Ray 基于 Nginx 的 vmess+ws+tls 一键安装脚本
+# V2Ray 基于 Nginx 的 vmess+ws+tls 一键安装脚本 （Use Path）
 
 * V2Ray是一个优秀的开源网络代理工具，可以帮助你畅爽体验互联网，目前已经全平台支持Windows、Mac、Android、IOS、Linux等操作系统的使用。
+* 本脚本的另一个分支版本（Use Host）地址： https://github.com/dylanbai8/V2Ray_ws-tls_Website_onekey 请根据需求进行选择， 感谢作者 dylanbai8 的改进与维护
 ## 本脚本为一键完全配置脚本，在所有流程正常运行完毕后，直接按照输出结果设置客户端即可使用
 ## 请注意：我们依然强烈建议你全方面的了解整个程序的工作流程及原理
 ## 目前支持 Centos7 + / Debian 8+ / Ubuntu 16.04+ 
@@ -30,7 +31,7 @@
 * 安装好 git
 ## 安装方式
 ```
-git clone https://github.com/wulabing/V2Ray_ws-tls_bash_onekey.git temp && cd temp && bash install.sh | tee v2log.txt
+git clone https://github.com/wulabing/V2Ray_ws-tls_bash_onekey.git temp && cd temp && bash install.sh | tee v2ray_ins.log
 ```
 ## 启动方式
 
@@ -53,7 +54,7 @@ git clone https://github.com/wulabing/V2Ray_ws-tls_bash_onekey.git temp && cd te
 |4|PASS|Ubuntu 16.04|
 |5|PASS|Ubuntu 17.04|
 ### 问题反馈
-* 请携带 v2log.txt 文件内容进行反馈
+* 请携带 v2ray_ins.log 文件内容进行反馈
 ### 更新说明
 ## 2018-03-05
 V2.1.1(stable)
