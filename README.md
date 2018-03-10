@@ -2,14 +2,15 @@
 
 * V2Ray是一个优秀的开源网络代理工具，可以帮助你畅爽体验互联网，目前已经全平台支持Windows、Mac、Android、IOS、Linux等操作系统的使用。
 * 本脚本的另一个分支版本（Use Host）地址： https://github.com/dylanbai8/V2Ray_ws-tls_Website_onekey 请根据需求进行选择， 感谢作者 dylanbai8 的改进与维护
-## 本脚本为一键完全配置脚本，在所有流程正常运行完毕后，直接按照输出结果设置客户端即可使用
-## 请注意：我们依然强烈建议你全方面的了解整个程序的工作流程及原理
+* 本脚本为一键完全配置脚本，在所有流程正常运行完毕后，直接按照输出结果设置客户端即可使用
+* 请注意：我们依然强烈建议你全方面的了解整个程序的工作流程及原理
 ## 目前支持 Centos7 + / Debian 8+ / Ubuntu 16.04+ 
 ## 请用户根据该文档及时更新 V2ray core，否则有可能会出现 客户端无法连接到服务端 的情况
 * 本脚本默认安装最新版本的V2ray core
 * 本脚本的第一批用户安装的内核为 V2ray core 3.6 版本，请该内核版本的用户，根据下文及时更新内核版本。
-* V2ray core 目前最新版本为 3.12
-
+* V2ray core 目前最新版本为 3.13
+* 由于新版本增加了 web 伪装，因此强烈建议使用默认的443端口作为连接端口
+* **感谢作者 dunizb 的自用 开源 html 计算器源码 项目地址 https://github.com/dunizb/sCalc**
 ## V2ray core 更新方式
 执行：
 `bash <(curl -L -s https://install.direct/go.sh)`
@@ -43,19 +44,16 @@ git clone https://github.com/wulabing/V2Ray_ws-tls_bash_onekey.git temp && cd te
 
 
 ### 测试说明
-* 该测试为 V2.0 版本在 Vultr 测试机使用官方模板进行的测试
-* 理论上支持所有具备 Systemd 特性的开发版系统
-
-| NO | Status| Platform|
-|----|-------|---------|
-|1|PASS|Centos 7|
-|2|PASS|Debian 8|
-|3|PASS|Debian 9|
-|4|PASS|Ubuntu 16.04|
-|5|PASS|Ubuntu 17.04|
+* V3.0 版本仅在 Debian 8 上进行过测试，目前需要收集更多的测试数据
 ### 问题反馈
 * 请携带 v2ray_ins.log 文件内容进行反馈
 ### 更新说明
+## 2018-03-10
+V3.0(beta)
+* 1.部分功能进行代码重构
+* 2.添加了 301 重定向，即 http 强制跳转 https 
+* 3.添加了 页面伪装（一个计算器程序）
+* 4.伪装path 从原来的/ray/ 变为 随机生成
 ## 2018-03-05
 V2.1.1(stable)
 * 1.变更 检测到端口占用后，尝试自动kill相关进程
