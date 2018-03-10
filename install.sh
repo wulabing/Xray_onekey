@@ -4,7 +4,7 @@
 #	System Request:Debian 7+/Ubuntu 14.04+/Centos 6+
 #	Author:	wulabing
 #	Dscription: V2ray ws+tls onekey 
-#	Version: 2.1
+#	Version: 3.0
 #	Blog: https://www.wulabing.com
 #	Official document: www.v2ray.com
 #====================================================
@@ -27,6 +27,9 @@ nginx_conf_dir="/etc/nginx/conf.d"
 v2ray_conf="${v2ray_conf_dir}/config.json"
 nginx_conf="${nginx_conf_dir}/v2ray.conf"
 
+#生成伪装路径
+camouflage=`cat /dev/urandom | head -n 10 | md5sum | head -c 8`
+
 source /etc/os-release
 
 check_system(){
@@ -37,14 +40,15 @@ check_system(){
         echo -e "${OK} ${GreenBG} SElinux 设置中，请耐心等待，不要进行其他操作${Font} "
         setsebool -P httpd_can_network_connect 1
         echo -e "${OK} ${GreenBG} SElinux 设置完成 ${Font} "
+        ## Centos 也可以通过添加 epel 仓库来安装，目前不做改动
         rpm -ivh http://nginx.org/packages/centos/7/noarch/RPMS/nginx-release-centos-7-0.el7.ngx.noarch.rpm
-        echo -e "${OK} ${GreenBG} Nginx rpm源 安装完成 ${Font}"
+        echo -e "${OK} ${GreenBG} Nginx rpm源 安装完成 ${Font}" 
     elif [[ "${ID}" == "debian" && ${VERSION_ID} -ge 8 ]];then
         echo -e "${OK} ${GreenBG} 当前系统为 Debian ${VERSION_ID} ${Font} "
-        INS="apt-get"
+        INS="apt"
     elif [[ "${ID}" == "ubuntu" && `echo "${VERSION_ID}" | cut -d '.' -f1` -ge 16 ]];then
         echo -e "${OK} ${GreenBG} 当前系统为 Ubuntu ${VERSION_ID} ${Font} "
-        INS="apt-get"
+        INS="apt"
     else
         echo -e "${Error} ${RedBG} 当前系统为 ${ID} ${VERSION_ID} 不在支持的系统列表内，安装中断 ${Font} "
         exit 1
@@ -61,21 +65,23 @@ is_root(){
         exit 1
     fi
 }
+judge(){
+    if [[ $? -eq 0 ]];then
+        echo -e "${OK} ${GreenBG} $1 完成 ${Font}"
+        sleep 1
+    else
+        echo -e "${Error} ${RedBG} $1 失败${Font}"
+        exit 1
+    fi
+}
 ntpdate_install(){
     if [[ "${ID}" == "centos" ]];then
-        yum install ntpdate -y
+        ${INS} install ntpdate -y
     else
-        apt-get update
-        apt-get install ntpdate -y
+        ${INS} update
+        ${INS} install ntpdate -y
     fi
-
-    if [[ $? -ne 0 ]];then
-        echo -e "${Error} ${RedBG} NTPdate 时间同步服务安装失败，请根据错误提示进行修复 ${Font}"
-        exit 2
-    else
-        echo -e "${OK} ${GreenBG} NTPdate 时间同步服务安装成功 ${Font}"
-        sleep 1
-    fi
+    judge "安装 NTPdate 时间同步服务 "
 }
 time_modify(){
 
@@ -98,43 +104,20 @@ dependency_install(){
     ${INS} install wget curl lsof -y
 
     if [[ "${ID}" == "centos" ]];then
-        yum -y install crontabs
+       ${INS} -y install crontabs
     else
-        apt-get install cron
+        ${INS} install cron
     fi
-
-    if [[ $? -eq 0 ]];then
-        echo -e "${OK} ${GreenBG} crontab 安装完成 ${Font}"
-        sleep 1
-    else
-        echo -e "${Error} ${RedBG} crontab 安装失败 ${Font}"
-        exit 1
-    fi
+    judge "安装 crontab"
 
     ${INS} install net-tools -y
-    if [[ $? -eq 0 ]];then
-        echo -e "${OK} ${GreenBG} net-tools 安装完成 ${Font}"
-        sleep 1
-    else
-        echo -e "${Error} ${RedBG} net-tools 安装失败 ${Font}"
-        exit 1
-    fi
+    judge "安装 net-tools"
+
     ${INS} install bc -y
-    if [[ $? -eq 0 ]];then
-        echo -e "${OK} ${GreenBG} bc 安装完成 ${Font}"
-        sleep 1
-    else
-        echo -e "${Error} ${RedBG} bc 安装失败 ${Font}"
-        exit 1
-    fi
+    judge "安装 bc"
+
     ${INS} install unzip -y
-    if [[ $? -eq 0 ]];then
-        echo -e "${OK} ${GreenBG} unzip 安装完成 ${Font}"
-        sleep 1
-    else
-        echo -e "${Error} ${RedBG} unzip 安装失败 ${Font}"
-        exit 1
-    fi
+    judge "安装 unzip"
 }
 port_alterid_set(){
     stty erase '^H' && read -p "请输入连接端口（default:443）:" port
@@ -148,11 +131,21 @@ modify_port_UUID(){
     sed -i "/\"port\"/c  \    \"port\":${PORT}," ${v2ray_conf}
     sed -i "/\"id\"/c \\\t  \"id\":\"${UUID}\"," ${v2ray_conf}
     sed -i "/\"alterId\"/c \\\t  \"alterId\":${alterID}" ${v2ray_conf}
+    sed -i "/\"path\"/c \\\t  \"path\":\"\/${camouflage}\/\"" ${v2ray_conf}
 }
 modify_nginx(){
-    sed -i "/listen/c \\\tlisten ${port} ssl;" ${nginx_conf}
+    ## sed 部分地方 适应新配置修正
+    sed -i "1,/listen/{s/listen 443 ssl;/listen ${port} ssl;/}" ${v2ray_conf}
     sed -i "/server_name/c \\\tserver_name ${domain};" ${nginx_conf}
+    sed -i "/location/c \\\tlocation \/${camouflage}\/" ${nginx_conf}
     sed -i "/proxy_pass/c \\\tproxy_pass http://127.0.0.1:${PORT};" ${nginx_conf}
+    sed -i "/return/c \\\treturn 301 https://${domain}\$request_uri;" ${nginx_conf}
+}
+web_camouflage(){
+    ##请注意 这里和LNMP脚本的默认路径冲突，千万不要在安装了LNMP的环境下使用本脚本，否则后果自负
+    rm -rf /home/wwwroot && mkdir -p /home/wwwroot && cd /home/wwwroot
+    git clone https://github.com/wulabing/sCalc.git
+    judge "web 站点伪装"   
 }
 v2ray_install(){
     if [[ -d /root/v2ray ]];then
@@ -166,13 +159,7 @@ v2ray_install(){
     
     if [[ -f go.sh ]];then
         bash go.sh --force
-        if [[ $? -eq 0 ]];then
-            echo -e "${OK} ${GreenBG} V2ray 安装成功 ${Font}"
-            sleep 2
-        else 
-            echo -e "${Error} ${RedBG} V2ray 安装失败，请检查相关依赖是否正确安装 ${Font}"
-            exit 3
-        fi
+        judge "安装 V2ray"
     else
         echo -e "${Error} ${RedBG} V2ray 安装文件下载失败，请检查下载地址是否可用 ${Font}"
         exit 4
@@ -194,34 +181,15 @@ ssl_install(){
     else
         ${INS} install socat netcat -y
     fi
-
-    if [[ $? -eq 0 ]];then
-        echo -e "${OK} ${GreenBG} SSL 证书生成脚本依赖安装成功 ${Font}"
-        sleep 2
-    else
-        echo -e "${Error} ${RedBG} SSL 证书生成脚本依赖安装失败 ${Font}"
-        exit 6
-    fi
+    judge "安装 SSL 证书生成脚本依赖"
 
     curl  https://get.acme.sh | sh
-
-    if [[ $? -eq 0 ]];then
-        echo -e "${OK} ${GreenBG} SSL 证书生成脚本安装成功 ${Font}"
-        sleep 2
-    else
-        echo -e "${Error} ${RedBG} SSL 证书生成脚本安装失败，请检查相关依赖是否正常安装 ${Font}"
-        exit 7
-    fi
+    judge "安装 SSL 证书生成脚本"
 
 }
 domain_check(){
     stty erase '^H' && read -p "请输入你的域名信息(eg:www.wulabing.com):" domain
-    ## ifconfig
-    ## stty erase '^H' && read -p "请输入公网 IP 所在网卡名称(default:eth0):" broadcast
-    ## [[ -z ${broadcast} ]] && broadcast="eth0"
     domain_ip=`ping ${domain} -c 1 | sed '1{s/[^(]*(//;s/).*//;q}'`
-    ##local_ip=`ifconfig -a|grep inet|grep -v 127.0.0.1|grep -v inet6 | awk '{print $2}' | tr -d "addr:"`
-    ##local_ip=`curl ip.sb`
     echo -e "${OK} ${GreenBG} 正在获取 公网ip 信息，请耐心等待 ${Font}"
     local_ip=`curl -4 ip.sb`
     echo -e "域名dns解析IP：${domain_ip}"
@@ -304,26 +272,23 @@ v2ray_conf_add(){
 EOF
 
 modify_port_UUID
-    if [[ $? -eq 0 ]];then
-        echo -e "${OK} ${GreenBG} V2ray 配置修改成功 ${Font}"
-        sleep 2
-    else
-        echo -e "${Error} ${RedBG} V2ray 配置修改失败 ${Font}"
-        exit 6
-    fi
+judge "V2ray 配置修改"
 }
 nginx_conf_add(){
     touch ${nginx_conf_dir}/v2ray.conf
     cat>${nginx_conf_dir}/v2ray.conf<<EOF
     server {
-        listen  443 ssl;
+        listen 443 ssl;
         ssl on;
         ssl_certificate       /etc/v2ray/v2ray.crt;
         ssl_certificate_key   /etc/v2ray/v2ray.key;
         ssl_protocols         TLSv1 TLSv1.1 TLSv1.2;
         ssl_ciphers           HIGH:!aNULL:!MD5;
         server_name           serveraddr.com;
-        location /ray/ {
+        index index.html index.htm;
+        root  /home/wwwroot/sCalc;    
+        location /ray/ 
+        {
         proxy_redirect off;
         proxy_pass http://127.0.0.1:10000;
         proxy_http_version 1.1;
@@ -332,38 +297,26 @@ nginx_conf_add(){
         proxy_set_header Host \$http_host;
         }
 }
+    server {
+        listen 80;
+        server_name serveraddr.com;
+        return 301 https://use.shadowsocksr.win\$request_uri;
+    }
 EOF
 
 modify_nginx
-if [[ $? -eq 0 ]];then
-    echo -e "${OK} ${GreenBG} Nginx 配置修改成功 ${Font}"
-    sleep 2
-else
-    echo -e "${Error} ${RedBG} Nginx 配置修改失败 ${Font}"
-    exit 6
-fi
+judge "Nginx 配置修改"
 
 }
 
 start_process_systemd(){
     ### nginx服务在安装完成后会自动启动。需要通过restart或reload重新加载配置
     systemctl restart nginx 
+    judge "Nginx 启动"
 
-    if [[ $? -eq 0 ]];then
-        echo -e "${OK} ${GreenBG} Nginx 启动成功 ${Font}"
-        sleep 2
-    else
-        echo -e "${Error} ${RedBG} Nginx 启动失败 ${Font}"
-    fi
 
     systemctl start v2ray
-
-    if [[ $? -eq 0 ]];then
-        echo -e "${OK} ${GreenBG} V2ray 启动成功 ${Font}"
-        sleep 2
-    else
-        echo -e "${Error} ${RedBG} V2ray 启动失败 ${Font}"
-    fi
+    judge "V2ray 启动"
 }
 
 show_information(){
@@ -378,7 +331,7 @@ show_information(){
     echo -e "${Red} 加密方式（security）：${Font} 自适应 "
     echo -e "${Red} 传输协议（network）：${Font} ws "
     echo -e "${Red} 伪装类型（type）：${Font} none "
-    echo -e "${Red} 伪装域名（不要落下/）：${Font} /ray/ "
+    echo -e "${Red} 伪装域名（不要落下/）：${Font} /${camouflage}/ "
     echo -e "${Red} 底层传输安全：${Font} tls "
 
     
@@ -400,6 +353,7 @@ main(){
     nginx_install
     v2ray_conf_add
     nginx_conf_add
+    web_camouflage
     show_information
     start_process_systemd
 }
