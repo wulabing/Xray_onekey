@@ -50,6 +50,9 @@ git clone https://github.com/wulabing/V2Ray_ws-tls_bash_onekey.git temp && cd te
 ### 问题反馈
 * 请携带 v2ray_ins.log 文件内容进行反馈
 ### 更新说明
+## 2018-03-18
+V3.0(Stable)
+* 1.修复 Path 分流时访问特定的伪装 Path 时出现的 Bad Request 问题 （统一为404 Not Found）
 ## 2018-03-10
 V3.0(beta)
 * 1.部分功能进行代码重构
