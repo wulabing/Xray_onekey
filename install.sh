@@ -140,7 +140,7 @@ modify_nginx(){
     sed -i "/location/c \\\tlocation \/${camouflage}\/" ${nginx_conf}
     sed -i "/proxy_pass/c \\\tproxy_pass http://127.0.0.1:${PORT};" ${nginx_conf}
     sed -i "/return/c \\\treturn 301 https://${domain}\$request_uri;" ${nginx_conf}
-    sed -i "/keepalive_timeout/i \\tproxy_intercept_errors on;" /etc/nginx/nginx.conf
+    sed -i "/keepalive_timeout/i \\\tproxy_intercept_errors on;" /etc/nginx/nginx.conf
 }
 web_camouflage(){
     ##请注意 这里和LNMP脚本的默认路径冲突，千万不要在安装了LNMP的环境下使用本脚本，否则后果自负
