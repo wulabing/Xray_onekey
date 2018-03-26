@@ -32,30 +32,43 @@ camouflage=`cat /dev/urandom | head -n 10 | md5sum | head -c 8`
 
 source /etc/os-release
 
+#从VERSION中提取发行版系统的英文名称，为了在debian/ubuntu下添加相对应的Nginx apt源
+VERSION=`echo ${VERSION} | awk -F "[()]" '{print $2}'`
+
 check_system(){
     
     if [[ "${ID}" == "centos" && ${VERSION_ID} -ge 7 ]];then
-        echo -e "${OK} ${GreenBG} 当前系统为 Centos ${VERSION_ID} ${Font} "
+        echo -e "${OK} ${GreenBG} 当前系统为 Centos ${VERSION_ID} ${VERSION} ${Font} "
         INS="yum"
         echo -e "${OK} ${GreenBG} SElinux 设置中，请耐心等待，不要进行其他操作${Font} "
         setsebool -P httpd_can_network_connect 1
         echo -e "${OK} ${GreenBG} SElinux 设置完成 ${Font} "
         ## Centos 也可以通过添加 epel 仓库来安装，目前不做改动
-        rpm -ivh http://nginx.org/packages/centos/7/noarch/RPMS/nginx-release-centos-7-0.el7.ngx.noarch.rpm
-        echo -e "${OK} ${GreenBG} Nginx rpm源 安装完成 ${Font}" 
+        ## 已改为 epel 安装
+        yum -y install epel-release
+        echo -e "${OK} ${GreenBG} epel 源 安装完成 ${Font}" 
     elif [[ "${ID}" == "debian" && ${VERSION_ID} -ge 8 ]];then
-        echo -e "${OK} ${GreenBG} 当前系统为 Debian ${VERSION_ID} ${Font} "
+        echo -e "${OK} ${GreenBG} 当前系统为 Debian ${VERSION_ID} ${VERSION} ${Font} "
         INS="apt"
+        ## 添加 Nginx apt源
+        echo "deb http://nginx.org/packages/debian/ ${VERSION} nginx" >> /etc/apt/sources.list
+        echo "deb-src http://nginx.org/packages/debian/ ${VERSION} nginx" >> /etc/apt/sources.list
+        wget -nc https://nginx.org/keys/nginx_signing.key
+        apt-key add nginx_signing.key
     elif [[ "${ID}" == "ubuntu" && `echo "${VERSION_ID}" | cut -d '.' -f1` -ge 16 ]];then
-        echo -e "${OK} ${GreenBG} 当前系统为 Ubuntu ${VERSION_ID} ${Font} "
+        echo -e "${OK} ${GreenBG} 当前系统为 Ubuntu ${VERSION_ID} ${VERSION} ${Font} "
         INS="apt"
+        ## 添加 Nginx apt源
+        echo "deb http://nginx.org/packages/debian/ ${VERSION} nginx" >> /etc/apt/sources.list
+        echo "deb-src http://nginx.org/packages/debian/ ${VERSION} nginx" >> /etc/apt/sources.list
+        wget -nc https://nginx.org/keys/nginx_signing.key
+        apt-key add nginx_signing.key
     else
         echo -e "${Error} ${RedBG} 当前系统为 ${ID} ${VERSION_ID} 不在支持的系统列表内，安装中断 ${Font} "
         exit 1
     fi
 
 }
-
 is_root(){
     if [ `id -u` == 0 ]
         then echo -e "${OK} ${GreenBG} 当前用户是root用户，进入安装流程 ${Font} "
@@ -110,8 +123,9 @@ dependency_install(){
     fi
     judge "安装 crontab"
 
-    ${INS} install net-tools -y
-    judge "安装 net-tools"
+    # 新版的IP判定不需要使用net-tools
+    # ${INS} install net-tools -y
+    # judge "安装 net-tools"
 
     ${INS} install bc -y
     judge "安装 bc"
@@ -313,7 +327,7 @@ judge "Nginx 配置修改"
 
 start_process_systemd(){
     ### nginx服务在安装完成后会自动启动。需要通过restart或reload重新加载配置
-    systemctl restart nginx 
+    systemctl start nginx 
     judge "Nginx 启动"
 
 
@@ -350,12 +364,19 @@ main(){
     v2ray_install
     port_exist_check 80
     port_exist_check ${port}
-    ssl_install
-    acme
     nginx_install
     v2ray_conf_add
     nginx_conf_add
     web_camouflage
+
+    #改变证书安装位置，防止端口冲突关闭相关应用
+    systemctl stop nginx
+    systemctl stop v2ray
+    
+    #将证书生成放在最后，尽量避免多次尝试脚本从而造成的多次证书申请
+    ssl_install
+    acme
+
     show_information
     start_process_systemd
 }
