@@ -11,7 +11,7 @@
 ## 如果你选择使用 V2ray，强烈建议你关闭并删除所有的 shadowsocksR 服务端，仅使用标准的 V2ray 三件套（原因请查看 Wiki ）
 * 本脚本默认安装最新版本的V2ray core
 * 本脚本的第一批用户安装的内核为 V2ray core 3.6 版本，请该内核版本的用户，根据下文及时更新内核版本。
-* V2ray core 目前最新版本为 3.13
+* V2ray core 目前最新版本为 3.14
 * 由于新版本增加了 web 伪装，因此强烈建议使用默认的443端口作为连接端口
 * **感谢作者 dunizb 的自用 开源 html 计算器源码 项目地址 https://github.com/dunizb/sCalc**
 ## V2ray core 更新方式
@@ -51,6 +51,11 @@ git clone https://github.com/wulabing/V2Ray_ws-tls_bash_onekey.git temp && cd te
 ### 问题反馈
 * 请携带 v2ray_ins.log 文件内容进行反馈
 ### 更新说明
+## 2018-03-26
+V3.1(Beta)
+* 1.去除无关的依赖
+* 2.安装顺序变更，SSL生成放在程序末尾
+* 3.NGINX 安装版本统一为最新 stable 版本（为将来可能进行的 http2 及 tls1.3 适配做好准备,debian 源默认 NGINX 版本过低不支持 http2）
 ## 2018-03-18
 V3.0(Stable)
 * 1.修复 Path 分流时访问特定的伪装 Path 时出现的 Bad Request 问题 （统一为404 Not Found）
