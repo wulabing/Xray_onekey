@@ -47,7 +47,8 @@ git clone https://github.com/wulabing/V2Ray_ws-tls_bash_onekey.git temp && cd te
 
 
 ### 测试说明
-* V3.0 版本仅在 Debian 8 上进行过测试，目前需要收集更多的测试数据
+* V3.1 版本在 Debian 8 /Debian 9 /Ubuntu 16.04 上进行过测试，目前需要收集更多的测试数据
+* **V3.1 版本在 Centos 7 的测试过程中未能成功申请证书，目前需要收集更多的测试数据**
 ### 问题反馈
 * 请携带 v2ray_ins.log 文件内容进行反馈
 ### 更新说明
