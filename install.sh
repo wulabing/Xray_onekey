@@ -4,7 +4,7 @@
 #	System Request:Debian 7+/Ubuntu 14.04+/Centos 6+
 #	Author:	wulabing
 #	Dscription: V2ray ws+tls onekey 
-#	Version: 3.0
+#	Version: 3.2
 #	Blog: https://www.wulabing.com
 #	Official document: www.v2ray.com
 #====================================================
@@ -51,16 +51,16 @@ check_system(){
         echo -e "${OK} ${GreenBG} 当前系统为 Debian ${VERSION_ID} ${VERSION} ${Font} "
         INS="apt"
         ## 添加 Nginx apt源
-        echo "deb http://nginx.org/packages/debian/ ${VERSION} nginx" >> /etc/apt/sources.list
-        echo "deb-src http://nginx.org/packages/debian/ ${VERSION} nginx" >> /etc/apt/sources.list
+        echo "deb http://nginx.org/packages/mainline/debian/ ${VERSION} nginx" >> /etc/apt/sources.list
+        echo "deb-src http://nginx.org/packages/mainline/debian/ ${VERSION} nginx" >> /etc/apt/sources.list
         wget -nc https://nginx.org/keys/nginx_signing.key
         apt-key add nginx_signing.key
     elif [[ "${ID}" == "ubuntu" && `echo "${VERSION_ID}" | cut -d '.' -f1` -ge 16 ]];then
         echo -e "${OK} ${GreenBG} 当前系统为 Ubuntu ${VERSION_ID} ${VERSION} ${Font} "
         INS="apt"
         ## 添加 Nginx apt源
-        echo "deb http://nginx.org/packages/debian/ ${VERSION} nginx" >> /etc/apt/sources.list
-        echo "deb-src http://nginx.org/packages/debian/ ${VERSION} nginx" >> /etc/apt/sources.list
+        echo "deb http://nginx.org/packages/mainline/debian/ ${VERSION} nginx" >> /etc/apt/sources.list
+        echo "deb-src http://nginx.org/packages/mainline/debian/ ${VERSION} nginx" >> /etc/apt/sources.list
         wget -nc https://nginx.org/keys/nginx_signing.key
         apt-key add nginx_signing.key
     else
@@ -293,11 +293,11 @@ nginx_conf_add(){
     touch ${nginx_conf_dir}/v2ray.conf
     cat>${nginx_conf_dir}/v2ray.conf<<EOF
     server {
-        listen 443 ssl;
+        listen 443 ssl http2;
         ssl on;
         ssl_certificate       /etc/v2ray/v2ray.crt;
         ssl_certificate_key   /etc/v2ray/v2ray.key;
-        ssl_protocols         TLSv1 TLSv1.1 TLSv1.2;
+        ssl_protocols         TLSv1 TLSv1.1 TLSv1.2 TLSv1.3;
         ssl_ciphers           HIGH:!aNULL:!MD5;
         server_name           serveraddr.com;
         index index.html index.htm;
