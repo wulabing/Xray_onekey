@@ -8,7 +8,7 @@
 * 已安装的用户，当出现无法连接的情况时，请用户根据该文档更新 V2ray core 
 * 请注意：我们依然强烈建议你全方面的了解整个程序的工作流程及原理
 
-## 目前支持Debian 8+ / Ubuntu 16.04+ （Centos7 V3.2版本需要自己手动修改一下Nginx配置为3.1版本的nginx配置）
+## 目前支持Debian 8+ / Ubuntu 16.04+ / Centos7
 ## 如果你选择使用 V2ray，强烈建议你关闭并删除所有的 shadowsocksR 服务端，仅使用标准的 V2ray 三件套（原因请查看 Wiki ）
 * 本脚本默认安装最新版本的V2ray core
 * 本脚本的第一批用户安装的内核为 V2ray core 3.6 版本，请该内核版本的用户，根据下文及时更新内核版本。
@@ -53,10 +53,9 @@ git clone https://github.com/wulabing/V2Ray_ws-tls_bash_onekey.git temp && cd te
 * 请携带 v2ray_ins.log 文件内容进行反馈
 ### 更新说明
 ## 2018-04-03
-V3.2(Pre)
+V3.2(Beta)
 * Nginx 版本更新至mainline版本
 * Nginx 配置中添加 TLS1.3 http2
-* 新版本 Nginx 配置不支持Centos7（可手动修改后正常使用）
 ## 2018-03-26
 V3.1(Beta)
 * 1.去除无关的依赖
