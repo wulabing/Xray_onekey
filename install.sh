@@ -44,9 +44,14 @@ check_system(){
         setsebool -P httpd_can_network_connect 1
         echo -e "${OK} ${GreenBG} SElinux 设置完成 ${Font} "
         ## Centos 也可以通过添加 epel 仓库来安装，目前不做改动
-        ## 已改为 epel 安装
-        yum -y install epel-release
-        echo -e "${OK} ${GreenBG} epel 源 安装完成 ${Font}" 
+        cat>/etc/yum.repos.d/nginx.repo<<EOF
+[nginx]
+name=nginx repo
+baseurl=http://nginx.org/packages/mainline/centos/7/\$basearch/
+gpgcheck=0
+enabled=1
+EOF
+        echo -e "${OK} ${GreenBG} Nginx 源 安装完成 ${Font}" 
     elif [[ "${ID}" == "debian" && ${VERSION_ID} -ge 8 ]];then
         echo -e "${OK} ${GreenBG} 当前系统为 Debian ${VERSION_ID} ${VERSION} ${Font} "
         INS="apt"
