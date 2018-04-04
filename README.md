@@ -1,6 +1,6 @@
 # V2Ray 基于 Nginx 的 vmess+ws+tls 一键安装脚本 （Use Path）
-更新预告 V4.0(beta）（时间未定）：下一个大版本更新将会把 h5ai（[demo](https://larsjung.de/h5ai/demo/)）与 V2ray 结合接起来,同时不会取消当前的计算器伪装，由用户自行选择 伪装页面
-## V3.2 版本更新虽然对Nginx中添加了http2和TLS1.3的配置信息，但是没什么卵用。因为tls1.3需要openssl版本至少为1.1.1（目前不是stable版本），http2要求openssl至少为1.0.2（db8默认是1.0.1，），并且golang目前尚未支持TLS1.3，所以此变更只是给用户点心理安慰，访问网页还是走的TLS1.2 http2部分也不会生效。
+更新预告 V4.0（时间未定）：下一个大版本更新将会把 h5ai（[demo](https://larsjung.de/h5ai/demo/)）与 V2ray 结合接起来,同时不会取消当前的计算器伪装，由用户自行选择 伪装页面
+## V3.2 版本更新虽然对Nginx中添加了http2和TLS1.3的配置信息，但是没什么卵用。因为tls1.3需要openssl版本至少为1.1.1（目前不是stable版本），http2要求openssl至少为1.0.2（db8默认是1.0.1，db9默认可支持），并且golang目前尚未支持TLS1.3，所以此变更只是给用户点心理安慰，访问网页还是走的TLS1.2 
 * h5ai is a modern file indexer for HTTP web servers with focus on your files. Directories are displayed in a appealing way and browsing them is enhanced by different views, a breadcrumb and a tree overview. Initially h5ai was an acronym for HTML5 Apache Index but now it supports other web servers too.
 * V2Ray是一个优秀的开源网络代理工具，可以帮助你畅爽体验互联网，目前已经全平台支持Windows、Mac、Android、IOS、Linux等操作系统的使用。
 * 本脚本的另一个分支版本（Use Host）地址： https://github.com/dylanbai8/V2Ray_ws-tls_Website_onekey 请根据需求进行选择， 感谢作者 dylanbai8 的改进与维护
