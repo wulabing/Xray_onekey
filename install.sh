@@ -4,7 +4,7 @@
 #	System Request:Debian 7+/Ubuntu 14.04+/Centos 6+
 #	Author:	wulabing
 #	Dscription: V2ray ws+tls onekey 
-#	Version: 3.2
+#	Version: 3.3
 #	Blog: https://www.wulabing.com
 #	Official document: www.v2ray.com
 #====================================================
@@ -56,18 +56,22 @@ EOF
         echo -e "${OK} ${GreenBG} 当前系统为 Debian ${VERSION_ID} ${VERSION} ${Font} "
         INS="apt"
         ## 添加 Nginx apt源
+        if [ ! -f nginx_signing.key ];then
         echo "deb http://nginx.org/packages/mainline/debian/ ${VERSION} nginx" >> /etc/apt/sources.list
         echo "deb-src http://nginx.org/packages/mainline/debian/ ${VERSION} nginx" >> /etc/apt/sources.list
         wget -nc https://nginx.org/keys/nginx_signing.key
         apt-key add nginx_signing.key
+        fi
     elif [[ "${ID}" == "ubuntu" && `echo "${VERSION_ID}" | cut -d '.' -f1` -ge 16 ]];then
-        echo -e "${OK} ${GreenBG} 当前系统为 Ubuntu ${VERSION_ID} ${VERSION} ${Font} "
+        echo -e "${OK} ${GreenBG} 当前系统为 Ubuntu ${VERSION_ID} ${VERSION_CODENAME} ${Font} "
         INS="apt"
         ## 添加 Nginx apt源
-        echo "deb http://nginx.org/packages/mainline/debian/ ${VERSION} nginx" >> /etc/apt/sources.list
-        echo "deb-src http://nginx.org/packages/mainline/debian/ ${VERSION} nginx" >> /etc/apt/sources.list
+        if [ ! -f nginx_signing.key ];then
+        echo "deb http://nginx.org/packages/mainline/ubuntu/ ${VERSION_CODENAME} nginx" >> /etc/apt/sources.list
+        echo "deb-src http://nginx.org/packages/mainline/ubuntu/ ${VERSION_CODENAME} nginx" >> /etc/apt/sources.list
         wget -nc https://nginx.org/keys/nginx_signing.key
         apt-key add nginx_signing.key
+        fi
     else
         echo -e "${Error} ${RedBG} 当前系统为 ${ID} ${VERSION_ID} 不在支持的系统列表内，安装中断 ${Font} "
         exit 1
@@ -154,6 +158,9 @@ modify_port_UUID(){
 }
 modify_nginx(){
     ## sed 部分地方 适应新配置修正
+    if [[ -f /etc/nginx/nginx.conf.bak ]];then
+        cp /etc/nginx/nginx.conf.bak /etc/nginx/nginx.conf
+    fi
     sed -i "1,/listen/{s/listen 443 ssl;/listen ${port} ssl;/}" ${v2ray_conf}
     sed -i "/server_name/c \\\tserver_name ${domain};" ${nginx_conf}
     sed -i "/location/c \\\tlocation \/${camouflage}\/" ${nginx_conf}
@@ -193,6 +200,11 @@ nginx_install(){
     else
         echo -e "${Error} ${RedBG} nginx 安装失败 ${Font}"
         exit 5
+    fi
+    if [[ ! -f /etc/nginx/nginx.conf.bak ]];then
+        cp /etc/nginx/nginx.conf /etc/nginx/nginx.conf.bak
+        echo -e "${OK} ${GreenBG} nginx 初始配置备份完成 ${Font}"
+        sleep 1
     fi
 }
 ssl_install(){
