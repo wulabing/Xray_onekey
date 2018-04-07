@@ -11,8 +11,9 @@
 ## 如果你选择使用 V2ray，强烈建议你关闭并删除所有的 shadowsocksR 服务端，仅使用标准的 V2ray 三件套（原因请查看 Wiki ）
 * 本脚本默认安装最新版本的V2ray core
 * 本脚本的第一批用户安装的内核为 V2ray core 3.6 版本，请该内核版本的用户，根据下文及时更新内核版本。
-* V2ray core 目前最新版本为 3.16
+* V2ray core 目前最新版本为 3.16 ,该版本修复了 mux 多路复用相关的若干bug，推荐更新至该版本内核（同时请注意客户端 core 的同步更新）
 * 由于新版本增加了 web 伪装，因此强烈建议使用默认的443端口作为连接端口
+* 
 * **感谢作者 dunizb 的自用 开源 html 计算器源码 项目地址 https://github.com/dunizb/sCalc**
 ## V2ray core 更新方式
 执行：
@@ -35,7 +36,7 @@
 * 安装好 git
 ## 安装方式
 ```
-git clone https://github.com/wulabing/V2Ray_ws-tls_bash_onekey.git temp && cd temp && bash install.sh | tee v2ray_ins.log
+bash <(curl -L -s https://raw.githubusercontent.com/wulabing/V2Ray_ws-tls_bash_onekey/master/install.sh) | tee v2ray_ins.log
 ```
 ## 启动方式
 
@@ -53,7 +54,7 @@ git clone https://github.com/wulabing/V2Ray_ws-tls_bash_onekey.git temp && cd te
 ### 更新说明
 ## 2018-04-06
 v3.3(Beta)
-* 修复 Ubuntu 16.04/17.10 安装后的Nginx启动失败（等待反馈）
+* 修复 Ubuntu 16.04/17.10 安装后的Nginx启动失败
 * 修复 由于重复执行脚本导致的 Nginx 安装源的重复添加问题
 * 修复 由于重复执行脚本导致的 Nginx 配置文件异常，从而导致 Nginx 启动失败的问题
 * 修复 Nginx Ubuntu 源错误添加导致的 Nginx 版本问题
