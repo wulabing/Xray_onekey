@@ -33,7 +33,7 @@
 ## 准备工作
 * 准备一个域名，并将A记录添加好。
 * [V2ray官方说明](https://www.v2ray.com/)，了解 TLS WebSocket 及 V2ray 相关信息
-* 安装好 git
+* 安装好 curl
 ## 安装方式
 ```
 bash <(curl -L -s https://raw.githubusercontent.com/wulabing/V2Ray_ws-tls_bash_onekey/master/install.sh) | tee v2ray_ins.log
@@ -52,6 +52,10 @@ bash <(curl -L -s https://raw.githubusercontent.com/wulabing/V2Ray_ws-tls_bash_o
 * V3.3 版本在 Ubuntu 16.04 下进行过并通过测试。
 * 请携带 v2ray_ins.log 文件内容进行反馈
 ### 更新说明
+## 2018-04-08
+v3.3.1（Beta）
+* 安装依赖小幅调整
+* Readme内容调整
 ## 2018-04-06
 v3.3(Beta)
 * 修复 Ubuntu 16.04/17.10 安装后的Nginx启动失败
