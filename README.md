@@ -1,7 +1,7 @@
 # V2Ray 基于 Nginx 的 vmess+ws+tls 一键安装脚本 （Use Path）
 ### 请使用本脚本的用户填写一下本调查问卷，感谢您的配合 https://goo.gl/forms/4IG6CG6xV629C4vp2
 ### 由于 vmess over websocket 目前可能存在断流问题（未经证实但是我自己用是比较经常遇到），脚本将在近期更新 http2 over TLS 配置（与当前配置部分不兼容，两脚本互相独立）
-
+### 请注意 只有客户端 core 版本在 3.14 以上才可以正常使用 http2 over TLS,请用户注意客户端的 V2ray Core 版本
 * V2Ray是一个优秀的开源网络代理工具，可以帮助你畅爽体验互联网，目前已经全平台支持Windows、Mac、Android、IOS、Linux等操作系统的使用。
 * 本脚本的另一个分支版本（Use Host）地址： https://github.com/dylanbai8/V2Ray_ws-tls_Website_onekey 请根据需求进行选择， 感谢作者 dylanbai8 的改进与维护
 * 本脚本为一键完全配置脚本，在所有流程正常运行完毕后，直接按照输出结果设置客户端即可使用
