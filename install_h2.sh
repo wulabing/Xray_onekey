@@ -254,7 +254,7 @@ show_information(){
     echo -e "${Red} 伪装类型（type）：${Font} none "
     echo -e "${Red} 伪装域名（不要落下/）：${Font} /${camouflage}/ "
     echo -e "${Red} 底层传输安全：${Font} tls "
-    echo -e "${OK} ${GreenBG} 请注意，目前的GUI客户端不支持通过填写配置支持h2，请通过 添加自定义配置 添加节点信息  ${Font}"
+    echo -e "${OK} ${GreenBG} 请注意，目前的GUI客户端（V2rayN）已经支持H2手动添加配置，当然您也可以通过 添加自定义配置 添加节点信息  ${Font}"
     echo -e "${OK} ${GreenBG} 配置地址（方便下载）： ${json_addr} ${Font}"
     echo -e "${OK} ${GreenBG} 配置地址（服务器本地备份）：/etc/v2ray/client.json ${Font}"
 }
