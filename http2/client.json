@@ -36,7 +36,7 @@
       "security": "tls"
     },
       "mux": {
-      "enabled": true
+      "enabled": false
     }
   },
 "outboundDetour": [
