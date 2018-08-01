@@ -1,8 +1,7 @@
 # V2Ray 基于 Nginx 的 vmess+ws+tls 一键安装脚本 （Use Path）
-### 请使用本脚本的用户填写一下本调查问卷，感谢您的配合 https://goo.gl/forms/4IG6CG6xV629C4vp2
-### 由于 vmess over websocket 目前可能存在断流问题（未经证实但是我自己用是比较经常遇到），脚本将在近期更新 http2 over TLS 配置（与当前配置部分不兼容，两脚本互相独立）
-### 请注意 只有客户端 core 版本在 3.14 以上才可以正常使用 http2 over TLS,请用户注意客户端的 V2ray Core 版本
-### 2018-04-12 V2rayN/V2rayNG 支持 H2 配置的手动添加
+### 2018-04-12 V2rayN/V2rayNG 支持 H2 
+### 2018-08-01 近期将根据调查问卷的建议进行改进，并进行日常维护更新
+
 * V2Ray是一个优秀的开源网络代理工具，可以帮助你畅爽体验互联网，目前已经全平台支持Windows、Mac、Android、IOS、Linux等操作系统的使用。
 * 本脚本的另一个分支版本（Use Host）地址： https://github.com/dylanbai8/V2Ray_ws-tls_Website_onekey 请根据需求进行选择， 感谢作者 dylanbai8 的改进与维护
 * 本脚本为一键完全配置脚本，在所有流程正常运行完毕后，直接按照输出结果设置客户端即可使用
@@ -12,8 +11,7 @@
 ## 目前支持Debian 8+ / Ubuntu 16.04+ / Centos7
 ## 如果你选择使用 V2ray，强烈建议你关闭并删除所有的 shadowsocksR 服务端，仅使用标准的 V2ray 三件套（原因请查看 Wiki ）
 * 本脚本默认安装最新版本的V2ray core
-* 本脚本的第一批用户安装的内核为 V2ray core 3.6 版本，请该内核版本的用户，根据下文及时更新内核版本。
-* V2ray core 目前最新版本为 3.21（同时请注意客户端 core 的同步更新，需要保证客户端内核版本 >= 服务端内核版本）
+* V2ray core 目前最新版本为 3.33（同时请注意客户端 core 的同步更新，需要保证客户端内核版本 >= 服务端内核版本）
 * 由于新版本增加了 web 伪装，因此强烈建议使用默认的443端口作为连接端口
 * 
 * **感谢作者 dunizb 的自用 开源 html 计算器源码 项目地址 https://github.com/dunizb/sCalc**
