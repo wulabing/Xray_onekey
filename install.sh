@@ -310,11 +310,11 @@ nginx_conf_add(){
     touch ${nginx_conf_dir}/v2ray.conf
     cat>${nginx_conf_dir}/v2ray.conf<<EOF
     server {
-        listen 443 ssl http2;
+        listen 443 ssl;
         ssl on;
         ssl_certificate       /etc/v2ray/v2ray.crt;
         ssl_certificate_key   /etc/v2ray/v2ray.key;
-        ssl_protocols         TLSv1 TLSv1.1 TLSv1.2 TLSv1.3;
+        ssl_protocols         TLSv1 TLSv1.1 TLSv1.2;
         ssl_ciphers           HIGH:!aNULL:!MD5;
         server_name           serveraddr.com;
         index index.html index.htm;
