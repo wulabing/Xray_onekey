@@ -277,29 +277,33 @@ acme(){
 v2ray_conf_add(){
     cat>${v2ray_conf_dir}/config.json<<EOF
 {
-  "inbound": {
-    "port": 10000,
-    "listen":"127.0.0.1",
-    "protocol": "vmess",
-    "settings": {
-      "clients": [
-        {
-          "id": "b831381d-6324-4d53-ad4f-8cda48b30811",
-          "alterId": 64
+  "inbounds": [
+    {
+      "port": 10000,
+      "listen":"127.0.0.1",
+      "protocol": "vmess",
+      "settings": {
+        "clients": [
+          {
+            "id": "b831381d-6324-4d53-ad4f-8cda48b30811",
+            "alterId": 64
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "ws",
+        "wsSettings": {
+        "path": "/ray"
         }
-      ]
-    },
-    "streamSettings":{
-      "network":"ws",
-      "wsSettings": {
-      "path": "/ray/"
       }
     }
-  },
-  "outbound": {
-    "protocol": "freedom",
-    "settings": {}
-  }
+  ],
+  "outbound": [
+    {
+      "protocol": "freedom",
+      "settings": {}
+    }
+  ]
 }
 EOF
 
@@ -364,7 +368,7 @@ show_information(){
     echo -e "${Red} 加密方式（security）：${Font} 自适应 "
     echo -e "${Red} 传输协议（network）：${Font} ws "
     echo -e "${Red} 伪装类型（type）：${Font} none "
-    echo -e "${Red} 伪装域名（不要落下/）：${Font} /${camouflage}/ "
+    echo -e "${Red} 路径（不要落下/）：${Font} /${camouflage}/ "
     echo -e "${Red} 底层传输安全：${Font} tls "
 
     
