@@ -16,8 +16,7 @@
       "streamSettings": {
         "network": "ws", 
         "wsSettings": {
-          "path": "/e01ec5ea/", 
-          "headers": { }
+          "path": "/e01ec5ea/"
         }
       }
     }
