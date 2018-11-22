@@ -1,7 +1,7 @@
 # V2Ray 基于 Nginx 的 vmess+ws+tls 一键安装脚本 （Use Path）
 
 ### 2018-11-22
-### 注: V2rayN 客户端 使用本 ws+tls 脚本可能会出现无法连接的情况，您尝试使用命令行运行，或者使用 clash for windows 客户端代替 V2rayN
+### 更新 4.x 版本配置信息
 
 * V2Ray是一个优秀的开源网络代理工具，可以帮助你畅爽体验互联网，目前已经全平台支持Windows、Mac、Android、IOS、Linux等操作系统的使用。
 * 本脚本的另一个分支版本（Use Host）地址： https://github.com/dylanbai8/V2Ray_ws-tls_Website_onekey 请根据需求进行选择， 感谢作者 dylanbai8 的改进与维护
