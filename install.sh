@@ -275,38 +275,8 @@ acme(){
     fi
 }
 v2ray_conf_add(){
-    cat>${v2ray_conf_dir}/config.json<<EOF
-{
-  "inbounds": [
-    {
-      "port": 10000,
-      "listen":"127.0.0.1",
-      "protocol": "vmess",
-      "settings": {
-        "clients": [
-          {
-            "id": "b831381d-6324-4d53-ad4f-8cda48b30811",
-            "alterId": 64
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "ws",
-        "wsSettings": {
-        "path": "/ray"
-        }
-      }
-    }
-  ],
-  "outbound": [
-    {
-      "protocol": "freedom",
-      "settings": {}
-    }
-  ]
-}
-EOF
-
+    cd /etc/v2ray
+    wget https://raw.githubusercontent.com/wulabing/V2Ray_ws-tls_bash_onekey/master/tls/config.json
 modify_port_UUID
 judge "V2ray 配置修改"
 }
