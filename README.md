@@ -1,13 +1,21 @@
 # V2Ray 基于 Nginx 的 vmess+ws+tls 一键安装脚本 （Use Path）
 
 ### 2018-11-22
-### 更新 4.x 版本配置信息
+更新 4.x 版本配置信息
+### 由于早期的脚本设计缺陷，每三个月需要用户手动更新证书，如遇到证书过期，请按照以下步骤操作
+```
+systemctl stop nginx
 
+"/root/.acme.sh"/acme.sh --cron --home "/root/.acme.sh"
+
+systemctl start nginx
+```
 * V2Ray是一个优秀的开源网络代理工具，可以帮助你畅爽体验互联网，目前已经全平台支持Windows、Mac、Android、IOS、Linux等操作系统的使用。
 * 本脚本的另一个分支版本（Use Host）地址： https://github.com/dylanbai8/V2Ray_ws-tls_Website_onekey 请根据需求进行选择， 感谢作者 dylanbai8 的改进与维护
 * 本脚本为一键完全配置脚本，在所有流程正常运行完毕后，直接按照输出结果设置客户端即可使用
 * 已安装的用户，当出现无法连接的情况时，请用户根据该文档更新 V2ray core 
 * 请注意：我们依然强烈建议你全方面的了解整个程序的工作流程及原理
+
 
 ## 目前支持Debian 8+ / Ubuntu 16.04+ / Centos7
 ## 如果你选择使用 V2ray，强烈建议你关闭并删除所有的 shadowsocksR 服务端，仅使用标准的 V2ray 三件套（原因请查看 Wiki ）
