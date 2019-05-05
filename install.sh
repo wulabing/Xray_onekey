@@ -270,7 +270,7 @@ acme(){
 }
 v2ray_conf_add(){
     cd /etc/v2ray
-    wget https://raw.githubusercontent.com/huangian8/V2Ray_ws-tls_bash_onekey/master/tls/config.json -O config.json
+    wget https://raw.githubusercontent.com/wulabing/V2Ray_ws-tls_bash_onekey/master/tls/config.json -O config.json
 modify_port_UUID
 judge "V2ray 配置修改"
 }
@@ -291,8 +291,8 @@ server {
     keepalive_requests         100;
     root                       /home/wwwroot/sCalc;
     
-    if ($scheme = http) {
-        return  301 https://$host$request_uri;
+    if (\$scheme = http) {
+        return  301 https://\$host\$request_uri;
     }
     
     gzip                       on;
@@ -307,8 +307,8 @@ server {
     location / {
         index  index.html index.htm index.php;
 
-        if (!-e $request_filename) {
-            rewrite  ^(.*)$ /index.php$1 last;
+        if (!-e \$request_filename) {
+            rewrite  ^(.*)$ /index.php\$1 last;
         }
     }
     
