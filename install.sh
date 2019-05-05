@@ -270,7 +270,7 @@ acme(){
 }
 v2ray_conf_add(){
     cd /etc/v2ray
-    wget https://raw.githubusercontent.com/wulabing/V2Ray_ws-tls_bash_onekey/master/tls/config.json -O config.json
+    wget https://raw.githubusercontent.com/huangqian8/V2Ray_ws-tls_bash_onekey/master/tls/config.json -O config.json
 modify_port_UUID
 judge "V2ray 配置修改"
 }
@@ -300,9 +300,9 @@ server {
     gzip_min_length            1k;
     gzip_types                 text/plain text/css text/xml text/javascript text/x-component application/json application/javascript application/x-javascript application/xml application/xhtml+xml application/rss+xml application/atom+xml application/x-font-ttf application/vnd.ms-fontobject image/svg+xml image/x-icon font/opentype;
     client_max_body_size       5m;
-    error_page                 400 404 /404.html;
-    error_page                 403 /403.html;
-    error_page                 500 502 503 504 /50x.html;
+    error_page                 400 404 /404/404.html;
+    error_page                 403 /404/403.html;
+    error_page                 500 502 503 504 /404/50x.html;
     
     location / {
         index  index.html index.htm index.php;
