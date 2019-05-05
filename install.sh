@@ -1,12 +1,12 @@
 #!/bin/bash
 
 #====================================================
-#	System Request:Debian 7+/Ubuntu 14.04+/Centos 6+
-#	Author:	wulabing
-#	Dscription: V2ray ws+tls onekey 
-#	Version: 3.3.1
-#	Blog: https://www.wulabing.com
-#	Official document: www.v2ray.com
+#   System Request:Debian 7+/Ubuntu 14.04+/Centos 6+
+#   Author: wulabing
+#   Dscription: V2ray ws+tls onekey 
+#   Version: 3.3.1
+#   Blog: https://www.wulabing.com
+#   Official document: www.v2ray.com
 #====================================================
 
 #fonts color
@@ -73,14 +73,14 @@ EOF
         apt-key add nginx_signing.key
         fi
     else
-        echo -e "${Error} ${RedBG} 当前系统为 ${ID} ${VERSION_ID} 不在支持的系统列表内，安装中断 ${Font} "
+        echo -e "${Error} ${RedBG} 当前系统为 ${ID} ${VERSION_ID} 不在支持的系统列表内，安装中断 ${Font}"
         exit 1
     fi
 
 }
 is_root(){
     if [ `id -u` == 0 ]
-        then echo -e "${OK} ${GreenBG} 当前用户是root用户，进入安装流程 ${Font} "
+        then echo -e "${OK} ${GreenBG} 当前用户是root用户，进入安装流程 ${Font}"
         sleep 3
     else
         echo -e "${Error} ${RedBG} 当前用户不是root用户，请切换到root用户后重新执行脚本 ${Font}" 
@@ -103,17 +103,13 @@ ntpdate_install(){
         ${INS} update
         ${INS} install ntpdate -y
     fi
-    judge "安装 NTPdate 时间同步服务 "
+    judge "安装 NTPdate 时间同步服务"
 }
 time_modify(){
-
     ntpdate_install
-
     systemctl stop ntp &>/dev/null
-
     echo -e "${Info} ${GreenBG} 正在进行时间同步 ${Font}"
     ntpdate time.nist.gov
-
     if [[ $? -eq 0 ]];then 
         echo -e "${OK} ${GreenBG} 时间同步成功 ${Font}"
         echo -e "${OK} ${GreenBG} 当前系统时间 `date -R`（请注意时区间时间换算，换算后时间误差应为三分钟以内）${Font}"
@@ -124,7 +120,6 @@ time_modify(){
 }
 dependency_install(){
     ${INS} install wget git lsof -y
-
     if [[ "${ID}" == "centos" ]];then
        ${INS} -y install crontabs
     else
@@ -161,17 +156,18 @@ modify_nginx(){
     if [[ -f /etc/nginx/nginx.conf.bak ]];then
         cp /etc/nginx/nginx.conf.bak /etc/nginx/nginx.conf
     fi
-    sed -i "1,/listen/{s/listen 443 ssl;/listen ${port} ssl;/}" ${nginx_conf}
+    sed -i "s/443 ssl http2/${port} ssl http2/" ${nginx_conf}
     sed -i "/server_name/c \\\tserver_name ${domain};" ${nginx_conf}
-    sed -i "/location/c \\\tlocation \/${camouflage}\/" ${nginx_conf}
+    sed -i "s/ray/${camouflage}/" ${nginx_conf}
     sed -i "/proxy_pass/c \\\tproxy_pass http://127.0.0.1:${PORT};" ${nginx_conf}
-    sed -i "/return/c \\\treturn 301 https://${domain}\$request_uri;" ${nginx_conf}
     sed -i "27i \\\tproxy_intercept_errors on;"  /etc/nginx/nginx.conf
 }
 web_camouflage(){
     ##请注意 这里和LNMP脚本的默认路径冲突，千万不要在安装了LNMP的环境下使用本脚本，否则后果自负
     rm -rf /home/wwwroot && mkdir -p /home/wwwroot && cd /home/wwwroot
-    git clone https://github.com/wulabing/sCalc.git
+    git clone https://github.com/dunizb/sCalc.git
+    cd sCalc
+    git clone https://github.com/pkfrom/404.git
     judge "web 站点伪装"   
 }
 v2ray_install(){
@@ -180,9 +176,7 @@ v2ray_install(){
     fi
 
     mkdir -p /root/v2ray && cd /root/v2ray
-    wget  --no-check-certificate https://install.direct/go.sh
-
-    ## wget http://install.direct/go.sh
+    wget --no-check-certificate https://install.direct/go.sh
     
     if [[ -f go.sh ]];then
         bash go.sh --force
@@ -276,39 +270,58 @@ acme(){
 }
 v2ray_conf_add(){
     cd /etc/v2ray
-    wget https://raw.githubusercontent.com/wulabing/V2Ray_ws-tls_bash_onekey/master/tls/config.json -O config.json
+    wget https://raw.githubusercontent.com/huangian8/V2Ray_ws-tls_bash_onekey/master/tls/config.json -O config.json
 modify_port_UUID
 judge "V2ray 配置修改"
 }
 nginx_conf_add(){
     touch ${nginx_conf_dir}/v2ray.conf
     cat>${nginx_conf_dir}/v2ray.conf<<EOF
-    server {
-        listen 443 ssl;
-        ssl on;
-        ssl_certificate       /etc/v2ray/v2ray.crt;
-        ssl_certificate_key   /etc/v2ray/v2ray.key;
-        ssl_protocols         TLSv1 TLSv1.1 TLSv1.2;
-        ssl_ciphers           HIGH:!aNULL:!MD5;
-        server_name           serveraddr.com;
-        index index.html index.htm;
-        root  /home/wwwroot/sCalc;
-        error_page 400 = /400.html;
-        location /ray/ 
-        {
-        proxy_redirect off;
-        proxy_pass http://127.0.0.1:10000;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade \$http_upgrade;
-        proxy_set_header Connection "upgrade";
-        proxy_set_header Host \$http_host;
-        }
-}
-    server {
-        listen 80;
-        server_name serveraddr.com;
-        return 301 https://use.shadowsocksr.win\$request_uri;
+server {
+    listen                     80;
+    listen                     443 ssl http2;
+    server_name                serveraddr.com;
+    ssl_certificate            /etc/v2ray/v2ray.crt;
+    ssl_certificate_key        /etc/v2ray/v2ray.key;
+    ssl_ciphers                HIGH:!aNULL:!MD5;
+    ssl_protocols              TLSv1 TLSv1.1 TLSv1.2;
+    ssl_session_cache          shared:SSL:5m;
+    ssl_session_timeout        5m;
+    keepalive_timeout          75s;
+    keepalive_requests         100;
+    root                       /home/wwwroot/sCalc;
+    
+    if ($scheme = http) {
+        return  301 https://$host$request_uri;
     }
+    
+    gzip                       on;
+    gzip_comp_level            6;
+    gzip_min_length            1k;
+    gzip_types                 text/plain text/css text/xml text/javascript text/x-component application/json application/javascript application/x-javascript application/xml application/xhtml+xml application/rss+xml application/atom+xml application/x-font-ttf application/vnd.ms-fontobject image/svg+xml image/x-icon font/opentype;
+    client_max_body_size       5m;
+    error_page                 400 404 /404.html;
+    error_page                 403 /403.html;
+    error_page                 500 502 503 504 /50x.html;
+    
+    location / {
+        index  index.html index.htm index.php;
+
+        if (!-e $request_filename) {
+            rewrite  ^(.*)$ /index.php$1 last;
+        }
+    }
+    
+    location /ray/ {
+        proxy_redirect          off;
+        proxy_pass              http://127.0.0.1:10000;
+        proxy_http_version      1.1;
+        proxy_set_header        Upgrade \$http_upgrade;
+        proxy_set_header        Connection "upgrade";
+        proxy_set_header        Host \$http_host;
+        proxy_intercept_errors  on;
+    }
+}
 EOF
 
 modify_nginx
@@ -320,7 +333,6 @@ start_process_systemd(){
     ### nginx服务在安装完成后会自动启动。需要通过restart或reload重新加载配置
     systemctl start nginx 
     judge "Nginx 启动"
-
 
     systemctl start v2ray
     judge "V2ray 启动"
@@ -339,19 +351,17 @@ acme_cron_update(){
 show_information(){
     clear
 
-    echo -e "${OK} ${Green} V2ray+ws+tls 安装成功 "
+    echo -e "${OK} ${Green} V2ray+ws+tls 安装成功"
     echo -e "${Red} V2ray 配置信息 ${Font}"
-    echo -e "${Red} 地址（address）:${Font} ${domain} "
-    echo -e "${Red} 端口（port）：${Font} ${port} "
+    echo -e "${Red} 地址（address）:${Font} ${domain}"
+    echo -e "${Red} 端口（port）：${Font} ${port}"
     echo -e "${Red} 用户id（UUID）：${Font} ${UUID}"
     echo -e "${Red} 额外id（alterId）：${Font} ${alterID}"
-    echo -e "${Red} 加密方式（security）：${Font} 自适应 "
-    echo -e "${Red} 传输协议（network）：${Font} ws "
-    echo -e "${Red} 伪装类型（type）：${Font} none "
-    echo -e "${Red} 路径（不要落下/）：${Font} /${camouflage}/ "
-    echo -e "${Red} 底层传输安全：${Font} tls "
-
-    
+    echo -e "${Red} 加密方式（security）：${Font} 自适应"
+    echo -e "${Red} 传输协议（network）：${Font} ws"
+    echo -e "${Red} 伪装类型（type）：${Font} none"
+    echo -e "${Red} 路径（不要落下/）：${Font} /${camouflage}/"
+    echo -e "${Red} 底层传输安全：${Font} tls"    
 
 }
 
