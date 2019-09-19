@@ -321,6 +321,8 @@ start_process_systemd(){
     systemctl start nginx 
     judge "Nginx 启动"
 
+    systemctl enable nginx
+    judge "设置 Nginx 开机自启"
 
     systemctl start v2ray
     judge "V2ray 启动"
