@@ -23,7 +23,7 @@
 ## 安装方式（不兼容，二选一）
 Vmess+websocket+TLS+Nginx+Website
 ```
-bash <(curl -L -s https://raw.githubusercontent.com/leungxt/V2Ray_ws-tls_bash_onekey/V2Ray_ws-tls_bash_onekey/master/install.sh) | tee v2ray_ins.log
+bash <(curl -L -s https://raw.githubusercontent.com/leungxt/V2Ray_ws-tls_bash_onekey/master/install.sh) | tee v2ray_ins.log
 ```
 
 ## 启动方式
