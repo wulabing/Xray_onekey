@@ -171,7 +171,7 @@ modify_nginx(){
 web_camouflage(){
     ##请注意 这里和LNMP脚本的默认路径冲突，千万不要在安装了LNMP的环境下使用本脚本，否则后果自负
     rm -rf /home/wwwroot && mkdir -p /home/wwwroot && cd /home/wwwroot
-    git clone https://github.com/wulabing/sCalc.git
+    git clone https://github.com/leungxt/sCalc.git
     judge "web 站点伪装"   
 }
 v2ray_install(){
@@ -276,7 +276,7 @@ acme(){
 }
 v2ray_conf_add(){
     cd /etc/v2ray
-    wget https://raw.githubusercontent.com/wulabing/V2Ray_ws-tls_bash_onekey/master/tls/config.json -O config.json
+    wget https://raw.githubusercontent.com/leungxt/V2Ray_ws-tls_bash_onekey/master/tls/config.json -O config.json
 modify_port_UUID
 judge "V2ray 配置修改"
 }
