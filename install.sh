@@ -63,12 +63,12 @@ EOF
         apt-key add nginx_signing.key
         fi
     elif [[ "${ID}" == "ubuntu" && `echo "${VERSION_ID}" | cut -d '.' -f1` -ge 16 ]];then
-        echo -e "${OK} ${GreenBG} 当前系统为 Ubuntu ${VERSION_ID} ${VERSION_CODENAME} ${Font} "
+        echo -e "${OK} ${GreenBG} 当前系统为 Ubuntu ${VERSION_ID} ${UBUNTU_CODENAME} ${Font} "
         INS="apt"
         ## 添加 Nginx apt源
         if [ ! -f nginx_signing.key ];then
-        echo "deb http://nginx.org/packages/mainline/ubuntu/ ${VERSION_CODENAME} nginx" >> /etc/apt/sources.list
-        echo "deb-src http://nginx.org/packages/mainline/ubuntu/ ${VERSION_CODENAME} nginx" >> /etc/apt/sources.list
+        echo "deb http://nginx.org/packages/mainline/ubuntu/ ${UBUNTU_CODENAME} nginx" >> /etc/apt/sources.list
+        echo "deb-src http://nginx.org/packages/mainline/ubuntu/ ${UBUNTU_CODENAME} nginx" >> /etc/apt/sources.list
         wget -nc https://nginx.org/keys/nginx_signing.key
         apt-key add nginx_signing.key
         fi
