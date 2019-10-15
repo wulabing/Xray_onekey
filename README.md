@@ -2,12 +2,21 @@
 
 > 近期将适配Centos8，并处理 nginx 安装部分的 bug
 
-### 2019-09-19
-脚本功能性测试，已通过,目前该脚本依然可正常工作
-时间同步请保证服务器当前时间误差不要过大（24h以上）
+### 2019-10-16
 
-### 2018-11-22
-更新 4.x 版本配置信息
+* 适配 Centos8 Debian10 Ubuntu19.04
+* 修复 部分系统下 计划任务不生效的问题
+* 修复 时间同步服务 在 Centos8 下无法安装的错误
+* 修复 部分系统下 证书不会自动更新的问题
+* 修复 部分系统下 Nginx 开机自启配置失效的问题
+* 变更 重复安装时，将不对相同的域名进行重复的证书申请，防止出现 Let's encrypt API 次数限制
+* 变更 默认 alterID 64 -> 4 ，减少资源占用
+* 变更 nginx 安装方式从源获取 变更为 编译安装，并使用新版Openssl，支持tls1.3
+* 变更 nginx 配置文件 ssl_protocols ssl_ciphers，适配 tls1.3
+* 变更 取消对Debian8 Ubuntu 16.04 的适配工作（本版本可能依旧可用）
+* 变更 默认页面伪装为 html5 小游戏
+* 新增 安装完成，节点配置信息留档
+* 新增 手动挂载证书
 
 ### 2018-12-10
 修复证书无法正常自动更新的bug
@@ -19,13 +28,12 @@
 * 请注意：我们依然强烈建议你全方面的了解整个程序的工作流程及原理
 
 
-## 目前支持Debian 8+ / Ubuntu 16.04+ / Centos7
+## 目前支持Debian 9+ / Ubuntu 18.04+ / Centos7+
 ## 如果你选择使用 V2ray，强烈建议你关闭并删除所有的 shadowsocksR 服务端，仅使用标准的 V2ray 三件套（原因请查看 Wiki ）
 * 本脚本默认安装最新版本的V2ray core
-* V2ray core 目前最新版本为 3.33（同时请注意客户端 core 的同步更新，需要保证客户端内核版本 >= 服务端内核版本）
+* V2ray core 目前最新版本为 4.20（同时请注意客户端 core 的同步更新，需要保证客户端内核版本 >= 服务端内核版本）
 * 由于新版本增加了 web 伪装，因此强烈建议使用默认的443端口作为连接端口
-* 
-* **感谢作者 dunizb 的自用 开源 html 计算器源码 项目地址 https://github.com/dunizb/sCalc**
+
 ## V2ray core 更新方式
 执行：
 `bash <(curl -L -s https://install.direct/go.sh)`
@@ -58,16 +66,18 @@ bash <(curl -L -s https://raw.githubusercontent.com/wulabing/V2Ray_ws-tls_bash_o
 
 启动 V2ray：`systemctl start v2ray`
 
-启动 Nginx：`systemctl start nginx`
+启动 Nginx：`/etc/nginx/sbin/nginx`
 
 （其他的应该不用我多说了吧 嘿嘿嘿）
 
 
 ### 测试说明
-* V3.1 版本在 Debian 8 / Debian 9 / Ubuntu 16.04 / Centos 7(防火墙着实又坑了我一把) 上进行过测试。
-* V3.3 版本在 Ubuntu 16.04 下进行过并通过测试。
-* 请携带 v2ray_ins.log 文件内容进行反馈
+* V5.0 版本在 Debian 8 / Debian 9 / Ubuntu 16.04 / Centos 7(防火墙着实又坑了我一把) 上进行过测试。
+
 ### 更新说明
+
+...
+
 ## 2018-04-10
 * vmess+http2 over tls 脚本更新
 ## 2018-04-08
