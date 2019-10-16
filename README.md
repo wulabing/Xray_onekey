@@ -75,7 +75,7 @@ bash <(curl -L -s https://raw.githubusercontent.com/wulabing/V2Ray_ws-tls_bash_o
 
 启动 V2ray：`systemctl start v2ray`
 
-停止 V2ray: `systemctl stop v2ray`
+停止 V2ray：`systemctl stop v2ray`
 
 启动 Nginx：`/etc/nginx/sbin/nginx`
 
