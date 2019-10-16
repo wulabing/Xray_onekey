@@ -125,6 +125,7 @@ dependency_install(){
     judge "安装 crontab"
 
     if [[ "${ID}" == "centos" ]];then
+       touch /var/spool/cron/root && chmod 600 /var/spool/cron/root
        systemctl start crond && systemctl enable crond
     else
        touch /var/spool/cron/crontabs/root && chmod 600 /var/spool/cron/crontabs/root
@@ -135,11 +136,14 @@ dependency_install(){
 
 
 
-    ${INS} install bc -y
+    ${INS} -y install bc
     judge "安装 bc"
 
-    ${INS} install unzip -y
+    ${INS} -y install unzip
     judge "安装 unzip"
+
+    ${INS} -y install qrencode
+    judge "安装 qrencode"
 
     if [[ "${ID}" == "centos" ]];then
        ${INS} -y groupinstall "Development tools"
@@ -155,7 +159,7 @@ dependency_install(){
     fi
 
 
-    judge "nginx 编译依赖"
+    judge "nginx 编译依赖安装"
 
 }
 basic_optimization(){
@@ -173,9 +177,9 @@ basic_optimization(){
 
 }
 port_alterid_set(){
-    stty erase '^H' && read -p "请输入连接端口（default:443）:" port
+    read -p "请输入连接端口（default:443）:" port
     [[ -z ${port} ]] && port="443"
-    stty erase '^H' && read -p "请输入alterID（default:4）:" alterID
+    read -p "请输入alterID（default:4）:" alterID
     [[ -z ${alterID} ]] && alterID="4"
 }
 modify_port_UUID(){
@@ -204,7 +208,9 @@ v2ray_install(){
     if [[ -d /root/v2ray ]];then
         rm -rf /root/v2ray
     fi
-
+    if [[ -d /etc/v2ray ]];then
+        rm -rf /etc/v2ray
+    fi
     mkdir -p /root/v2ray && cd /root/v2ray
     wget  --no-check-certificate https://install.direct/go.sh
 
@@ -221,6 +227,10 @@ v2ray_install(){
     rm -rf /root/v2ray
 }
 nginx_install(){
+    if [[ -d "/etc/nginx" ]];then
+        rm -rf /etc/nginx
+    fi
+
     wget -nc http://nginx.org/download/nginx-${nginx_version}.tar.gz -P ${nginx_openssl_src}
     judge "Nginx 下载"
     wget -nc https://www.openssl.org/source/openssl-${openssl_version}.tar.gz -P ${nginx_openssl_src}
@@ -390,7 +400,7 @@ start_process_systemd(){
 	echo "${nginx_dir}/sbin/nginx" >> /etc/rc.local
     judge "设置 Nginx 开机自启"
 
-    systemctl start v2ray
+    systemctl restart v2ray
     judge "V2ray 启动"
 
     systemctl enable v2ray
@@ -419,6 +429,28 @@ acme_cron_update(){
     fi
     judge "cron 计划任务更新"
 }
+
+vmess_qr_config(){
+    cat >/etc/v2ray/vmess_qr.json <<-EOF
+    {
+        "v": "2",
+        "ps": "wulabing_${domain}",
+        "add": "${domain}",
+        "port": "${port}",
+        "id": "${UUID}",
+        "aid": "${alterID}",
+        "net": "ws",
+        "type": "none",
+        "host": "${domain}",
+        "path": "/${camouflage}/",
+        "tls": "tls"
+    }
+EOF
+
+    vmess_link="vmess://$(cat /etc/v2ray/vmess_qr.json | base64 -w 0)"
+    echo -e "${Red} URL导入链接:${vmess_link} ${Font}" >>./v2ray_info.txt
+}
+
 show_information(){
     clear
     cd ~
@@ -434,7 +466,7 @@ show_information(){
     echo -e "${Red} 伪装类型（type）：${Font} none " >>./v2ray_info.txt
     echo -e "${Red} 路径（不要落下/）：${Font} /${camouflage}/ " >>./v2ray_info.txt
     echo -e "${Red} 底层传输安全：${Font} tls " >>./v2ray_info.txt
-
+    vmess_qr_config
     cat ./v2ray_info.txt
 
 }
