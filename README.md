@@ -1,6 +1,11 @@
 # V2Ray 基于 Nginx 的 vmess+ws+tls 一键安装脚本 （Use Path）
 
-> 近期将适配Centos8，并处理 nginx 安装部分的 bug
+### 2019-10-17
+
+> 建议遇到问题的用户重置系统后重新安装
+
+* 变更 添加 Nginx systemd serverfile
+* 修复 又双叒叕尝试修复 Nginx 开机自启动问题
 
 ### 2019-10-16
 
@@ -77,9 +82,9 @@ bash <(curl -L -s https://raw.githubusercontent.com/wulabing/V2Ray_ws-tls_bash_o
 
 停止 V2ray：`systemctl stop v2ray`
 
-启动 Nginx：`/etc/nginx/sbin/nginx`
+启动 Nginx：`systemctl start nginx`
 
-停止 Nginx：`/etc/nginx/sbin/nginx -s stop`
+停止 Nginx：`systemctl stop nginx`
 
 
 （其他的应该不用我多说了吧 嘿嘿嘿）
