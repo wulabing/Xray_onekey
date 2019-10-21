@@ -1,5 +1,9 @@
 # V2Ray 基于 Nginx 的 vmess+ws+tls 一键安装脚本 （Use Path）
 
+> 感谢 JetBrains 提供的非商业开源软件开发授权
+
+> Thanks for non-commercial open source development authorization by JetBrains
+
 ### 2019-10-17
 
 > 建议遇到问题的用户重置系统后重新安装
@@ -176,3 +180,5 @@ V1.01（beta）
 V1.0（beta）
 * 1.目前仅支持 Debian 8+ / Ubuntu 16.04+ 
 * 2.逐渐完善中
+
+
