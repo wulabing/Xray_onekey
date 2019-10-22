@@ -4,9 +4,11 @@
 
 > Thanks for non-commercial open source development authorization by JetBrains
 
+#### 如果你遇到 PC 端可用，手机不可用的情况，请将手机调至飞行模式后再取消飞行模式，然后尝试连接
 ### 2019-10-17
 
 > 建议遇到问题的用户重置系统后重新安装
+
 
 * 变更 添加 Nginx systemd serverfile
 * 修复 又双叒叕尝试修复 Nginx 开机自启动问题
