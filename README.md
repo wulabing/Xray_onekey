@@ -1,10 +1,45 @@
 # V2Ray 基于 Nginx 的 vmess+ws+tls 一键安装脚本 （Use Path）
 
-### 2018-11-22
-更新 4.x 版本配置信息
+> 感谢 JetBrains 提供的非商业开源软件开发授权
 
-### 2018-12-10
-修复证书无法正常自动更新的bug
+> Thanks for non-commercial open source development authorization by JetBrains
+
+#### 如果你遇到 PC 端可用，手机不可用的情况，请将手机调至飞行模式后再取消飞行模式，然后尝试连接
+### 2019-10-17
+
+> 建议遇到问题的用户重置系统后重新安装
+
+
+* 变更 添加 Nginx systemd serverfile
+* 修复 又双叒叕尝试修复 Nginx 开机自启动问题
+
+### 2019-10-16
+
+* 适配 Centos8 Debian10 Ubuntu19.04
+* 修复 部分系统下 计划任务不生效的问题
+* 修复 时间同步服务 在 Centos8 下无法安装的错误
+* 修复 部分系统下 证书不会自动更新的问题
+* 修复 部分系统下 Nginx 开机自启配置失效的问题
+* 变更 重复安装时，将不对相同的域名进行重复的证书申请，防止出现 Let's encrypt API 次数限制
+* 变更 默认 alterID 64 -> 4 ，减少资源占用
+* 变更 nginx 安装方式从源获取 变更为 编译安装，并使用新版Openssl，支持tls1.3
+* 变更 nginx 配置文件 ssl_protocols ssl_ciphers，适配 tls1.3
+* 变更 取消对Debian8 Ubuntu 16.04 的适配工作（本版本可能依旧可用）
+* 变更 默认页面伪装为 html5 小游戏
+* 新增 安装完成，节点配置信息留档
+* 新增 使用自定义证书
+* 新增 链接方式导入导入
+* 新增 二维码方式导入
+
+### 使用自定义证书
+将crt和key文件命名为v2ray.crt v2ray.key 放在 /data 目录下（若目录不存在请先建目录）
+
+### 查看客户端配置
+放在执行脚本所在目录下的 v2ray_info.txt
+
+推荐使用 `cat v2ray_info.txt` 查看
+
+### V2ray 简介
 
 * V2Ray是一个优秀的开源网络代理工具，可以帮助你畅爽体验互联网，目前已经全平台支持Windows、Mac、Android、IOS、Linux等操作系统的使用。
 * 本脚本的另一个分支版本（Use Host）地址： https://github.com/dylanbai8/V2Ray_ws-tls_Website_onekey 请根据需求进行选择， 感谢作者 dylanbai8 的改进与维护
@@ -13,13 +48,12 @@
 * 请注意：我们依然强烈建议你全方面的了解整个程序的工作流程及原理
 
 
-## 目前支持Debian 8+ / Ubuntu 16.04+ / Centos7
-## 如果你选择使用 V2ray，强烈建议你关闭并删除所有的 shadowsocksR 服务端，仅使用标准的 V2ray 三件套（原因请查看 Wiki ）
+### 目前支持Debian 9+ / Ubuntu 18.04+ / Centos7+
+### 如果你选择使用 V2ray，强烈建议你关闭并删除所有的 shadowsocksR 服务端，仅使用标准的 V2ray 三件套（原因请查看 Wiki ）
 * 本脚本默认安装最新版本的V2ray core
-* V2ray core 目前最新版本为 3.33（同时请注意客户端 core 的同步更新，需要保证客户端内核版本 >= 服务端内核版本）
+* V2ray core 目前最新版本为 4.20（同时请注意客户端 core 的同步更新，需要保证客户端内核版本 >= 服务端内核版本）
 * 由于新版本增加了 web 伪装，因此强烈建议使用默认的443端口作为连接端口
-* 
-* **感谢作者 dunizb 的自用 开源 html 计算器源码 项目地址 https://github.com/dunizb/sCalc**
+* 伪装内容是随便找的，内容与作者无关，可自行替换。
 ## V2ray core 更新方式
 执行：
 `bash <(curl -L -s https://install.direct/go.sh)`
@@ -48,20 +82,34 @@ Vmess + HTTP2 over TLS
 ```
 bash <(curl -L -s https://raw.githubusercontent.com/wulabing/V2Ray_ws-tls_bash_onekey/master/install_h2.sh) | tee v2ray_ins_h2.log
 ```
-## 启动方式
+### 启动方式
 
 启动 V2ray：`systemctl start v2ray`
 
+停止 V2ray：`systemctl stop v2ray`
+
 启动 Nginx：`systemctl start nginx`
 
+停止 Nginx：`systemctl stop nginx`
+
+
 （其他的应该不用我多说了吧 嘿嘿嘿）
+### 相关目录
 
+Web 目录：`/home/wwwroot/levis`
 
-### 测试说明
-* V3.1 版本在 Debian 8 / Debian 9 / Ubuntu 16.04 / Centos 7(防火墙着实又坑了我一把) 上进行过测试。
-* V3.3 版本在 Ubuntu 16.04 下进行过并通过测试。
-* 请携带 v2ray_ins.log 文件内容进行反馈
+V2ray 服务端配置：`/etc/v2ray/config.json`
+
+V2ray 客户端配置: `执行安装时所在目录下的 v2ray_info.txt`
+
+Nginx 目录： `/etc/nginx`
+
+证书目录: `/data/v2ray.key 和 /data/v2ray.crt`
+
 ### 更新说明
+
+...
+
 ## 2018-04-10
 * vmess+http2 over tls 脚本更新
 ## 2018-04-08
@@ -134,3 +182,5 @@ V1.01（beta）
 V1.0（beta）
 * 1.目前仅支持 Debian 8+ / Ubuntu 16.04+ 
 * 2.逐渐完善中
+
+
