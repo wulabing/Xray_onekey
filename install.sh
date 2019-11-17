@@ -367,8 +367,9 @@ nginx_conf_add(){
         ssl_ciphers           TLS13-AES-256-GCM-SHA384:TLS13-CHACHA20-POLY1305-SHA256:TLS13-AES-128-GCM-SHA256:TLS13-AES-128-CCM-8-SHA256:TLS13-AES-128-CCM-SHA256:EECDH+CHACHA20:EECDH+CHACHA20-draft:EECDH+ECDSA+AES128:EECDH+aRSA+AES128:RSA+AES128:EECDH+ECDSA+AES256:EECDH+aRSA+AES256:RSA+AES256:EECDH+ECDSA+3DES:EECDH+aRSA+3DES:RSA+3DES:!MD5;
         server_name           serveraddr.com;
         index index.html index.htm;
-        root  /home/wwwroot/levis;
-        error_page 400 = /400.html;
+        #root  /home/wwwroot/levis;
+        root /400.html;
+        error_page 400 https://www.idleleo.com;
         location /ray/ 
         {
         proxy_redirect off;
@@ -377,6 +378,10 @@ nginx_conf_add(){
         proxy_set_header Upgrade \$http_upgrade;
         proxy_set_header Connection "upgrade";
         proxy_set_header Host \$http_host;
+        }
+        location /
+        {
+        return 302 https://www.idleleo.com;
         }
 }
     server {
