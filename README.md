@@ -4,6 +4,8 @@
 
 > Thanks for non-commercial open source development authorization by JetBrains
 
+> telegram 交流群:https://t.me/wulabing_v2ray
+
 #### 如果你遇到 PC 端可用，手机不可用的情况，请将手机调至飞行模式后再取消飞行模式，然后尝试连接
 ### 2019-10-17
 
