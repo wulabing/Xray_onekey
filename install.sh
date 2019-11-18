@@ -359,6 +359,7 @@ judge "V2ray 配置修改"
 nginx_conf_add(){
     touch ${nginx_conf_dir}/v2ray.conf
     cat>${nginx_conf_dir}/v2ray.conf<<EOF
+    server_tokens off;
     server {
         listen 443 ssl;
         ssl_certificate       /data/v2ray.crt;
@@ -383,7 +384,7 @@ nginx_conf_add(){
         {
         return 302 https://www.idleleo.com;
         }
-}
+    }
     server {
         listen 80;
         server_name serveraddr.com;
