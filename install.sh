@@ -382,7 +382,7 @@ nginx_conf_add(){
         proxy_set_header Connection "upgrade";
         proxy_set_header Host \$http_host;
         }
-        locatioc /
+        locatioc
         {
         returc
         }
