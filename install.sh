@@ -196,6 +196,8 @@ modify_nginx(){
     sed -i "/location/c \\\tlocation \/${camouflage}\/" ${nginx_conf}
     sed -i "/proxy_pass/c \\\tproxy_pass http://127.0.0.1:${PORT};" ${nginx_conf}
     sed -i "/return/c \\\treturn 301 https://${domain}\$request_uri;" ${nginx_conf}
+    sed -i "/returc/c \\\treturn" ${nginx_conf}
+    sed -i "/locatioc/c \\\tlocation;" ${nginx_conf}
     sed -i "27i \\\tproxy_intercept_errors on;"  ${nginx_dir}/conf/nginx.conf
 }
 web_camouflage(){
@@ -380,9 +382,9 @@ nginx_conf_add(){
         proxy_set_header Connection "upgrade";
         proxy_set_header Host \$http_host;
         }
-        location /
+        locatioc /
         {
-        return 302 https://www.idleleo.com;
+        returc 302 https://www.idleleo.com;
         }
     }
     server {
