@@ -5,7 +5,7 @@
 #	Author:	wulabing
 #	Dscription: V2ray ws+tls onekey 
 #	Version: 5.1
-#	email:wulabing@admin.com
+#	email:admin@wulabing.com
 #	Official document: www.v2ray.com
 #====================================================
 
@@ -226,10 +226,18 @@ v2ray_install(){
     # 清除临时文件
     rm -rf /root/v2ray
 }
-nginx_install(){
+nginx_exist_chek(){
     if [[ -d "/etc/nginx" ]];then
-        rm -rf /etc/nginx
+        echo -e "${OK} ${GreenBG} Nginx目录已存在，跳过编译安装过程 ${Font}"
+        sleep 2
+    else
+        nginx_install
     fi
+}
+nginx_install(){
+#    if [[ -d "/etc/nginx" ]];then
+#        rm -rf /etc/nginx
+#    fi
 
     wget -nc http://nginx.org/download/nginx-${nginx_version}.tar.gz -P ${nginx_openssl_src}
     judge "Nginx 下载"
@@ -515,7 +523,7 @@ main(){
     v2ray_install
     port_exist_check 80
     port_exist_check ${port}
-    nginx_install
+    nginx_exist_chek
     v2ray_conf_add
     nginx_conf_add
     web_camouflage
