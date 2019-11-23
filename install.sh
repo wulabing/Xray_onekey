@@ -227,8 +227,8 @@ v2ray_install(){
     rm -rf /root/v2ray
 }
 nginx_exist_chek(){
-    if [[ -d "/etc/nginx" ]];then
-        echo -e "${OK} ${GreenBG} Nginx目录已存在，跳过编译安装过程 ${Font}"
+    if [[ -f "/etc/nginx/sbin/nginx" ]];then
+        echo -e "${OK} ${GreenBG} Nginx已存在，跳过编译安装过程 ${Font}"
         sleep 2
     else
         nginx_install
