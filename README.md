@@ -98,7 +98,7 @@ bash <(curl -L -s https://raw.githubusercontent.com/wulabing/V2Ray_ws-tls_bash_o
 （其他的应该不用我多说了吧 嘿嘿嘿）
 ### 相关目录
 
-Web 目录：`/home/wwwroot/levis`
+Web 目录：`/home/wwwroot/3DCEList`
 
 V2ray 服务端配置：`/etc/v2ray/config.json`
 
