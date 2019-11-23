@@ -155,7 +155,7 @@ dependency_install(){
     if [[ "${ID}" == "centos" ]];then
        ${INS} -y install pcre pcre-devel zlib-devel
     else
-       ${INS} -y install libpcre3 libpcre3-dev zlib1g-dev
+       ${INS} -y install libpcre3 libpcre3-dev zlib1g-dev dbus
     fi
 
 
