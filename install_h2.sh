@@ -327,6 +327,7 @@ EOF
 
 show_information(){
     clear
+    cd ~
 
     echo -e "${OK} ${Green} V2ray http2 over tls 安装成功 " >./v2ray_info.txt
     echo -e "${Red} V2ray 配置信息 ${Font}" >>./v2ray_info.txt
