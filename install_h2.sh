@@ -322,7 +322,7 @@ EOF
     vmess_link="vmess://$(cat /etc/v2ray/vmess_qr.json | base64 -w 0)"
     echo -e "${Red} URL导入链接:${vmess_link} ${Font}" >>./v2ray_info.txt
     echo -e "${Red} 二维码: ${Font}" >>./v2ray_info.txt
-    echo "${vmess_link}"| qrencode -o - -t utf8 >>./v2ray_info.txt
+    echo -n "${vmess_link}"| qrencode -o - -t utf8 >>./v2ray_info.txt
 }
 
 show_information(){
