@@ -179,8 +179,8 @@ basic_optimization(){
 port_alterid_set(){
     read -p "请输入连接端口（default:443）:" port
     [[ -z ${port} ]] && port="443"
-    read -p "请输入alterID（default:4）:" alterID
-    [[ -z ${alterID} ]] && alterID="4"
+    read -p "请输入alterID（default:2）:" alterID
+    [[ -z ${alterID} ]] && alterID="2"
 }
 modify_port_UUID(){
     let PORT=$RANDOM+10000

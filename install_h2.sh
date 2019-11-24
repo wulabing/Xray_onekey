@@ -178,8 +178,8 @@ dependency_install(){
 port_alterid_set(){
     stty erase '^H' && read -p "请输入连接端口（default:443）:" port
     [[ -z ${port} ]] && port="443"
-    stty erase '^H' && read -p "请输入alterID（default:64）:" alterID
-    [[ -z ${alterID} ]] && alterID="64"
+    stty erase '^H' && read -p "请输入alterID（default:2）:" alterID
+    [[ -z ${alterID} ]] && alterID="2"
 }
 
 random_UUID(){
@@ -269,7 +269,8 @@ acme(){
     if [[ $? -eq 0 ]];then
         echo -e "${OK} ${GreenBG} SSL 证书生成成功 ${Font}"
         sleep 2
-        ~/.acme.sh/acme.sh --installcert -d ${domain} --fullchainpath /etc/v2ray/v2ray.crt --keypath /etc/v2ray/v2ray.key --ecc
+        mkdir /data
+        ~/.acme.sh/acme.sh --installcert -d ${domain} --fullchainpath /data/v2ray.crt --keypath /data/v2ray.key --ecc
         if [[ $? -eq 0 ]];then
         echo -e "${OK} ${GreenBG} 证书配置成功 ${Font}"
         sleep 2
@@ -314,6 +315,7 @@ vmess_qr_config(){
   "aid": "${alterID}",
   "net": "h2",
   "type": "none",
+  "path": "/${camouflage}/",
   "tls": "tls"
 }
 EOF
