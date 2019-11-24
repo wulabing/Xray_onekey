@@ -19,7 +19,7 @@
 将crt和key文件命名为v2ray.crt v2ray.key 放在 /data 目录下（若目录不存在请先建目录）
 
 ### 查看客户端配置
-放在执行脚本所在目录下的 v2ray_info.txt
+用户 家目录下的 v2ray_info.txt
 
 推荐使用 `cat v2ray_info.txt` 查看
 
