@@ -56,6 +56,7 @@ check_system(){
         exit 1
     fi
 
+    $INS install dbus
     systemctl stop firewalld && systemctl disable firewalld
     echo -e "${OK} ${GreenBG} firewalld 已关闭 ${Font}"
 }

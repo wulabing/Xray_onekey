@@ -52,6 +52,7 @@ check_system(){
         exit 1
     fi
 
+    $INS install dbus
     systemctl stop firewalld && systemctl disable firewalld
     echo -e "${OK} ${GreenBG} firewalld 已关闭 ${Font}"
 }
@@ -171,8 +172,6 @@ dependency_install(){
     ${INS} -y install qrencode
     judge "安装 qrencode"
 
-    ${INS} -y install dbus
-    judge "安装 dbus"
 
 }
 port_alterid_set(){
