@@ -310,7 +310,7 @@ domain_check(){
     echo -e "本机IP: ${local_ip}"
     sleep 2
     if [[ $(echo ${local_ip}|tr '.' '+'|bc) -eq $(echo ${domain_ip}|tr '.' '+'|bc) ]];then
-        echo -e "${OK} ${GreenBG} 域名dns解析IP  与 本机IP 匹配 ${Font}"
+        echo -e "${OK} ${GreenBG} 域名dns解析IP 与 本机IP 匹配 ${Font}"
         sleep 2
     else
         echo -e "${Error} ${RedBG} 请确保域名添加了正确的 A 记录，否则将无法正常使用 V2ray"
@@ -441,19 +441,19 @@ acme_cron_update(){
 
 vmess_qr_config(){
     cat >/etc/v2ray/vmess_qr.json <<-EOF
-    {
-        "v": "2",
-        "ps": "wulabing_${domain}",
-        "add": "${domain}",
-        "port": "${port}",
-        "id": "${UUID}",
-        "aid": "${alterID}",
-        "net": "ws",
-        "type": "none",
-        "host": "${domain}",
-        "path": "/${camouflage}/",
-        "tls": "tls"
-    }
+{
+  "v": "2",
+  "ps": "wulabing_${domain}",
+  "add": "${domain}",
+  "port": "${port}",
+  "id": "${UUID}",
+  "aid": "${alterID}",
+  "net": "ws",
+  "type": "none",
+  "host": "${domain}",
+  "path": "/${camouflage}/",
+  "tls": "tls"
+}
 EOF
 
     vmess_link="vmess://$(cat /etc/v2ray/vmess_qr.json | base64 -w 0)"
