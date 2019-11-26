@@ -563,5 +563,5 @@ list(){
             ;;
     esac
 }
-list
+list $1
 
