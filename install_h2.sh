@@ -177,7 +177,7 @@ dependency_install(){
 port_alterid_set(){
     stty erase '^H' && read -p "请输入连接端口（default:443）:" port
     [[ -z ${port} ]] && port="443"
-    stty erase '^H' && read -p "请输入alterID（default:2）:" alterID
+    stty erase '^H' && read -p "请输入alterID（default:2 仅允许填数字）:" alterID
     [[ -z ${alterID} ]] && alterID="2"
 }
 
