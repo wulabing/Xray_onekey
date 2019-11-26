@@ -563,5 +563,5 @@ list(){
             ;;
     esac
 }
-main
+list
 
