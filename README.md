@@ -7,11 +7,10 @@
 > telegram 交流群:https://t.me/wulabing_v2ray
 
 #### 如果你遇到 PC 端可用，手机不可用的情况，请将手机调至飞行模式后再取消飞行模式，然后尝试连接
-### 2019-11-25
+### 2019-11-26
 >  本版本有可能解决 ws tls 的祖传断流玄学问题，如有需要请执行安装脚本进行更新
-* TLS配置修改为TLS1.3 only
-* Nginx 开启 HTTP/2 （不过没什么用 websocket 依旧是HTTP/1.1)
-
+* TLS配置修改为支持1.2 1.3 可通过 tls_modify 选项切换
+* 卸载功能支持 可通过 uninstall 选项卸载
 
 ### 使用自定义证书
 将crt和key文件命名为v2ray.crt v2ray.key 放在 /data 目录下（若目录不存在请先建目录）
