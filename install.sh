@@ -27,9 +27,14 @@ nginx_conf_dir="/etc/nginx/conf/conf.d"
 v2ray_conf="${v2ray_conf_dir}/config.json"
 nginx_conf="${nginx_conf_dir}/v2ray.conf"
 nginx_dir="/etc/nginx"
+web_dir="/home/wwwroot"
 nginx_openssl_src="/usr/local/src"
+v2ray_bin_file="/usr/bin/v2ray"
+nginx_systemd_file="/lib/systemd/system/nginx.service"
+v2ray_systemd_file="/etc/systemd/system/v2ray.service"
 nginx_version="1.16.1"
 openssl_version="1.1.1d"
+
 #生成伪装路径
 camouflage=`cat /dev/urandom | head -n 10 | md5sum | head -c 8`
 
@@ -180,7 +185,7 @@ basic_optimization(){
 port_alterid_set(){
     read -p "请输入连接端口（default:443）:" port
     [[ -z ${port} ]] && port="443"
-    read -p "请输入alterID（default:2）:" alterID
+    read -p "请输入alterID（default:2 仅允许填数字）:" alterID
     [[ -z ${alterID} ]] && alterID="2"
 }
 modify_port_UUID(){
@@ -203,7 +208,7 @@ web_camouflage(){
     ##请注意 这里和LNMP脚本的默认路径冲突，千万不要在安装了LNMP的环境下使用本脚本，否则后果自负
     rm -rf /home/wwwroot && mkdir -p /home/wwwroot && cd /home/wwwroot
     git clone https://github.com/wulabing/3DCEList.git
-    judge "web 站点伪装"   
+    judge "web 站点伪装"
 }
 v2ray_install(){
     if [[ -d /root/v2ray ]];then
@@ -216,7 +221,7 @@ v2ray_install(){
     wget  --no-check-certificate https://install.direct/go.sh
 
     ## wget http://install.direct/go.sh
-    
+
     if [[ -f go.sh ]];then
         bash go.sh --force
         judge "安装 V2ray"
@@ -293,7 +298,7 @@ nginx_install(){
 }
 ssl_install(){
     if [[ "${ID}" == "centos" ]];then
-        ${INS} install socat nc -y        
+        ${INS} install socat nc -y
     else
         ${INS} install socat netcat -y
     fi
@@ -318,11 +323,11 @@ domain_check(){
         echo -e "${Error} ${RedBG} 域名dns解析IP 与 本机IP 不匹配 是否继续安装？（y/n）${Font}" && read install
         case $install in
         [yY][eE][sS]|[yY])
-            echo -e "${GreenBG} 继续安装 ${Font}" 
+            echo -e "${GreenBG} 继续安装 ${Font}"
             sleep 2
             ;;
         *)
-            echo -e "${RedBG} 安装终止 ${Font}" 
+            echo -e "${RedBG} 安装终止 ${Font}"
             exit 2
             ;;
         esac
@@ -372,13 +377,13 @@ nginx_conf_add(){
         listen 443 ssl http2;
         ssl_certificate       /data/v2ray.crt;
         ssl_certificate_key   /data/v2ray.key;
-        ssl_protocols         TLSv1.3;
+        ssl_protocols         TLSv1.2 TLSv1.3;
         ssl_ciphers           TLS13-AES-256-GCM-SHA384:TLS13-CHACHA20-POLY1305-SHA256:TLS13-AES-128-GCM-SHA256:TLS13-AES-128-CCM-8-SHA256:TLS13-AES-128-CCM-SHA256:EECDH+CHACHA20:EECDH+CHACHA20-draft:EECDH+ECDSA+AES128:EECDH+aRSA+AES128:RSA+AES128:EECDH+ECDSA+AES256:EECDH+aRSA+AES256:RSA+AES256:EECDH+ECDSA+3DES:EECDH+aRSA+3DES:RSA+3DES:!MD5;
         server_name           serveraddr.com;
         index index.html index.htm;
         root  /home/wwwroot/3DCEList;
         error_page 400 = /400.html;
-        location /ray/ 
+        location /ray/
         {
         proxy_redirect off;
         proxy_pass http://127.0.0.1:10000;
@@ -494,8 +499,9 @@ ssl_judge_and_install(){
         acme
     fi
 }
+
 nginx_systemd(){
-    cat>/lib/systemd/system/nginx.service<<EOF
+    cat>$nginx_systemd_file<<EOF
 [Unit]
 Description=The NGINX HTTP and reverse proxy server
 After=syslog.target network.target remote-fs.target nss-lookup.target
@@ -515,6 +521,36 @@ EOF
 
 judge "Nginx systemd ServerFile 添加"
 }
+
+tls_type(){
+    if [[ -f "/etc/nginx/sbin/nginx" ]] && [[ -f "$nginx_conf" ]];then
+        echo "请选择支持的 TLS 版本（default:1）:"
+        echo "1: TLS1.2 and TLS1.3"
+        echo "2: TLS1.3 only"
+        read -p  "请输入：" tls_version
+        [[ -z ${tls_version} ]] && tls_version=1
+        if [[ $tls_version == 2 ]];then
+            sed -i 's/ssl_protocols.*/ssl_protocols         TLSv1.3;/' $nginx_conf
+            echo -e "${OK} ${GreenBG} 已切换至 TLS1.3 only ${Font}"
+        else
+            sed -i 's/ssl_protocols.*/ssl_protocols         TLSv1.2 TLSv1.3;/' $nginx_conf
+            echo -e "${OK} ${GreenBG} 已切换至TLS1.2 and TLS1.3 ${Font}"
+        fi
+        systemctl restart nginx
+        judge "Nginx 重启"
+    else
+        echo -e "${Error} ${RedBG} Nginx 或 配置文件不存在，请正确安装脚本后执行${Font}"
+    fi
+}
+uninstall_all(){
+    [[ -f $nginx_systemd_file ]] && rm -f $nginx_systemd_file
+    [[ -f $v2ray_systemd_file ]] && rm -f $v2ray_systemd_file
+    [[ -d $v2ray_bin_file ]] && rm -rf $v2ray_bin_file
+    [[ -d $nginx_dir ]] && rm -rf $nginx_dir
+    [[ -d $v2ray_conf_dir ]] && rm -rf $v2ray_conf_dir
+    [[ -d $web_dir ]] && rm -rf $web_dir
+    echo -e "${OK} ${GreenBG} 已卸载，SSL证书文件已保留 ${Font}"
+}
 main(){
     is_root
     check_system
@@ -531,13 +567,24 @@ main(){
     nginx_conf_add
     web_camouflage
 
-    #将证书生成放在最后，尽量避免多次尝试脚本从而造成的多次证书申请
     ssl_judge_and_install
     nginx_systemd
     show_information
     start_process_systemd
     acme_cron_update
 }
-
-main
+list(){
+    case $1 in
+        tls_modify)
+            tls_type
+            ;;
+        uninstall)
+            uninstall_all
+            ;;
+        *)
+            main
+            ;;
+    esac
+}
+list $1
 
