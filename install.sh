@@ -588,6 +588,9 @@ list(){
         crontab_modify)
             acme_cron_update
             ;;
+        boost)
+            bash <(curl -L -s "https://raw.githubusercontent.com/chiakge/Linux-NetSpeed/master/tcp.sh")
+            ;;
         *)
             main
             ;;
