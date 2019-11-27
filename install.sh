@@ -436,10 +436,10 @@ start_process_systemd(){
 #}
 acme_cron_update(){
     if [[ "${ID}" == "centos" ]];then
-        sed -i "/acme.sh/c 0 0 * * 0 systemctl stop nginx && \"/root/.acme.sh\"/acme.sh --cron --home \"/root/.acme.sh\" \
+        sed -i "/acme.sh/c 0 3 * * 0 systemctl stop nginx && \"/root/.acme.sh\"/acme.sh --cron --home \"/root/.acme.sh\" \
         > /dev/null && systemctl start nginx" /var/spool/cron/root
     else
-        sed -i "/acme.sh/c 0 0 * * 0 systemctl stop nginx && \"/root/.acme.sh\"/acme.sh --cron --home \"/root/.acme.sh\" \
+        sed -i "/acme.sh/c 0 3 * * 0 systemctl stop nginx && \"/root/.acme.sh\"/acme.sh --cron --home \"/root/.acme.sh\" \
         > /dev/null && systemctl start nginx" /var/spool/cron/crontabs/root
     fi
     judge "cron 计划任务更新"
@@ -580,6 +580,9 @@ list(){
             ;;
         uninstall)
             uninstall_all
+            ;;
+        crontab_modify)
+            acme_cron_update
             ;;
         *)
             main
