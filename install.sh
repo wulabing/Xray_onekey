@@ -525,12 +525,16 @@ judge "Nginx systemd ServerFile 添加"
 tls_type(){
     if [[ -f "/etc/nginx/sbin/nginx" ]] && [[ -f "$nginx_conf" ]];then
         echo "请选择支持的 TLS 版本（default:1）:"
-        echo "1: TLS1.2 and TLS1.3"
-        echo "2: TLS1.3 only"
+        echo "1: TLS1.1 TLS1.2 and TLS1.3"
+        echo "2: TLS1.2 and TLS1.3"
+        echo "3: TLS1.3 only"
         read -p  "请输入：" tls_version
-        [[ -z ${tls_version} ]] && tls_version=1
-        if [[ $tls_version == 2 ]];then
+        [[ -z ${tls_version} ]] && tls_version=2
+        if [[ $tls_version == 3 ]];then
             sed -i 's/ssl_protocols.*/ssl_protocols         TLSv1.3;/' $nginx_conf
+            echo -e "${OK} ${GreenBG} 已切换至 TLS1.3 only ${Font}"
+        elif [[ $tls_version == 1 ]];then
+            sed -i 's/ssl_protocols.*/ssl_protocols         TLSv1.1 TLSv1.2 TLSv1.3;/' $nginx_conf
             echo -e "${OK} ${GreenBG} 已切换至 TLS1.3 only ${Font}"
         else
             sed -i 's/ssl_protocols.*/ssl_protocols         TLSv1.2 TLSv1.3;/' $nginx_conf
