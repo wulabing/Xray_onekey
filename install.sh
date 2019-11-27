@@ -535,7 +535,7 @@ tls_type(){
             echo -e "${OK} ${GreenBG} 已切换至 TLS1.3 only ${Font}"
         elif [[ $tls_version == 1 ]];then
             sed -i 's/ssl_protocols.*/ssl_protocols         TLSv1.1 TLSv1.2 TLSv1.3;/' $nginx_conf
-            echo -e "${OK} ${GreenBG} 已切换至 TLS1.3 only ${Font}"
+            echo -e "${OK} ${GreenBG} 已切换至 TLS1.1 TLS1.2 and TLS1.3 ${Font}"
         else
             sed -i 's/ssl_protocols.*/ssl_protocols         TLSv1.2 TLSv1.3;/' $nginx_conf
             echo -e "${OK} ${GreenBG} 已切换至TLS1.2 and TLS1.3 ${Font}"
