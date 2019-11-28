@@ -178,6 +178,13 @@ dependency_install(){
     ${INS} -y haveged
     judge "haveged 安装"
 
+    if [[ "${ID}" == "centos" ]];then
+       systemctl start rngd && systemctl enable rngd
+       systemctl start haveged && systemctl enable haveged
+    else
+       systemctl start rng-tools && systemctl enable rng-tools
+       systemctl start haveged && systemctl enable haveged
+    fi
 
 }
 port_alterid_set(){
