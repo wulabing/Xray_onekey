@@ -172,6 +172,12 @@ dependency_install(){
     ${INS} -y install qrencode
     judge "安装 qrencode"
 
+    ${INS} -y rng-tools
+    judge "rng-tools 安装"
+
+    ${INS} -y haveged
+    judge "haveged 安装"
+
 
 }
 port_alterid_set(){

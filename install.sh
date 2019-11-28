@@ -164,6 +164,11 @@ dependency_install(){
        ${INS} -y install libpcre3 libpcre3-dev zlib1g-dev dbus
     fi
 
+    ${INS} -y rng-tools
+    judge "rng-tools 安装"
+
+    ${INS} -y haveged
+    judge "haveged 安装"
 
     judge "nginx 编译依赖安装"
 
