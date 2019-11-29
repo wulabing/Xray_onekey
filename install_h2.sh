@@ -178,6 +178,8 @@ dependency_install(){
     ${INS} -y haveged
     judge "haveged 安装"
 
+    sed -i -r '/^HRNGDEVICE/d;/#HRNGDEVICE=\/dev\/null/a HRNGDEVICE=/dev/urandom' /etc/default/rng-tools
+
     if [[ "${ID}" == "centos" ]];then
        systemctl start rngd && systemctl enable rngd
        systemctl start haveged && systemctl enable haveged
