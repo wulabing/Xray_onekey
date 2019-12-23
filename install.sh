@@ -214,6 +214,7 @@ modify_path(){
 modify_alterid(){
     sed -i "/\"alterId\"/c \\\t  \"alterId\":${alterID}" ${v2ray_conf}
     judge "V2ray alterid 修改"
+    echo -e "${GreenBG} alterID:${alterID} ${Font}"
 }
 modify_inbound_port(){
     let PORT=$RANDOM+10000
@@ -221,14 +222,15 @@ modify_inbound_port(){
     judge "V2ray inbound_port 修改"
 }
 modify_UUID(){
-    UUID=$(cat /proc/sys/kernel/random/uuid)
+    [ -z $UUID ] && UUID=$(cat /proc/sys/kernel/random/uuid)
     sed -i "/\"id\"/c \\\t  \"id\":\"${UUID}\"," ${v2ray_conf}
     judge "V2ray UUID 修改"
+    echo -e "${GreenBG} UUID:${UUID} ${Font}"
 }
 modify_nginx_port(){
     sed -i "1,/listen/{s#listen#listen ${port} ssl http2;#}" ${nginx_conf}
     judge "V2ray port 修改"
-
+    echo -e "${GreenBG} 端口号:${port} ${Font}"
 }
 modify_nginx_other(){
     sed -i "/server_name/c \\\tserver_name ${domain};" ${nginx_conf}
@@ -681,7 +683,7 @@ menu(){
     read -p "请输入数字：" menu_num
     case $menu_num in
         0)
-          maintain
+          update_sh
           ;;
         1)
           install_v2ray_ws_tls
@@ -713,7 +715,7 @@ menu(){
         10)
           uninstall_all
           ;;
-        111)
+        11)
           exit 0
           ;;
         *)
