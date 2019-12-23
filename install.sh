@@ -37,6 +37,7 @@ nginx_systemd_file="/lib/systemd/system/nginx.service"
 v2ray_systemd_file="/etc/systemd/system/v2ray.service"
 v2ray_access_log="/var/log/v2ray/access.log"
 v2ray_error_log="/var/log/v2ray/error.log"
+amce_sh_file="/root/.acme.sh/acme.sh"
 nginx_version="1.16.1"
 openssl_version="1.1.1d"
 
@@ -587,6 +588,12 @@ show_access_log(){
 show_error_log(){
     [ -f ${v2ray_error_log} ] && tail -f ${v2ray_error_log} || echo -e  "${RedBG}log文件不存在${Font}"
 }
+ssl_update_manuel(){
+    [ -f ${amce_sh_file} ] && "/root/.acme.sh"/acme.sh --cron --home "/root/.acme.sh" || echo -e  "${RedBG}证书签发工具不存在${Font}"
+}
+bbr_boost_sh(){
+    bash <(curl -L -s "https://raw.githubusercontent.com/chiakge/Linux-NetSpeed/master/tcp.sh")
+}
 uninstall_all(){
     [[ -f $nginx_systemd_file ]] && rm -f $nginx_systemd_file
     [[ -f $v2ray_systemd_file ]] && rm -f $v2ray_systemd_file
@@ -641,7 +648,7 @@ list(){
             acme_cron_update
             ;;
         boost)
-            bash <(curl -L -s "https://raw.githubusercontent.com/chiakge/Linux-NetSpeed/master/tcp.sh")
+            bbr_boost_sh
             ;;
         *)
             menu
@@ -655,21 +662,21 @@ menu(){
     echo -e "\thttps://github.com/wulabing\n"
 
     echo -e "—————————————— 安装向导 ——————————————"""
-    echo -e "${Green}0.${Font}升级 脚本"
-    echo -e "${Green}1.${Font}安装 V2Ray (websocket+tls)"
-    echo -e "${Green}2.${Font}安装 V2Ray (http/2)"
+    echo -e "${Green}0.${Font}  升级 脚本"
+    echo -e "${Green}1.${Font}  安装 V2Ray (websocket+tls)"
+    echo -e "${Green}2.${Font}  安装 V2Ray (http/2)"
     echo -e "—————————————— 配置变更 ——————————————"
-    echo -e "${Green}3.${Font}变更 UUID"
-    echo -e "${Green}4.${Font}变更 alterid"
-    echo -e "${Green}5.${Font}变更 port"
+    echo -e "${Green}3.${Font}  变更 UUID"
+    echo -e "${Green}4.${Font}  变更 alterid"
+    echo -e "${Green}5.${Font}  变更 port"
     echo -e "—————————————— 查看日志 ——————————————"
-    echo -e "${Green}6.${Font}查看 实时访问日志"
-    echo -e "${Green}7.${Font}查看 实时错误日志"
+    echo -e "${Green}6.${Font}  查看 实时访问日志"
+    echo -e "${Green}7.${Font}  查看 实时错误日志"
     echo -e "—————————————— 其他选项 ——————————————"
-    echo -e "${Green}8.${Font}安装 4合1 bbr 锐速安装脚本"
-    echo -e "${Green}9.${Font}证书 有效期更新"
-    echo -e "${Green}10.${Font}卸载 V2Ray"
-    echo -e "${Green}11.${Font}退出 \n"
+    echo -e "${Green}8.${Font}  安装 4合1 bbr 锐速安装脚本"
+    echo -e "${Green}9.${Font}  证书 有效期更新"
+    echo -e "${Green}10.${Font} 卸载 V2Ray"
+    echo -e "${Green}11.${Font} 退出 \n"
 
     read -p "请输入数字：" menu_num
     case $menu_num in
@@ -698,12 +705,15 @@ menu(){
           show_error_log
           ;;
         8)
-          bash <(curl -L -s "https://raw.githubusercontent.com/chiakge/Linux-NetSpeed/master/tcp.sh")
+          bbr_boost_sh
           ;;
         9)
-          uninstall_all
+          ssl_update_manuel
           ;;
         10)
+          uninstall_all
+          ;;
+        111)
           exit 0
           ;;
         *)
