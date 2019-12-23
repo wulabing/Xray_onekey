@@ -3,15 +3,15 @@
 #====================================================
 #	System Request:Debian 9+/Ubuntu 18.04+/Centos 7+
 #	Author:	wulabing
-#	Dscription: V2ray ws+tls onekey 
-#	Version: 5.1
+#	Dscription: V2ray ws+tls onekey Management
+#	Version: 1.0
 #	email:admin@wulabing.com
 #	Official document: www.v2ray.com
 #====================================================
 
 #fonts color
-Green="\033[32m" 
-Red="\033[31m" 
+Green="\033[32m"
+Red="\033[31m"
 Yellow="\033[33m"
 GreenBG="\033[42;37m"
 RedBG="\033[41;37m"
@@ -21,6 +21,9 @@ Font="\033[0m"
 Info="${Green}[信息]${Font}"
 OK="${Green}[OK]${Font}"
 Error="${Red}[错误]${Font}"
+
+# 版本
+shell_version="1.0"
 
 v2ray_conf_dir="/etc/v2ray"
 nginx_conf_dir="/etc/nginx/conf/conf.d"
@@ -32,6 +35,8 @@ nginx_openssl_src="/usr/local/src"
 v2ray_bin_file="/usr/bin/v2ray"
 nginx_systemd_file="/lib/systemd/system/nginx.service"
 v2ray_systemd_file="/etc/systemd/system/v2ray.service"
+v2ray_access_log="/var/log/v2ray/access.log"
+v2ray_error_log="/var/log/v2ray/error.log"
 nginx_version="1.16.1"
 openssl_version="1.1.1d"
 
@@ -71,7 +76,7 @@ is_root(){
         then echo -e "${OK} ${GreenBG} 当前用户是root用户，进入安装流程 ${Font}"
         sleep 3
     else
-        echo -e "${Error} ${RedBG} 当前用户不是root用户，请切换到root用户后重新执行脚本 ${Font}" 
+        echo -e "${Error} ${RedBG} 当前用户不是root用户，请切换到root用户后重新执行脚本 ${Font}"
         exit 1
     fi
 }
@@ -201,16 +206,30 @@ port_alterid_set(){
     read -p "请输入alterID（default:2 仅允许填数字）:" alterID
     [[ -z ${alterID} ]] && alterID="2"
 }
-modify_port_UUID(){
-    let PORT=$RANDOM+10000
-    UUID=$(cat /proc/sys/kernel/random/uuid)
-    sed -i "/\"port\"/c  \    \"port\":${PORT}," ${v2ray_conf}
-    sed -i "/\"id\"/c \\\t  \"id\":\"${UUID}\"," ${v2ray_conf}
-    sed -i "/\"alterId\"/c \\\t  \"alterId\":${alterID}" ${v2ray_conf}
+modify_path(){
     sed -i "/\"path\"/c \\\t  \"path\":\"\/${camouflage}\/\"" ${v2ray_conf}
+    judge "V2ray 伪装路径 修改"
 }
-modify_nginx(){
-    sed -i "1,/listen/{s/listen 443 ssl http2;/listen ${port} ssl http2;/}" ${nginx_conf}
+modify_alterid(){
+    sed -i "/\"alterId\"/c \\\t  \"alterId\":${alterID}" ${v2ray_conf}
+    judge "V2ray alterid 修改"
+}
+modify_inbound_port(){
+    let PORT=$RANDOM+10000
+    sed -i "/\"port\"/c  \    \"port\":${PORT}," ${v2ray_conf}
+    judge "V2ray inbound_port 修改"
+}
+modify_UUID(){
+    UUID=$(cat /proc/sys/kernel/random/uuid)
+    sed -i "/\"id\"/c \\\t  \"id\":\"${UUID}\"," ${v2ray_conf}
+    judge "V2ray UUID 修改"
+}
+modify_nginx_port(){
+    sed -i "1,/listen/{s#listen#listen ${port} ssl http2;#}" ${nginx_conf}
+    judge "V2ray port 修改"
+
+}
+modify_nginx_other(){
     sed -i "/server_name/c \\\tserver_name ${domain};" ${nginx_conf}
     sed -i "/location/c \\\tlocation \/${camouflage}\/" ${nginx_conf}
     sed -i "/proxy_pass/c \\\tproxy_pass http://127.0.0.1:${PORT};" ${nginx_conf}
@@ -380,8 +399,10 @@ acme(){
 v2ray_conf_add(){
     cd /etc/v2ray
     wget https://raw.githubusercontent.com/wulabing/V2Ray_ws-tls_bash_onekey/master/tls/config.json -O config.json
-modify_port_UUID
-judge "V2ray 配置修改"
+    modify_path
+    modify_alterid
+    modify_inbound_port
+    modify_UUID
 }
 nginx_conf_add(){
     touch ${nginx_conf_dir}/v2ray.conf
@@ -413,7 +434,8 @@ nginx_conf_add(){
     }
 EOF
 
-modify_nginx
+modify_nginx_port
+modify_nginx_other
 judge "Nginx 配置修改"
 
 }
@@ -559,6 +581,12 @@ tls_type(){
         echo -e "${Error} ${RedBG} Nginx 或 配置文件不存在，请正确安装脚本后执行${Font}"
     fi
 }
+show_access_log(){
+    [ -f ${v2ray_access_log} ] && tail -f ${v2ray_access_log} || echo -e "${RedBG}log文件不存在${Font}"
+}
+show_error_log(){
+    [ -f ${v2ray_error_log} ] && tail -f ${v2ray_error_log} || echo -e  "${RedBG}log文件不存在${Font}"
+}
 uninstall_all(){
     [[ -f $nginx_systemd_file ]] && rm -f $nginx_systemd_file
     [[ -f $v2ray_systemd_file ]] && rm -f $v2ray_systemd_file
@@ -568,7 +596,7 @@ uninstall_all(){
     [[ -d $web_dir ]] && rm -rf $web_dir
     echo -e "${OK} ${GreenBG} 已卸载，SSL证书文件已保留 ${Font}"
 }
-main(){
+install_v2ray_ws_tls(){
     is_root
     check_system
     chrony_install
@@ -579,7 +607,7 @@ main(){
     v2ray_install
     port_exist_check 80
     port_exist_check ${port}
-    nginx_exist_chek
+    nginx_exist_check
     v2ray_conf_add
     nginx_conf_add
     web_camouflage
@@ -589,6 +617,17 @@ main(){
     show_information
     start_process_systemd
     acme_cron_update
+}
+install_v2_h2(){
+    maintain "正在合并代码，请等待更新"
+}
+update_sh(){
+    maintain "正在合并代码，请等待更新"
+}
+maintain(){
+    echo -e "${RedBG}该选项暂时无法使用${Font}"
+    echo -e "${RedBG}$1${Font}"
+    exit 0
 }
 list(){
     case $1 in
@@ -605,9 +644,72 @@ list(){
             bash <(curl -L -s "https://raw.githubusercontent.com/chiakge/Linux-NetSpeed/master/tcp.sh")
             ;;
         *)
-            main
+            menu
             ;;
     esac
 }
-list $1
 
+menu(){
+    echo -e "\t V2ray 安装管理脚本 ${Red}[${shell_version}]${Font}"
+    echo -e "\t---authored by wulabing---"
+    echo -e "\thttps://github.com/wulabing\n"
+
+    echo -e "—————————————— 安装向导 ——————————————"""
+    echo -e "${Green}0.${Font}升级 脚本"
+    echo -e "${Green}1.${Font}安装 V2Ray (websocket+tls)"
+    echo -e "${Green}2.${Font}安装 V2Ray (http/2)"
+    echo -e "—————————————— 配置变更 ——————————————"
+    echo -e "${Green}3.${Font}变更 UUID"
+    echo -e "${Green}4.${Font}变更 alterid"
+    echo -e "${Green}5.${Font}变更 port"
+    echo -e "—————————————— 查看日志 ——————————————"
+    echo -e "${Green}6.${Font}查看 实时访问日志"
+    echo -e "${Green}7.${Font}查看 实时错误日志"
+    echo -e "—————————————— 其他选项 ——————————————"
+    echo -e "${Green}8.${Font}安装 4合1 bbr 锐速安装脚本"
+    echo -e "${Green}9.${Font}证书 有效期更新"
+    echo -e "${Green}10.${Font}卸载 V2Ray"
+    echo -e "${Green}11.${Font}退出 \n"
+
+    read -p "请输入数字：" menu_num
+    case $menu_num in
+        0)
+          maintain
+          ;;
+        1)
+          install_v2ray_ws_tls
+          ;;
+        2)
+          install_v2_h2
+          ;;
+        3)
+          modify_UUID
+          ;;
+        4)
+          modify_alterid
+          ;;
+        5)
+          modify_nginx_port
+          ;;
+        6)
+          show_access_log
+          ;;
+        7)
+          show_error_log
+          ;;
+        8)
+          bash <(curl -L -s "https://raw.githubusercontent.com/chiakge/Linux-NetSpeed/master/tcp.sh")
+          ;;
+        9)
+          uninstall_all
+          ;;
+        10)
+          exit 0
+          ;;
+        *)
+          echo -e "${RedBG}请输入正确的数字${Font}"
+          ;;
+    esac
+}
+
+list $1
