@@ -267,7 +267,7 @@ v2ray_install(){
     # 清除临时文件
     rm -rf /root/v2ray
 }
-nginx_exist_chek(){
+nginx_exist_check(){
     if [[ -f "/etc/nginx/sbin/nginx" ]];then
         echo -e "${OK} ${GreenBG} Nginx已存在，跳过编译安装过程 ${Font}"
         sleep 2
