@@ -228,7 +228,7 @@ modify_UUID(){
     echo -e "${GreenBG} UUID:${UUID} ${Font}"
 }
 modify_nginx_port(){
-    sed -i "/listen/c \\\tlisten ${port} ssl http2" ${nginx_conf}
+    sed -i "/ssl http2;$/c \\\tlisten ${port} ssl http2;" ${nginx_conf}
     judge "V2ray port 修改"
     echo -e "${GreenBG} 端口号:${port} ${Font}"
 }
