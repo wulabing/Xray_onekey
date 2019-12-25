@@ -33,7 +33,7 @@ nginx_dir="/etc/nginx"
 web_dir="/home/wwwroot"
 nginx_openssl_src="/usr/local/src"
 v2ray_bin_file="/usr/bin/v2ray"
-nginx_systemd_file="/lib/systemd/system/nginx.service"
+nginx_systemd_file="/etc/systemd/system/nginx.service"
 v2ray_systemd_file="/etc/systemd/system/v2ray.service"
 v2ray_access_log="/var/log/v2ray/access.log"
 v2ray_error_log="/var/log/v2ray/error.log"
@@ -445,19 +445,18 @@ judge "Nginx 配置修改"
 
 start_process_systemd(){
     systemctl daemon-reload
-
     ### nginx服务在安装完成后会自动启动。需要通过restart或reload重新加载配置
     systemctl restart nginx
     judge "Nginx 启动"
-
-    systemctl enable nginx
-    judge "设置 Nginx 开机自启"
-
     systemctl restart v2ray
     judge "V2ray 启动"
+}
 
+enable_process_systemd(){
     systemctl enable v2ray
     judge "设置 v2ray 开机自启"
+    systemctl enable nginx
+    judge "设置 Nginx 开机自启"
 }
 
 #debian 系 9 10 适配
@@ -625,6 +624,7 @@ install_v2ray_ws_tls(){
     nginx_systemd
     show_information
     start_process_systemd
+    enable_process_systemd
     acme_cron_update
 }
 install_v2_h2(){
@@ -693,12 +693,15 @@ menu(){
           install_v2_h2
           ;;
         3)
+          read -p "请输入UUID:" UUID
           modify_UUID
           ;;
         4)
+          read -p "请输入alterID:" alterID
           modify_alterid
           ;;
         5)
+          read -p "请输入连接端口:" port
           modify_nginx_port
           ;;
         6)
