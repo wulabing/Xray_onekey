@@ -482,7 +482,7 @@ acme_cron_update(){
     judge "cron 计划任务更新"
 }
 
-vmess_qr_config(){
+vmess_qr_config_tls_ws(){
     cat >/etc/v2ray/vmess_qr.json <<-EOF
 {
   "v": "2",
@@ -494,6 +494,28 @@ vmess_qr_config(){
   "net": "ws",
   "type": "none",
   "host": "${domain}",
+  "path": "/${camouflage}/",
+  "tls": "tls"
+}
+EOF
+
+    vmess_link="vmess://$(cat /etc/v2ray/vmess_qr.json | base64 -w 0)"
+    echo -e "${Red} URL导入链接:${vmess_link} ${Font}" >>./v2ray_info.txt
+    echo -e "${Red} 二维码: ${Font}" >>./v2ray_info.txt
+    echo -n "${vmess_link}"| qrencode -o - -t utf8 >>./v2ray_info.txt
+}
+
+vmess_qr_config_h2(){
+    cat >/etc/v2ray/vmess_qr.json <<-EOF
+{
+  "v": "2",
+  "ps": "wulabing_${domain}",
+  "add": "${domain}",
+  "port": "${port}",
+  "id": "${UUID}",
+  "aid": "${alterID}",
+  "net": "h2",
+  "type": "none",
   "path": "/${camouflage}/",
   "tls": "tls"
 }
@@ -520,7 +542,7 @@ show_information(){
     echo -e "${Red} 伪装类型（type）：${Font} none " >>./v2ray_info.txt
     echo -e "${Red} 路径（不要落下/）：${Font} /${camouflage}/ " >>./v2ray_info.txt
     echo -e "${Red} 底层传输安全：${Font} tls " >>./v2ray_info.txt
-    vmess_qr_config
+
     cat ./v2ray_info.txt
 
 }
@@ -619,16 +641,34 @@ install_v2ray_ws_tls(){
     v2ray_conf_add
     nginx_conf_add
     web_camouflage
-
     ssl_judge_and_install
     nginx_systemd
+    vmess_qr_config_tls_ws
     show_information
     start_process_systemd
     enable_process_systemd
     acme_cron_update
+
 }
 install_v2_h2(){
-    maintain "正在合并代码，请等待更新"
+    is_root
+    check_system
+    chrony_install
+    dependency_install
+    basic_optimization
+    domain_check
+    port_alterid_set
+    v2ray_install
+    port_exist_check 80
+    port_exist_check ${port}
+    v2ray_conf_add
+    ssl_judge_and_install
+    nginx_systemd
+    vmess_qr_config_h2
+    show_information
+    start_process_systemd
+    enable_process_systemd
+
 }
 update_sh(){
     maintain "正在合并代码，请等待更新"
