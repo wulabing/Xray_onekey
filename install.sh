@@ -478,6 +478,9 @@ stop_process_systemd(){
     systemctl stop nginx
     systemctl stop v2ray
 }
+nginx_process_disabled(){
+    [ -f $nginx_systemd_file ] && systemctl stop nginx && systemctl disable nginx
+}
 
 #debian 系 9 10 适配
 #rc_local_initialization(){
@@ -669,7 +672,6 @@ install_v2ray_ws_tls(){
     start_process_systemd
     enable_process_systemd
     acme_cron_update
-
 }
 install_v2_h2(){
     is_root
@@ -684,7 +686,6 @@ install_v2_h2(){
     port_exist_check ${port}
     v2ray_conf_add
     ssl_judge_and_install
-    nginx_systemd
     basic_information
     vmess_qr_config_h2
     vmess_qr_link_image
@@ -792,26 +793,29 @@ menu(){
           start_process_systemd
           ;;
         6)
-          show_access_log
+          tls_modify
           ;;
         7)
-          show_error_log
+          show_access_log
           ;;
         8)
+          show_error_log
+          ;;
+        9)
           basic_information
           vmess_qr_link_image
           show_information
           ;;
-        9)
+        10)
           bbr_boost_sh
           ;;
-        10)
+        11)
           ssl_update_manuel
           ;;
-        11)
+        12)
           uninstall_all
           ;;
-        12)
+        13)
           exit 0
           ;;
         *)
