@@ -574,7 +574,7 @@ basic_information(){
     echo -e "${Red} 加密方式（security）：${Font} 自适应 " >> ${v2ray_info_file}
     echo -e "${Red} 传输协议（network）：${Font} $(info_extraction "net") " >> ${v2ray_info_file}
     echo -e "${Red} 伪装类型（type）：${Font} none " >> ${v2ray_info_file}
-    echo -e "${Red} 路径（不要落下/）：${Font} $(info_extraction "tls") " >> ${v2ray_info_file}
+    echo -e "${Red} 路径（不要落下/）：${Font} $(info_extraction "path") " >> ${v2ray_info_file}
     echo -e "${Red} 底层传输安全：${Font} tls " >> ${v2ray_info_file}
 }
 show_information(){
