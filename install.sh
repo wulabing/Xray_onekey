@@ -219,13 +219,12 @@ modify_path(){
 modify_alterid(){
     sed -i "/\"alterId\"/c \\\t  \"alterId\":${alterID}" ${v2ray_conf}
     judge "V2ray alterid 修改"
-    [ -f ${v2ray_qr_config_file} ] && sed -i "/\"aid\"/c \\  \"port\": \"${aid}\"," ${v2ray_qr_config_file}
+    [ -f ${v2ray_qr_config_file} ] && sed -i "/\"aid\"/c \\  \"aid\": \"${aid}\"," ${v2ray_qr_config_file}
     echo -e "${GreenBG} alterID:${alterID} ${Font}"
 }
 modify_inbound_port(){
     let PORT=$RANDOM+10000
     sed -i "/\"port\"/c  \    \"port\":${PORT}," ${v2ray_conf}
-    [ -f ${v2ray_qr_config_file} ] && sed -i "/\"port\"/c \\  \"port\": \"${PORT}\"," ${v2ray_qr_config_file}
     judge "V2ray inbound_port 修改"
 }
 modify_UUID(){
@@ -238,6 +237,7 @@ modify_UUID(){
 modify_nginx_port(){
     sed -i "/ssl http2;$/c \\\tlisten ${port} ssl http2;" ${nginx_conf}
     judge "V2ray port 修改"
+    [ -f ${v2ray_qr_config_file} ] && sed -i "/\"port\"/c \\  \"port\": \"${port}\"," ${v2ray_qr_config_file}
     echo -e "${GreenBG} 端口号:${port} ${Font}"
 }
 modify_nginx_other(){
@@ -506,7 +506,7 @@ acme_cron_update(){
 }
 
 vmess_qr_config_tls_ws(){
-    cat > $v2ray_qr_confg_file <<-EOF
+    cat > $v2ray_qr_config_file <<-EOF
 {
   "v": "2",
   "ps": "wulabing_${domain}",
@@ -524,7 +524,7 @@ EOF
 }
 
 vmess_qr_config_h2(){
-    cat > $v2ray_qr_confg_file <<-EOF
+    cat > $v2ray_qr_config_file <<-EOF
 {
   "v": "2",
   "ps": "wulabing_${domain}",
@@ -541,14 +541,14 @@ EOF
 }
 
 vmess_qr_link_image(){
-    vmess_link="vmess://$(cat $v2ray_qr_confg_file | base64 -w 0)"
+    vmess_link="vmess://$(cat $v2ray_qr_config_file | base64 -w 0)"
     echo -e "${Red} URL导入链接:${vmess_link} ${Font}" >> ${v2ray_info_file}
     echo -e "${Red} 二维码: ${Font}" >> ${v2ray_info_file}
     echo -n "${vmess_link}"| qrencode -o - -t utf8 >> ${v2ray_info_file}
 }
 
 info_extraction(){
-    grep $1 $v2ray_qr_confg_file | awk -F '"' '{print $4}'
+    grep $1 $v2ray_qr_config_file | awk -F '"' '{print $4}'
 }
 basic_information(){
     echo -e "${OK} ${Green} V2ray+ws+tls 安装成功" > ${v2ray_info_file}
