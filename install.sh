@@ -225,7 +225,7 @@ modify_alterid(){
 modify_inbound_port(){
     let PORT=$RANDOM+10000
     sed -i "/\"port\"/c  \    \"port\":${PORT}," ${v2ray_conf}
-    [ -f ${v2ray_qr_config_file} ] && sed -i "/\"port\"/c \\  \"port\": \"${port}\"," ${v2ray_qr_config_file}
+    [ -f ${v2ray_qr_config_file} ] && sed -i "/\"port\"/c \\  \"port\": \"${PORT}\"," ${v2ray_qr_config_file}
     judge "V2ray inbound_port 修改"
 }
 modify_UUID(){
