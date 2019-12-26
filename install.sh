@@ -415,12 +415,19 @@ acme(){
         exit 1
     fi
 }
-v2ray_conf_add(){
+v2ray_conf_add_tls(){
     cd /etc/v2ray
     wget https://raw.githubusercontent.com/wulabing/V2Ray_ws-tls_bash_onekey/master/tls/config.json -O config.json
     modify_path
     modify_alterid
     modify_inbound_port
+    modify_UUID
+}
+v2ray_conf_add_h2(){
+    cd /etc/v2ray
+    wget https://raw.githubusercontent.com/wulabing/V2Ray_ws-tls_bash_onekey/master/http2/config.json -O config.json
+    modify_path
+    modify_alterid
     modify_UUID
 }
 nginx_conf_add(){
@@ -660,7 +667,7 @@ install_v2ray_ws_tls(){
     port_exist_check 80
     port_exist_check ${port}
     nginx_exist_check
-    v2ray_conf_add
+    v2ray_conf_add_tls
     nginx_conf_add
     web_camouflage
     ssl_judge_and_install
@@ -684,7 +691,7 @@ install_v2_h2(){
     v2ray_install
     port_exist_check 80
     port_exist_check ${port}
-    v2ray_conf_add
+    v2ray_conf_add_h2
     ssl_judge_and_install
     basic_information
     vmess_qr_config_h2
