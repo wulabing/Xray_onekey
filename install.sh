@@ -453,7 +453,6 @@ judge "Nginx 配置修改"
 
 start_process_systemd(){
     systemctl daemon-reload
-    ### nginx服务在安装完成后会自动启动。需要通过restart或reload重新加载配置
     systemctl restart nginx
     judge "Nginx 启动"
     systemctl restart v2ray
@@ -465,6 +464,11 @@ enable_process_systemd(){
     judge "设置 v2ray 开机自启"
     systemctl enable nginx
     judge "设置 Nginx 开机自启"
+}
+
+stop_process_systemd(){
+    systemctl stop nginx
+    systemctl stop v2ray
 }
 
 #debian 系 9 10 适配
@@ -626,12 +630,14 @@ bbr_boost_sh(){
     bash <(curl -L -s -k "https://raw.githubusercontent.com/chiakge/Linux-NetSpeed/master/tcp.sh")
 }
 uninstall_all(){
+    stop_process_systemd
     [[ -f $nginx_systemd_file ]] && rm -f $nginx_systemd_file
     [[ -f $v2ray_systemd_file ]] && rm -f $v2ray_systemd_file
     [[ -d $v2ray_bin_file ]] && rm -rf $v2ray_bin_file
     [[ -d $nginx_dir ]] && rm -rf $nginx_dir
     [[ -d $v2ray_conf_dir ]] && rm -rf $v2ray_conf_dir
     [[ -d $web_dir ]] && rm -rf $web_dir
+    systemctl daemon-reload
     echo -e "${OK} ${GreenBG} 已卸载，SSL证书文件已保留 ${Font}"
 }
 install_v2ray_ws_tls(){
