@@ -24,7 +24,7 @@ Error="${Red}[错误]${Font}"
 
 # 版本
 shell_version="1.0"
-
+version_cmp="/tmp/version_cmp.tmp"
 v2ray_conf_dir="/etc/v2ray"
 nginx_conf_dir="/etc/nginx/conf/conf.d"
 v2ray_conf="${v2ray_conf_dir}/config.json"
@@ -125,7 +125,7 @@ chrony_install(){
             echo -e "${RedBG} 安装终止 ${Font}"
             exit 2
             ;;
-        esac
+    esac
 }
 
 dependency_install(){
@@ -694,7 +694,27 @@ install_v2_h2(){
 
 }
 update_sh(){
-    maintain "正在合并代码，请等待更新"
+    ol_version=$(curl -L -s https://raw.githubusercontent.com/wulabing/V2Ray_ws-tls_bash_onekey/master/install.sh \
+                 | grep "shell_version=" | awk -F "=" '{print $2}')
+    echo $ol_version > $version_cmp
+    echo $shell_version >> $version_cmp
+    if [ "$(sort -rV $version_cmp | head -1)" -gt "$shell_version" ]
+    then
+        echo -e "${OK} ${Green} 存在新版本，是否更新 [Y/N]? ${Font}"
+        read -r update_confirm
+        case $update_confirm in
+            [yY][eE][sS]|[yY])
+                wget -N https://raw.githubusercontent.com/wulabing/V2Ray_ws-tls_bash_onekey/master/install.sh
+                echo -e "${OK} ${Green} 更新完成 ${Font}"
+                ;;
+            *)
+                exit 0
+                ;;
+        esac
+    else
+        echo -e "${OK} ${Green} 当前版本为最新版本 ${Font}"
+    fi
+
 }
 maintain(){
     echo -e "${RedBG}该选项暂时无法使用${Font}"
