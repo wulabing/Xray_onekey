@@ -34,7 +34,7 @@ web_dir="/home/wwwroot"
 nginx_openssl_src="/usr/local/src"
 v2ray_bin_file="/usr/bin/v2ray"
 v2ray_info_file="$HOME/v2ray_info.inf"
-v2ray_qr_confg_file="/etc/v2ray/vmess_qr.json"
+v2ray_qr_config_file="/etc/v2ray/vmess_qr.json"
 nginx_systemd_file="/etc/systemd/system/nginx.service"
 v2ray_systemd_file="/etc/systemd/system/v2ray.service"
 v2ray_access_log="/var/log/v2ray/access.log"
@@ -219,17 +219,20 @@ modify_path(){
 modify_alterid(){
     sed -i "/\"alterId\"/c \\\t  \"alterId\":${alterID}" ${v2ray_conf}
     judge "V2ray alterid 修改"
+    [ -f ${v2ray_qr_confg_file} ] && sed -i "/\"aid\"/c \\  \"port\": \"${aid}\"," ${v2ray_qr_config_file}
     echo -e "${GreenBG} alterID:${alterID} ${Font}"
 }
 modify_inbound_port(){
     let PORT=$RANDOM+10000
     sed -i "/\"port\"/c  \    \"port\":${PORT}," ${v2ray_conf}
+    [ -f ${v2ray_qr_confg_file} ] && sed -i "/\"port\"/c \\  \"port\": \"${port}\"," ${v2ray_qr_config_file}
     judge "V2ray inbound_port 修改"
 }
 modify_UUID(){
     [ -z $UUID ] && UUID=$(cat /proc/sys/kernel/random/uuid)
     sed -i "/\"id\"/c \\\t  \"id\":\"${UUID}\"," ${v2ray_conf}
     judge "V2ray UUID 修改"
+    [ -f ${v2ray_qr_confg_file} ] && sed -i "/\"id\"/c \\  \"id\": \"${UUID}\"," ${v2ray_qr_config_file}
     echo -e "${GreenBG} UUID:${UUID} ${Font}"
 }
 modify_nginx_port(){
