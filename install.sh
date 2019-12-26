@@ -545,7 +545,7 @@ info_extraction(){
     grep $1 $v2ray_qr_confg_file | awk -F '"' '{print $4}'
 }
 basic_information(){
-    echo -e "${OK} ${Green} V2ray+ws+tls 安装成功" >> ${v2ray_info_file}
+    echo -e "${OK} ${Green} V2ray+ws+tls 安装成功" > ${v2ray_info_file}
     echo -e "${Red} V2ray 配置信息 ${Font}" >> ${v2ray_info_file}
     echo -e "${Red} 地址（address）:${Font} $(info_extraction "add") " >> ${v2ray_info_file}
     echo -e "${Red} 端口（port）：${Font} $(info_extraction "port") " >> ${v2ray_info_file}
@@ -659,9 +659,9 @@ install_v2ray_ws_tls(){
     web_camouflage
     ssl_judge_and_install
     nginx_systemd
+    basic_information
     vmess_qr_config_tls_ws
     vmess_qr_link_image
-    basic_information
     show_information
     start_process_systemd
     enable_process_systemd
@@ -682,9 +682,9 @@ install_v2_h2(){
     v2ray_conf_add
     ssl_judge_and_install
     nginx_systemd
+    basic_information
     vmess_qr_config_h2
     vmess_qr_link_image
-    basic_information
     show_information
     start_process_systemd
     enable_process_systemd
