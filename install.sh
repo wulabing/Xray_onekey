@@ -384,6 +384,14 @@ port_exist_check(){
     fi
 }
 acme(){
+    ~/.acme.sh/acme.sh --issue -d ${domain} --standalone -k ec-256 --force --test
+    if [[ $? -eq 0 ]];then
+        echo -e "${OK} ${GreenBG} SSL 证书测试签发成功，开始正式签发 ${Font}"
+        sleep 2
+    else
+        echo -e "${Error} ${RedBG} SSL 证书测试签发失败 ${Font}"
+    fi
+
     ~/.acme.sh/acme.sh --issue -d ${domain} --standalone -k ec-256 --force
     if [[ $? -eq 0 ]];then
         echo -e "${OK} ${GreenBG} SSL 证书生成成功 ${Font}"
@@ -735,14 +743,17 @@ menu(){
         3)
           read -p "请输入UUID:" UUID
           modify_UUID
+          start_process_systemd
           ;;
         4)
           read -p "请输入alterID:" alterID
           modify_alterid
+          start_process_systemd
           ;;
         5)
           read -p "请输入连接端口:" port
           modify_nginx_port
+          start_process_systemd
           ;;
         6)
           show_access_log
