@@ -33,6 +33,7 @@ nginx_dir="/etc/nginx"
 web_dir="/home/wwwroot"
 nginx_openssl_src="/usr/local/src"
 v2ray_bin_file="/usr/bin/v2ray"
+v2ray_info_file="~/v2ray_info.inf"
 nginx_systemd_file="/etc/systemd/system/nginx.service"
 v2ray_systemd_file="/etc/systemd/system/v2ray.service"
 v2ray_access_log="/var/log/v2ray/access.log"
@@ -513,11 +514,6 @@ vmess_qr_config_tls_ws(){
   "tls": "tls"
 }
 EOF
-
-    vmess_link="vmess://$(cat /etc/v2ray/vmess_qr.json | base64 -w 0)"
-    echo -e "${Red} URL导入链接:${vmess_link} ${Font}" >>./v2ray_info.txt
-    echo -e "${Red} 二维码: ${Font}" >>./v2ray_info.txt
-    echo -n "${vmess_link}"| qrencode -o - -t utf8 >>./v2ray_info.txt
 }
 
 vmess_qr_config_h2(){
@@ -535,31 +531,30 @@ vmess_qr_config_h2(){
   "tls": "tls"
 }
 EOF
-
-    vmess_link="vmess://$(cat /etc/v2ray/vmess_qr.json | base64 -w 0)"
-    echo -e "${Red} URL导入链接:${vmess_link} ${Font}" >>./v2ray_info.txt
-    echo -e "${Red} 二维码: ${Font}" >>./v2ray_info.txt
-    echo -n "${vmess_link}"| qrencode -o - -t utf8 >>./v2ray_info.txt
 }
 
+vmess_qr_link_image(){
+    vmess_link="vmess://$(cat /etc/v2ray/vmess_qr.json | base64 -w 0)"
+    echo -e "${Red} URL导入链接:${vmess_link} ${Font}" >> ${v2ray_info_file}
+    echo -e "${Red} 二维码: ${Font}" >> ${v2ray_info_file}
+    echo -n "${vmess_link}"| qrencode -o - -t utf8 >> ${v2ray_info_file}
+}
+
+basic_information(){
+    echo -e "${OK} ${Green} V2ray+ws+tls 安装成功" >> ${v2ray_info_file}
+    echo -e "${Red} V2ray 配置信息 ${Font}" >> ${v2ray_info_file}
+    echo -e "${Red} 地址（address）:${Font} ${domain} " >> ${v2ray_info_file}
+    echo -e "${Red} 端口（port）：${Font} ${port} " >> ${v2ray_info_file}
+    echo -e "${Red} 用户id（UUID）：${Font} ${UUID}" >> ${v2ray_info_file}
+    echo -e "${Red} 额外id（alterId）：${Font} ${alterID}" >> ${v2ray_info_file}
+    echo -e "${Red} 加密方式（security）：${Font} 自适应 " >> ${v2ray_info_file}
+    echo -e "${Red} 传输协议（network）：${Font} ws " >> ${v2ray_info_file}
+    echo -e "${Red} 伪装类型（type）：${Font} none " >> ${v2ray_info_file}
+    echo -e "${Red} 路径（不要落下/）：${Font} /${camouflage}/ " >> ${v2ray_info_file}
+    echo -e "${Red} 底层传输安全：${Font} tls " >> ${v2ray_info_file}
+}
 show_information(){
-    clear
-    cd ~
-
-    echo -e "${OK} ${Green} V2ray+ws+tls 安装成功" >./v2ray_info.txt
-    echo -e "${Red} V2ray 配置信息 ${Font}" >>./v2ray_info.txt
-    echo -e "${Red} 地址（address）:${Font} ${domain} " >>./v2ray_info.txt
-    echo -e "${Red} 端口（port）：${Font} ${port} " >>./v2ray_info.txt
-    echo -e "${Red} 用户id（UUID）：${Font} ${UUID}" >>./v2ray_info.txt
-    echo -e "${Red} 额外id（alterId）：${Font} ${alterID}" >>./v2ray_info.txt
-    echo -e "${Red} 加密方式（security）：${Font} 自适应 " >>./v2ray_info.txt
-    echo -e "${Red} 传输协议（network）：${Font} ws " >>./v2ray_info.txt
-    echo -e "${Red} 伪装类型（type）：${Font} none " >>./v2ray_info.txt
-    echo -e "${Red} 路径（不要落下/）：${Font} /${camouflage}/ " >>./v2ray_info.txt
-    echo -e "${Red} 底层传输安全：${Font} tls " >>./v2ray_info.txt
-
-    cat ./v2ray_info.txt
-
+    cat ${v2ray_info_file}
 }
 ssl_judge_and_install(){
     if [[ -f "/data/v2ray.key" && -f "/data/v2ray.crt" ]];then
@@ -661,6 +656,8 @@ install_v2ray_ws_tls(){
     ssl_judge_and_install
     nginx_systemd
     vmess_qr_config_tls_ws
+    vmess_qr_link_image
+    basic_information
     show_information
     start_process_systemd
     enable_process_systemd
@@ -682,6 +679,8 @@ install_v2_h2(){
     ssl_judge_and_install
     nginx_systemd
     vmess_qr_config_h2
+    vmess_qr_link_image
+    basic_information
     show_information
     start_process_systemd
     enable_process_systemd
