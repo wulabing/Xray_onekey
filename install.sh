@@ -428,6 +428,7 @@ v2ray_conf_add_h2(){
     wget https://raw.githubusercontent.com/wulabing/V2Ray_ws-tls_bash_onekey/master/http2/config.json -O config.json
     modify_path
     modify_alterid
+    modify_inbound_port
     modify_UUID
 }
 nginx_conf_add(){
