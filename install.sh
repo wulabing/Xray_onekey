@@ -34,6 +34,7 @@ web_dir="/home/wwwroot"
 nginx_openssl_src="/usr/local/src"
 v2ray_bin_file="/usr/bin/v2ray"
 v2ray_info_file="~/v2ray_info.inf"
+v2ray_qr_confg_file="/etc/v2ray/vmess_qr.json"
 nginx_systemd_file="/etc/systemd/system/nginx.service"
 v2ray_systemd_file="/etc/systemd/system/v2ray.service"
 v2ray_access_log="/var/log/v2ray/access.log"
@@ -499,7 +500,7 @@ acme_cron_update(){
 }
 
 vmess_qr_config_tls_ws(){
-    cat >/etc/v2ray/vmess_qr.json <<-EOF
+    cat > $v2ray_qr_confg_file <<-EOF
 {
   "v": "2",
   "ps": "wulabing_${domain}",
@@ -517,7 +518,7 @@ EOF
 }
 
 vmess_qr_config_h2(){
-    cat >/etc/v2ray/vmess_qr.json <<-EOF
+    cat > $v2ray_qr_confg_file <<-EOF
 {
   "v": "2",
   "ps": "wulabing_${domain}",
@@ -534,23 +535,26 @@ EOF
 }
 
 vmess_qr_link_image(){
-    vmess_link="vmess://$(cat /etc/v2ray/vmess_qr.json | base64 -w 0)"
+    vmess_link="vmess://$(cat $v2ray_qr_confg_file | base64 -w 0)"
     echo -e "${Red} URL导入链接:${vmess_link} ${Font}" >> ${v2ray_info_file}
     echo -e "${Red} 二维码: ${Font}" >> ${v2ray_info_file}
     echo -n "${vmess_link}"| qrencode -o - -t utf8 >> ${v2ray_info_file}
 }
 
+info_extraction(){
+    grep $1 $v2ray_qr_confg_file | awk -F '"' '{print $4}'
+}
 basic_information(){
     echo -e "${OK} ${Green} V2ray+ws+tls 安装成功" >> ${v2ray_info_file}
     echo -e "${Red} V2ray 配置信息 ${Font}" >> ${v2ray_info_file}
-    echo -e "${Red} 地址（address）:${Font} ${domain} " >> ${v2ray_info_file}
-    echo -e "${Red} 端口（port）：${Font} ${port} " >> ${v2ray_info_file}
-    echo -e "${Red} 用户id（UUID）：${Font} ${UUID}" >> ${v2ray_info_file}
-    echo -e "${Red} 额外id（alterId）：${Font} ${alterID}" >> ${v2ray_info_file}
+    echo -e "${Red} 地址（address）:${Font} $(info_extraction "add") " >> ${v2ray_info_file}
+    echo -e "${Red} 端口（port）：${Font} $(info_extraction "port") " >> ${v2ray_info_file}
+    echo -e "${Red} 用户id（UUID）：${Font} $(info_extraction '\"id\"')" >> ${v2ray_info_file}
+    echo -e "${Red} 额外id（alterId）：${Font} $(info_extraction "aid")" >> ${v2ray_info_file}
     echo -e "${Red} 加密方式（security）：${Font} 自适应 " >> ${v2ray_info_file}
-    echo -e "${Red} 传输协议（network）：${Font} ws " >> ${v2ray_info_file}
+    echo -e "${Red} 传输协议（network）：${Font} $(info_extraction "net") " >> ${v2ray_info_file}
     echo -e "${Red} 伪装类型（type）：${Font} none " >> ${v2ray_info_file}
-    echo -e "${Red} 路径（不要落下/）：${Font} /${camouflage}/ " >> ${v2ray_info_file}
+    echo -e "${Red} 路径（不要落下/）：${Font} $(info_extraction "tls") " >> ${v2ray_info_file}
     echo -e "${Red} 底层传输安全：${Font} tls " >> ${v2ray_info_file}
 }
 show_information(){
@@ -721,21 +725,22 @@ menu(){
 
     echo -e "—————————————— 安装向导 ——————————————"""
     echo -e "${Green}0.${Font}  升级 脚本"
-    echo -e "${Green}1.${Font}  安装 V2Ray (websocket+tls)"
+    echo -e "${Green}1.${Font}  安装 V2Ray (Nginx+ws+tls)"
     echo -e "${Green}2.${Font}  安装 V2Ray (http/2)"
     echo -e "—————————————— 配置变更 ——————————————"
     echo -e "${Green}3.${Font}  变更 UUID"
     echo -e "${Green}4.${Font}  变更 alterid"
     echo -e "${Green}5.${Font}  变更 port"
+    echo -e "${Green}6.${Font}  变更 TLS 版本(仅ws+tls有效)"
     echo -e "—————————————— 查看信息 ——————————————"
-    echo -e "${Green}6.${Font}  查看 实时访问日志"
-    echo -e "${Green}7.${Font}  查看 实时错误日志"
-    echo -e "${Green}8.${Font}  查看 V2Ray 配置信息"
+    echo -e "${Green}7.${Font}  查看 实时访问日志"
+    echo -e "${Green}8.${Font}  查看 实时错误日志"
+    echo -e "${Green}9.${Font}  查看 V2Ray 配置信息"
     echo -e "—————————————— 其他选项 ——————————————"
-    echo -e "${Green}9.${Font}  安装 4合1 bbr 锐速安装脚本"
-    echo -e "${Green}10.${Font} 证书 有效期更新"
-    echo -e "${Green}11.${Font} 卸载 V2Ray"
-    echo -e "${Green}12.${Font} 退出 \n"
+    echo -e "${Green}10.${Font} 安装 4合1 bbr 锐速安装脚本"
+    echo -e "${Green}11.${Font} 证书 有效期更新"
+    echo -e "${Green}12.${Font} 卸载 V2Ray"
+    echo -e "${Green}13.${Font} 退出 \n"
 
     read -p "请输入数字：" menu_num
     case $menu_num in
