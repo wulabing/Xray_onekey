@@ -33,7 +33,7 @@ nginx_dir="/etc/nginx"
 web_dir="/home/wwwroot"
 nginx_openssl_src="/usr/local/src"
 v2ray_bin_file="/usr/bin/v2ray"
-v2ray_info_file="~/v2ray_info.inf"
+v2ray_info_file="$HOME/v2ray_info.inf"
 v2ray_qr_confg_file="/etc/v2ray/vmess_qr.json"
 nginx_systemd_file="/etc/systemd/system/nginx.service"
 v2ray_systemd_file="/etc/systemd/system/v2ray.service"
@@ -775,7 +775,8 @@ menu(){
           show_error_log
           ;;
         8)
-          maintain "由于无法显示修改后的信息，该功能正在重构"
+          basic_information
+          show_information
           ;;
         9)
           bbr_boost_sh
