@@ -776,6 +776,7 @@ menu(){
           ;;
         8)
           basic_information
+          vmess_qr_link_image
           show_information
           ;;
         9)
