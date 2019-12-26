@@ -679,8 +679,8 @@ install_v2ray_ws_tls(){
     web_camouflage
     ssl_judge_and_install
     nginx_systemd
-    basic_information
     vmess_qr_config_tls_ws
+    basic_information
     vmess_qr_link_image
     show_information
     start_process_systemd
@@ -700,8 +700,8 @@ install_v2_h2(){
     port_exist_check ${port}
     v2ray_conf_add_h2
     ssl_judge_and_install
-    basic_information
     vmess_qr_config_h2
+    basic_information
     vmess_qr_link_image
     show_information
     start_process_systemd
