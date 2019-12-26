@@ -180,12 +180,15 @@ dependency_install(){
 
     if [[ "${ID}" == "centos" ]];then
        systemctl start rngd && systemctl enable rngd
+       judge "rng-tools 启动"
        systemctl start haveged && systemctl enable haveged
+       judge "haveged 启动"
     else
        systemctl start rng-tools && systemctl enable rng-tools
+       judge "rng-tools 启动"
        systemctl start haveged && systemctl enable haveged
+       judge "haveged 启动"
     fi
-    judge "nginx 编译依赖安装"
 }
 basic_optimization(){
     # 最大文件打开数
