@@ -731,7 +731,7 @@ install_v2_h2(){
 
 }
 update_sh(){
-    ol_version=$(curl -L -s https://raw.githubusercontent.com/wulabing/V2Ray_ws-tls_bash_onekey/master/install.sh | grep "shell_version=" | head -1 |awk -F '=|"' '{print $3}'
+    ol_version=$(curl -L -s https://raw.githubusercontent.com/wulabing/V2Ray_ws-tls_bash_onekey/master/install.sh | grep "shell_version=" | head -1 |awk -F '=|"' '{print $3}')
     echo "$ol_version" > $version_cmp
     echo "$shell_version" >> $version_cmp
     if [ "$(sort -rV $version_cmp | head -1)" -gt "$shell_version" ]
