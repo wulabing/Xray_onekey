@@ -475,7 +475,7 @@ judge "Nginx 配置修改"
 
 start_process_systemd(){
     systemctl daemon-reload
-    if [[ "$shell_mode" -eq "h2" ]]
+    if [[ "$shell_mode" -ne "h2" ]]
     then
         systemctl restart nginx
         judge "Nginx 启动"
@@ -487,7 +487,7 @@ start_process_systemd(){
 enable_process_systemd(){
     systemctl enable v2ray
     judge "设置 v2ray 开机自启"
-    if [[ "$shell_mode" -eq "h2" ]]
+    if [[ "$shell_mode" -ne "h2" ]]
     then
         systemctl enable nginx
         judge "设置 Nginx 开机自启"
