@@ -168,7 +168,7 @@ dependency_install(){
     judge "编译工具包 安装"
 
     if [[ "${ID}" == "centos" ]];then
-       ${INS} -y install pcre pcre-devel zlib-devel
+       ${INS} -y install pcre pcre-devel zlib-devel epel-release
     else
        ${INS} -y install libpcre3 libpcre3-dev zlib1g-dev dbus
     fi
@@ -731,10 +731,9 @@ install_v2_h2(){
 
 }
 update_sh(){
-    ol_version=$(curl -L -s https://raw.githubusercontent.com/wulabing/V2Ray_ws-tls_bash_onekey/master/install.sh \
-                 | grep "shell_version=" | awk -F "=" '{print $2}')
-    echo $ol_version > $version_cmp
-    echo $shell_version >> $version_cmp
+    ol_version=$(curl -L -s https://raw.githubusercontent.com/wulabing/V2Ray_ws-tls_bash_onekey/master/install.sh | grep "shell_version=" | head -1 |awk -F '=|"' '{print $3}'
+    echo "$ol_version" > $version_cmp
+    echo "$shell_version" >> $version_cmp
     if [ "$(sort -rV $version_cmp | head -1)" -gt "$shell_version" ]
     then
         echo -e "${OK} ${Green} 存在新版本，是否更新 [Y/N]? ${Font}"
