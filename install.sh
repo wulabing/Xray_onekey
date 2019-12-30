@@ -496,7 +496,10 @@ enable_process_systemd(){
 }
 
 stop_process_systemd(){
-    systemctl stop nginx
+    if [[ "$shell_mode" -ne "h2" ]]
+    then
+        systemctl stop nginx
+    fi
     systemctl stop v2ray
 }
 nginx_process_disabled(){
@@ -856,6 +859,7 @@ menu(){
           bbr_boost_sh
           ;;
         12)
+          stop_process_systemd
           ssl_update_manuel
           start_process_systemd
           ;;
