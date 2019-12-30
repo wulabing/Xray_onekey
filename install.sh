@@ -24,6 +24,7 @@ Error="${Red}[错误]${Font}"
 
 # 版本
 shell_version="1.0"
+shell_mode="None"
 version_cmp="/tmp/version_cmp.tmp"
 v2ray_conf_dir="/etc/v2ray"
 nginx_conf_dir="/etc/nginx/conf/conf.d"
@@ -223,8 +224,12 @@ modify_alterid(){
     echo -e "${GreenBG} alterID:${alterID} ${Font}"
 }
 modify_inbound_port(){
-    let PORT=$RANDOM+10000
-    sed -i "/\"port\"/c  \    \"port\":${PORT}," ${v2ray_conf}
+    if [[ "$shell_mode" = "h2"]]
+    then
+        let PORT=$RANDOM+10000
+        sed -i "/\"port\"/c  \    \"port\":${PORT}," ${v2ray_conf}
+    else
+        sed -i "/\"port\"/c  \    \"port\":${port}," ${v2ray_conf}
     judge "V2ray inbound_port 修改"
 }
 modify_UUID(){
@@ -469,7 +474,7 @@ judge "Nginx 配置修改"
 
 start_process_systemd(){
     systemctl daemon-reload
-    if [[ -n $(grep "ws" $v2ray_qr_config_file) ]]
+    if [[ "$shell_mode" -eq "h2" ]]
     then
         systemctl restart nginx
         judge "Nginx 启动"
@@ -481,7 +486,7 @@ start_process_systemd(){
 enable_process_systemd(){
     systemctl enable v2ray
     judge "设置 v2ray 开机自启"
-    if [[ -n $(grep "ws" $v2ray_qr_config_file) ]]
+    if [[ "$shell_mode" -eq "h2" ]]
     then
         systemctl enable nginx
         judge "设置 Nginx 开机自启"
@@ -663,6 +668,17 @@ uninstall_all(){
     systemctl daemon-reload
     echo -e "${OK} ${GreenBG} 已卸载，SSL证书文件已保留 ${Font}"
 }
+judge_mode(){
+    if [ -f $v2ray_qr_config_file ]
+    then
+        if [[ -n $(grep "ws" $v2ray_qr_config_file) ]]
+        then
+            shell_mode="ws"
+        elif [[ -n $(grep "h2" $v2ray_qr_config_file) ]]
+            shell_mode="h2"
+        fi
+    fi
+}
 install_v2ray_ws_tls(){
     is_root
     check_system
@@ -761,25 +777,27 @@ menu(){
     echo -e "\t V2ray 安装管理脚本 ${Red}[${shell_version}]${Font}"
     echo -e "\t---authored by wulabing---"
     echo -e "\thttps://github.com/wulabing\n"
+    echo -e "当前已安装版本:${shell_mode}"
 
     echo -e "—————————————— 安装向导 ——————————————"""
     echo -e "${Green}0.${Font}  升级 脚本"
     echo -e "${Green}1.${Font}  安装 V2Ray (Nginx+ws+tls)"
     echo -e "${Green}2.${Font}  安装 V2Ray (http/2)"
+    echo -e "${Green}3.${Font}  升级 V2Ray core"
     echo -e "—————————————— 配置变更 ——————————————"
-    echo -e "${Green}3.${Font}  变更 UUID"
-    echo -e "${Green}4.${Font}  变更 alterid"
-    echo -e "${Green}5.${Font}  变更 port"
-    echo -e "${Green}6.${Font}  变更 TLS 版本(仅ws+tls有效)"
+    echo -e "${Green}4.${Font}  变更 UUID"
+    echo -e "${Green}5.${Font}  变更 alterid"
+    echo -e "${Green}6.${Font}  变更 port"
+    echo -e "${Green}7.${Font}  变更 TLS 版本(仅ws+tls有效)"
     echo -e "—————————————— 查看信息 ——————————————"
-    echo -e "${Green}7.${Font}  查看 实时访问日志"
-    echo -e "${Green}8.${Font}  查看 实时错误日志"
-    echo -e "${Green}9.${Font}  查看 V2Ray 配置信息"
+    echo -e "${Green}8.${Font}  查看 实时访问日志"
+    echo -e "${Green}9.${Font}  查看 实时错误日志"
+    echo -e "${Green}10.${Font}  查看 V2Ray 配置信息"
     echo -e "—————————————— 其他选项 ——————————————"
-    echo -e "${Green}10.${Font} 安装 4合1 bbr 锐速安装脚本"
-    echo -e "${Green}11.${Font} 证书 有效期更新"
-    echo -e "${Green}12.${Font} 卸载 V2Ray"
-    echo -e "${Green}13.${Font} 退出 \n"
+    echo -e "${Green}11.${Font} 安装 4合1 bbr 锐速安装脚本"
+    echo -e "${Green}12.${Font} 证书 有效期更新"
+    echo -e "${Green}13.${Font} 卸载 V2Ray"
+    echo -e "${Green}14.${Font} 退出 \n"
 
     read -p "请输入数字：" menu_num
     case $menu_num in
@@ -787,9 +805,11 @@ menu(){
           update_sh
           ;;
         1)
+          shell_mode="ws"
           install_v2ray_ws_tls
           ;;
         2)
+          shell_mode="h2"
           install_v2_h2
           ;;
         3)
@@ -839,4 +859,5 @@ menu(){
     esac
 }
 
+judge_mode
 list $1
