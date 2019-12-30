@@ -779,7 +779,7 @@ menu(){
     echo -e "\t V2ray 安装管理脚本 ${Red}[${shell_version}]${Font}"
     echo -e "\t---authored by wulabing---"
     echo -e "\thttps://github.com/wulabing\n"
-    echo -e "当前已安装版本:${shell_mode}"
+    echo -e "当前已安装版本:${shell_mode}\n"
 
     echo -e "—————————————— 安装向导 ——————————————"""
     echo -e "${Green}0.${Font}  升级 脚本"
@@ -794,7 +794,7 @@ menu(){
     echo -e "—————————————— 查看信息 ——————————————"
     echo -e "${Green}8.${Font}  查看 实时访问日志"
     echo -e "${Green}9.${Font}  查看 实时错误日志"
-    echo -e "${Green}10.${Font}  查看 V2Ray 配置信息"
+    echo -e "${Green}10.${Font} 查看 V2Ray 配置信息"
     echo -e "—————————————— 其他选项 ——————————————"
     echo -e "${Green}11.${Font} 安装 4合1 bbr 锐速安装脚本"
     echo -e "${Green}12.${Font} 证书 有效期更新"
@@ -815,44 +815,53 @@ menu(){
           install_v2_h2
           ;;
         3)
+          bash <(curl -L -s https://install.direct/go.sh)
+          ;;
+        4)
           read -p "请输入UUID:" UUID
           modify_UUID
           start_process_systemd
           ;;
-        4)
+        5)
           read -p "请输入alterID:" alterID
           modify_alterid
           start_process_systemd
           ;;
-        5)
+        6)
           read -p "请输入连接端口:" port
-          modify_nginx_port
+          if [[ -n $(grep "ws" $v2ray_qr_config_file) ]]
+          then
+              modify_nginx_port
+          elif [[ -n $(grep "h2" $v2ray_qr_config_file) ]]
+          then
+              modify_inbound_port
+          fi
           start_process_systemd
           ;;
-        6)
+        7)
           tls_modify
           ;;
-        7)
+        8)
           show_access_log
           ;;
-        8)
+        9)
           show_error_log
           ;;
-        9)
+        10)
           basic_information
           vmess_qr_link_image
           show_information
           ;;
-        10)
+        11)
           bbr_boost_sh
           ;;
-        11)
+        12)
           ssl_update_manuel
           ;;
-        12)
+        13)
           uninstall_all
           ;;
-        13)
+        14)
           exit 0
           ;;
         *)
