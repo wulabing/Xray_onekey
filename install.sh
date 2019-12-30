@@ -839,7 +839,7 @@ menu(){
           start_process_systemd
           ;;
         7)
-          tls_modify
+          tls_type
           ;;
         8)
           show_access_log
@@ -857,6 +857,7 @@ menu(){
           ;;
         12)
           ssl_update_manuel
+          start_process_systemd
           ;;
         13)
           uninstall_all
