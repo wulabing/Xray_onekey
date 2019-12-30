@@ -676,6 +676,7 @@ judge_mode(){
         then
             shell_mode="ws"
         elif [[ -n $(grep "h2" $v2ray_qr_config_file) ]]
+        then
             shell_mode="h2"
         fi
     fi
