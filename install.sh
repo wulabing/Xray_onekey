@@ -267,7 +267,7 @@ v2ray_install(){
         rm -rf /etc/v2ray
     fi
     mkdir -p /root/v2ray && cd /root/v2ray
-    wget  --no-check-certificate https://install.direct/go.sh
+    wget -N --no-check-certificate https://install.direct/go.sh
 
     ## wget http://install.direct/go.sh
 
@@ -734,13 +734,13 @@ update_sh(){
     ol_version=$(curl -L -s https://raw.githubusercontent.com/wulabing/V2Ray_ws-tls_bash_onekey/master/install.sh | grep "shell_version=" | head -1 |awk -F '=|"' '{print $3}')
     echo "$ol_version" > $version_cmp
     echo "$shell_version" >> $version_cmp
-    if [ "$(sort -rV $version_cmp | head -1)" -gt "$shell_version" ]
+    if [[ "$shell_version" < "$(sort -rV $version_cmp | head -1)" ]]
     then
         echo -e "${OK} ${Green} 存在新版本，是否更新 [Y/N]? ${Font}"
         read -r update_confirm
         case $update_confirm in
             [yY][eE][sS]|[yY])
-                wget -N https://raw.githubusercontent.com/wulabing/V2Ray_ws-tls_bash_onekey/master/install.sh
+                wget -N --no-check-certificate https://raw.githubusercontent.com/wulabing/V2Ray_ws-tls_bash_onekey/master/install.sh
                 echo -e "${OK} ${Green} 更新完成 ${Font}"
                 ;;
             *)
