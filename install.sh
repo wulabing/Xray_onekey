@@ -224,7 +224,7 @@ modify_alterid(){
     echo -e "${GreenBG} alterID:${alterID} ${Font}"
 }
 modify_inbound_port(){
-    if [[ "$shell_mode" = "h2" ]]
+    if [[ "$shell_mode" -ne "h2" ]]
     then
         let PORT=$RANDOM+10000
         sed -i "/\"port\"/c  \    \"port\":${PORT}," ${v2ray_conf}
