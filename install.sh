@@ -404,6 +404,7 @@ acme(){
         sleep 2
     else
         echo -e "${Error} ${RedBG} SSL 证书测试签发失败 ${Font}"
+        exit 1
     fi
 
     ~/.acme.sh/acme.sh --issue -d ${domain} --standalone -k ec-256 --force
