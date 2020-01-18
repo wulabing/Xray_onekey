@@ -173,7 +173,7 @@ dependency_install(){
        ${INS} -y install libpcre3 libpcre3-dev zlib1g-dev dbus
     fi
 
-    ${INS} -y install rng-tools
+#    ${INS} -y install rng-tools
 #    judge "rng-tools 安装"
 
     ${INS} -y install haveged
@@ -182,12 +182,12 @@ dependency_install(){
     sed -i -r '/^HRNGDEVICE/d;/#HRNGDEVICE=\/dev\/null/a HRNGDEVICE=/dev/urandom' /etc/default/rng-tools
 
     if [[ "${ID}" == "centos" ]];then
-       systemctl start rngd && systemctl enable rngd
+#       systemctl start rngd && systemctl enable rngd
 #       judge "rng-tools 启动"
        systemctl start haveged && systemctl enable haveged
 #       judge "haveged 启动"
     else
-       systemctl start rng-tools && systemctl enable rng-tools
+#       systemctl start rng-tools && systemctl enable rng-tools
 #       judge "rng-tools 启动"
        systemctl start haveged && systemctl enable haveged
 #       judge "haveged 启动"
