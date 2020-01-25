@@ -160,6 +160,9 @@ dependency_install(){
     ${INS} -y install qrencode
     judge "安装 qrencode"
 
+    ${INS} -y install curl
+    judge "安装 crul"
+
     if [[ "${ID}" == "centos" ]];then
        ${INS} -y groupinstall "Development tools"
     else
@@ -404,6 +407,7 @@ acme(){
         sleep 2
     else
         echo -e "${Error} ${RedBG} SSL 证书测试签发失败 ${Font}"
+        rm -rf "~/.acme.sh/${domain}_ecc/${domain}.key" && rm -rf "~/.acme.sh/${domain}_ecc/${domain}.cer"
         exit 1
     fi
 
@@ -419,6 +423,7 @@ acme(){
         fi
     else
         echo -e "${Error} ${RedBG} SSL 证书生成失败 ${Font}"
+        rm -rf "~/.acme.sh/${domain}_ecc/${domain}.key" && rm -rf "~/.acme.sh/${domain}_ecc/${domain}.cer"
         exit 1
     fi
 }
