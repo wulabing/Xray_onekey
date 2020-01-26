@@ -23,7 +23,7 @@ OK="${Green}[OK]${Font}"
 Error="${Red}[错误]${Font}"
 
 # 版本
-shell_version="1.0.2"
+shell_version="1.0.3"
 shell_mode="None"
 version_cmp="/tmp/version_cmp.tmp"
 v2ray_conf_dir="/etc/v2ray"
@@ -530,10 +530,10 @@ nginx_process_disabled(){
 acme_cron_update(){
     if [[ "${ID}" == "centos" ]];then
         sed -i "/acme.sh/c 0 3 * * 0 systemctl stop nginx && \"/root/.acme.sh\"/acme.sh --cron --home \"/root/.acme.sh\" \
-        > /dev/null && systemctl start nginx" /var/spool/cron/root
+        &> /dev/null  && systemctl start nginx" /var/spool/cron/root
     else
         sed -i "/acme.sh/c 0 3 * * 0 systemctl stop nginx && \"/root/.acme.sh\"/acme.sh --cron --home \"/root/.acme.sh\" \
-        > /dev/null && systemctl start nginx" /var/spool/cron/crontabs/root
+        &> /dev/null && systemctl start nginx" /var/spool/cron/crontabs/root
     fi
     judge "cron 计划任务更新"
 }
@@ -815,7 +815,8 @@ menu(){
     echo -e "${Green}12.${Font} 安装 MTproxy(支持TLS混淆)"
     echo -e "${Green}13.${Font} 证书 有效期更新"
     echo -e "${Green}14.${Font} 卸载 V2Ray"
-    echo -e "${Green}15.${Font} 退出 \n"
+    echo -e "${Green}15.${Font} 更新 证书crontab计划任务"
+    echo -e "${Green}16.${Font} 退出 \n"
 
     read -p "请输入数字：" menu_num
     case $menu_num in
@@ -883,6 +884,9 @@ menu(){
           uninstall_all
           ;;
         15)
+          acme_cron_update
+          ;;
+        16)
           exit 0
           ;;
         *)
