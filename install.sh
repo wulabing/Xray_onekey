@@ -23,7 +23,7 @@ OK="${Green}[OK]${Font}"
 Error="${Red}[错误]${Font}"
 
 # 版本
-shell_version="1.0.1"
+shell_version="1.0.2"
 shell_mode="None"
 version_cmp="/tmp/version_cmp.tmp"
 v2ray_conf_dir="/etc/v2ray"
