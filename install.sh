@@ -23,7 +23,7 @@ OK="${Green}[OK]${Font}"
 Error="${Red}[错误]${Font}"
 
 # 版本
-shell_version="1.0.3"
+shell_version="1.0.4"
 shell_mode="None"
 version_cmp="/tmp/version_cmp.tmp"
 v2ray_conf_dir="/etc/v2ray"
@@ -818,6 +818,7 @@ menu(){
     echo -e "${Green}15.${Font} 更新 证书crontab计划任务"
     echo -e "${Green}16.${Font} 退出 \n"
 
+    update_sh
     read -p "请输入数字：" menu_num
     case $menu_num in
         0)
@@ -897,3 +898,4 @@ menu(){
 
 judge_mode
 list $1
+
