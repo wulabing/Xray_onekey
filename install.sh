@@ -1,5 +1,6 @@
 #!/bin/bash
 
+cd $(cd "$(dirname "$0")"; pwd)
 #====================================================
 #	System Request:Debian 9+/Ubuntu 18.04+/Centos 7+
 #	Author:	wulabing
@@ -600,9 +601,9 @@ show_information(){
     cat ${v2ray_info_file}
 }
 ssl_judge_and_install(){
-    if [[ -f "/data/v2ray.key" && -f "/data/v2ray.crt" ]];then
-        echo "证书文件已存在"
-    elif [[ -f "~/.acme.sh/${domain}_ecc/${domain}.key" && -f "~/.acme.sh/${domain}_ecc/${domain}.cer" ]];then
+#    if [[ -f "/data/v2ray.key" && -f "/data/v2ray.crt" ]];then
+#        echo "证书文件已存在"
+    if [[ -f "~/.acme.sh/${domain}_ecc/${domain}.key" && -f "~/.acme.sh/${domain}_ecc/${domain}.cer" ]];then
         echo "证书文件已存在"
         ~/.acme.sh/acme.sh --installcert -d ${domain} --fullchainpath /data/v2ray.crt --keypath /data/v2ray.key --ecc
         judge "证书应用"
@@ -668,7 +669,7 @@ ssl_update_manuel(){
     [ -f ${amce_sh_file} ] && "/root/.acme.sh"/acme.sh --cron --home "/root/.acme.sh" || echo -e  "${RedBG}证书签发工具不存在，请确认你是否使用了自己的证书${Font}"
 }
 bbr_boost_sh(){
-    wget -N --no-check-certificate https://raw.githubusercontent.com/chiakge/Linux-NetSpeed/master/tcp.sh && chmod +x tcp.sh && bash tcp.sh
+    wget -N --no-check-certificate https://raw.githubusercontent.com/wulabing/Linux-NetSpeed/master/tcp.sh && chmod +x tcp.sh && bash tcp.sh
 }
 mtproxy_sh(){
     wget -N --no-check-certificate https://github.com/whunt1/onekeymakemtg/raw/master/mtproxy_go.sh && chmod +x mtproxy_go.sh && bash mtproxy_go.sh
