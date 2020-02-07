@@ -684,7 +684,19 @@ uninstall_all(){
     [[ -f $nginx_systemd_file ]] && rm -f $nginx_systemd_file
     [[ -f $v2ray_systemd_file ]] && rm -f $v2ray_systemd_file
     [[ -d $v2ray_bin_file ]] && rm -rf $v2ray_bin_file
-    [[ -d $nginx_dir ]] && rm -rf $nginx_dir
+    if [[ -d $nginx_dir ]]
+    then
+        echo -e "${OK} ${Green} 是否卸载 Nginx [Y/N]? ${Font}"
+        read -r uninstall_nginx
+        case $uninstall_nginx in
+            [yY][eE][sS]|[yY])
+                rm -rf $nginx_dir
+                echo -e "${OK} ${Green} 已卸载 Nginx ${Font}"
+                ;;
+            *)
+                ;;
+        esac
+    fi
     [[ -d $v2ray_conf_dir ]] && rm -rf $v2ray_conf_dir
     [[ -d $web_dir ]] && rm -rf $web_dir
     systemctl daemon-reload
