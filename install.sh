@@ -539,11 +539,11 @@ acme_cron_update(){
     if [[ "${ID}" == "centos" ]];then
 #        sed -i "/acme.sh/c 0 3 * * 0 \"/root/.acme.sh\"/acme.sh --cron --home \"/root/.acme.sh\" \
 #        &> /dev/null" /var/spool/cron/root
-        sed -i "/acme.sh/c 0 3 * * 0 bash ${ssl_update_file}"
+        sed -i "/acme.sh/c 0 3 * * 0 bash ${ssl_update_file}" /var/spool/cron/root
     else
 #        sed -i "/acme.sh/c 0 3 * * 0 \"/root/.acme.sh\"/acme.sh --cron --home \"/root/.acme.sh\" \
 #        &> /dev/null" /var/spool/cron/crontabs/root
-        sed -i "/acme.sh/c 0 3 * * 0 bash ${ssl_update_file}"
+        sed -i "/acme.sh/c 0 3 * * 0 bash ${ssl_update_file}" /var/spool/cron/crontabs/root
     fi
     judge "cron 计划任务更新"
 }
