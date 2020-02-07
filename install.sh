@@ -1,4 +1,6 @@
 #!/bin/bash
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
+export PATH
 
 cd $(cd "$(dirname "$0")"; pwd)
 #====================================================
@@ -24,7 +26,7 @@ OK="${Green}[OK]${Font}"
 Error="${Red}[错误]${Font}"
 
 # 版本
-shell_version="1.0.7"
+shell_version="1.0.7.1"
 shell_mode="None"
 version_cmp="/tmp/version_cmp.tmp"
 v2ray_conf_dir="/etc/v2ray"
@@ -409,29 +411,29 @@ port_exist_check(){
     fi
 }
 acme(){
-    ~/.acme.sh/acme.sh --issue -d ${domain} --standalone -k ec-256 --force --test
+    $HOME/.acme.sh/acme.sh --issue -d ${domain} --standalone -k ec-256 --force --test
     if [[ $? -eq 0 ]];then
         echo -e "${OK} ${GreenBG} SSL 证书测试签发成功，开始正式签发 ${Font}"
         sleep 2
     else
         echo -e "${Error} ${RedBG} SSL 证书测试签发失败 ${Font}"
-        rm -rf "~/.acme.sh/${domain}_ecc/${domain}.key" && rm -rf "~/.acme.sh/${domain}_ecc/${domain}.cer"
+        rm -rf "$HOME/.acme.sh/${domain}_ecc/${domain}.key" && rm -rf "$HOME/.acme.sh/${domain}_ecc/${domain}.cer"
         exit 1
     fi
 
-    ~/.acme.sh/acme.sh --issue -d ${domain} --standalone -k ec-256 --force
+    $HOME/.acme.sh/acme.sh --issue -d ${domain} --standalone -k ec-256 --force
     if [[ $? -eq 0 ]];then
         echo -e "${OK} ${GreenBG} SSL 证书生成成功 ${Font}"
         sleep 2
         mkdir /data
-        ~/.acme.sh/acme.sh --installcert -d ${domain} --fullchainpath /data/v2ray.crt --keypath /data/v2ray.key --ecc
+        $HOME/.acme.sh/acme.sh --installcert -d ${domain} --fullchainpath /data/v2ray.crt --keypath /data/v2ray.key --ecc
         if [[ $? -eq 0 ]];then
         echo -e "${OK} ${GreenBG} 证书配置成功 ${Font}"
         sleep 2
         fi
     else
         echo -e "${Error} ${RedBG} SSL 证书生成失败 ${Font}"
-        rm -rf "~/.acme.sh/${domain}_ecc/${domain}.key" && rm -rf "~/.acme.sh/${domain}_ecc/${domain}.cer"
+        rm -rf "$HOME/.acme.sh/${domain}_ecc/${domain}.key" && rm -rf "$HOME/.acme.sh/${domain}_ecc/${domain}.cer"
         exit 1
     fi
 }
@@ -610,11 +612,25 @@ show_information(){
     cat ${v2ray_info_file}
 }
 ssl_judge_and_install(){
-#    if [[ -f "/data/v2ray.key" && -f "/data/v2ray.crt" ]];then
-#        echo "证书文件已存在"
-    if [[ -f "~/.acme.sh/${domain}_ecc/${domain}.key" && -f "~/.acme.sh/${domain}_ecc/${domain}.cer" ]];then
+    if [[ -f "/data/v2ray.key" || -f "/data/v2ray.crt" ]];then
+        echo "/data 目录下证书文件已存在"
+        echo -e "${OK} ${GreenBG} 是否删除 [Y/N]? ${Font}"
+        read -r ssl_delete
+        case $ssl_delete in
+            [yY][eE][sS]|[yY])
+                rm -rf /data/*
+                echo -e "${OK} ${GreenBG} 已删除 ${Font}"
+                ;;
+            *)
+                ;;
+        esac
+    fi
+
+    if [[ -f "/data/v2ray.key" || -f "/data/v2ray.crt" ]];then
         echo "证书文件已存在"
-        ~/.acme.sh/acme.sh --installcert -d ${domain} --fullchainpath /data/v2ray.crt --keypath /data/v2ray.key --ecc
+    elif [[ -f "$HOME/.acme.sh/${domain}_ecc/${domain}.key" && -f "$HOME/.acme.sh/${domain}_ecc/${domain}.cer" ]];then
+        echo "证书文件已存在"
+        $HOME/.acme.sh/acme.sh --installcert -d ${domain} --fullchainpath /data/v2ray.crt --keypath /data/v2ray.key --ecc
         judge "证书应用"
     else
         ssl_install
