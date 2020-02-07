@@ -42,6 +42,7 @@ v2ray_systemd_file="/etc/systemd/system/v2ray.service"
 v2ray_access_log="/var/log/v2ray/access.log"
 v2ray_error_log="/var/log/v2ray/error.log"
 amce_sh_file="/root/.acme.sh/acme.sh"
+ssl_update_file="/usr/bin/ssl_update.sh"
 nginx_version="1.16.1"
 openssl_version="1.1.1d"
 
@@ -72,10 +73,13 @@ check_system(){
     fi
 
     $INS install dbus
-    systemctl stop firewalld && systemctl disable firewalld
+
+    systemctl stop firewalld
+    systemctl disable firewalld
     echo -e "${OK} ${GreenBG} firewalld 已关闭 ${Font}"
 
-    systemctl stop ufw && systemctl disable ufw
+    systemctl stop ufw
+    systemctl disable ufw
     echo -e "${OK} ${GreenBG} ufw 已关闭 ${Font}"
 }
 
@@ -531,12 +535,15 @@ nginx_process_disabled(){
 #    judge "rc.local 配置"
 #}
 acme_cron_update(){
+    [ ! -f ${ssl_update_file} ] && wget -P /usr/bin "https://raw.githubusercontent.com/wulabing/V2Ray_ws-tls_bash_onekey/dev/ssl_update.sh"
     if [[ "${ID}" == "centos" ]];then
-        sed -i "/acme.sh/c 0 3 * * 0 \"/root/.acme.sh\"/acme.sh --cron --home \"/root/.acme.sh\" \
-        &> /dev/null" /var/spool/cron/root
+#        sed -i "/acme.sh/c 0 3 * * 0 \"/root/.acme.sh\"/acme.sh --cron --home \"/root/.acme.sh\" \
+#        &> /dev/null" /var/spool/cron/root
+        sed -i "/acme.sh/c 0 3 * * 0 bash ${ssl_update}"
     else
-        sed -i "/acme.sh/c 0 3 * * 0 \"/root/.acme.sh\"/acme.sh --cron --home \"/root/.acme.sh\" \
-        &> /dev/null" /var/spool/cron/crontabs/root
+#        sed -i "/acme.sh/c 0 3 * * 0 \"/root/.acme.sh\"/acme.sh --cron --home \"/root/.acme.sh\" \
+#        &> /dev/null" /var/spool/cron/crontabs/root
+        sed -i "/acme.sh/c 0 3 * * 0 bash ${ssl_update}"
     fi
     judge "cron 计划任务更新"
 }
