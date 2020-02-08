@@ -343,7 +343,7 @@ nginx_install(){
     echo -e "${OK} ${GreenBG} 即将开始编译安装 Nginx, 过程稍久，请耐心等待 ${Font}"
     sleep 4
 
-    cd nginx-${nginx_version}
+    cd ../nginx-${nginx_version}
     ./configure --prefix="${nginx_dir}"                         \
             --with-http_ssl_module                              \
             --with-http_gzip_static_module                      \
