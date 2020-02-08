@@ -47,6 +47,7 @@ amce_sh_file="/root/.acme.sh/acme.sh"
 ssl_update_file="/usr/bin/ssl_update.sh"
 nginx_version="1.16.1"
 openssl_version="1.1.1d"
+jemalloc_version="5.2.1"
 
 #生成伪装路径
 camouflage=`cat /dev/urandom | head -n 10 | md5sum | head -c 8`
@@ -311,6 +312,8 @@ nginx_install(){
     judge "Nginx 下载"
     wget -nc https://www.openssl.org/source/openssl-${openssl_version}.tar.gz -P ${nginx_openssl_src}
     judge "openssl 下载"
+    wget -nc https://github.com/jemalloc/jemalloc/releases/download/${jemalloc_version}/jemalloc-${jemalloc_version}.tar.bz2 -P ${nginx_openssl_src}
+    judge "jemalloc 下载"
 
     cd ${nginx_openssl_src}
 
@@ -320,7 +323,22 @@ nginx_install(){
     [[ -d openssl-"$openssl_version" ]] && rm -rf openssl-"$openssl_version"
     tar -zxvf openssl-"$openssl_version".tar.gz
 
+    [[ -d jemalloc-"${jemalloc_version}" ]] && rm -rf openssl-"$openssl_version"
+    tar -xvf openssl-"$openssl_version".tar.bz2
+
     [[ -d "$nginx_dir" ]] && rm -rf ${nginx_dir}
+
+
+    echo -e "${OK} ${GreenBG} 即将开始编译安装 jemalloc ${Font}"
+    sleep 2
+
+    cd jemalloc-${jemalloc_version}
+    ./configure
+    judge "编译检查"
+    make && make install
+    judge "jemalloc 编译安装"
+    echo '/usr/local/lib' > /etc/ld.so.conf.d/local.conf
+    ldconfig
 
     echo -e "${OK} ${GreenBG} 即将开始编译安装 Nginx, 过程稍久，请耐心等待 ${Font}"
     sleep 4
@@ -336,6 +354,7 @@ nginx_install(){
             --with-http_mp4_module                              \
             --with-http_secure_link_module                      \
             --with-http_v2_module                               \
+            --with-ld-opt="-ljemalloc"                          \
             --with-openssl=../openssl-"$openssl_version"
     judge "编译检查"
     make && make install
