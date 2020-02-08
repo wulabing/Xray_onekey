@@ -26,7 +26,7 @@ OK="${Green}[OK]${Font}"
 Error="${Red}[错误]${Font}"
 
 # 版本
-shell_version="1.0.7.1"
+shell_version="1.0.8"
 shell_mode="None"
 version_cmp="/tmp/version_cmp.tmp"
 v2ray_conf_dir="/etc/v2ray"
@@ -587,8 +587,8 @@ EOF
 
 vmess_qr_link_image(){
     vmess_link="vmess://$(cat $v2ray_qr_config_file | base64 -w 0)"
-    echo -e "${Red} URL导入链接:${vmess_link} ${Font}" >> ${v2ray_info_file}
     echo -e "${Red} 二维码: ${Font}" >> ${v2ray_info_file}
+    echo -e "${Red} URL导入链接:${vmess_link} ${Font}" >> ${v2ray_info_file}
     echo -n "${vmess_link}"| qrencode -o - -t utf8 >> ${v2ray_info_file}
 }
 
