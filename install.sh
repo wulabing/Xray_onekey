@@ -607,8 +607,8 @@ EOF
 vmess_qr_link_image(){
     vmess_link="vmess://$(cat $v2ray_qr_config_file | base64 -w 0)"
     echo -e "${Red} 二维码: ${Font}" >> ${v2ray_info_file}
-    echo -e "${Red} URL导入链接:${vmess_link} ${Font}" >> ${v2ray_info_file}
     echo -n "${vmess_link}"| qrencode -o - -t utf8 >> ${v2ray_info_file}
+    echo -e "${Red} URL导入链接:${vmess_link} ${Font}" >> ${v2ray_info_file}
 }
 
 info_extraction(){
