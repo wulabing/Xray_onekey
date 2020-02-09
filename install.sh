@@ -48,6 +48,7 @@ ssl_update_file="/usr/bin/ssl_update.sh"
 nginx_version="1.16.1"
 openssl_version="1.1.1d"
 jemalloc_version="5.2.1"
+v2ray_plugin_version="$(wget -qO- "https://github.com/shadowsocks/v2ray-plugin/tags" |grep -E "/shadowsocks/v2ray-plugin/releases/tag/" |head -1|sed -r 's/.*tag\/v(.+)\">.*/\1/')"
 
 #生成伪装路径
 camouflage=`cat /dev/urandom | head -n 10 | md5sum | head -c 8`
@@ -681,12 +682,12 @@ judge "Nginx systemd ServerFile 添加"
 
 tls_type(){
     if [[ -f "/etc/nginx/sbin/nginx" ]] && [[ -f "$nginx_conf" ]] && [[ "$shell_mode" == "ws" ]];then
-        echo "请选择支持的 TLS 版本（default:1）:"
+        echo "请选择支持的 TLS 版本（default:3）:"
         echo "1: TLS1.1 TLS1.2 and TLS1.3"
         echo "2: TLS1.2 and TLS1.3"
         echo "3: TLS1.3 only"
         read -p  "请输入：" tls_version
-        [[ -z ${tls_version} ]] && tls_version=2
+        [[ -z ${tls_version} ]] && tls_version=3
         if [[ $tls_version == 3 ]];then
             sed -i 's/ssl_protocols.*/ssl_protocols         TLSv1.3;/' $nginx_conf
             echo -e "${OK} ${GreenBG} 已切换至 TLS1.3 only ${Font}"
