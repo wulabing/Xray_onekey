@@ -892,7 +892,7 @@ menu(){
           install_v2_h2
           ;;
         3)
-          bash <(curl -L -s https://install.direct/go.sh)
+          bash <$(curl -L -s https://install.direct/go.sh)
           ;;
         4)
           read -p "请输入UUID:" UUID
