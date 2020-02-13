@@ -319,6 +319,9 @@ nginx_install(){
     echo -e "${OK} ${GreenBG} 即将开始编译安装 Nginx, 过程稍久，请耐心等待 ${Font}"
     sleep 4
 
+    # 关闭debug模式,减小编译后的文件大小
+    sed -i 's@CFLAGS="$CFLAGS -g"@#CFLAGS="$CFLAGS -g"@' auto/cc/gcc
+
     cd nginx-${nginx_version}
     ./configure --prefix="${nginx_dir}"                         \
             --with-http_ssl_module                              \
@@ -330,6 +333,7 @@ nginx_install(){
             --with-http_mp4_module                              \
             --with-http_secure_link_module                      \
             --with-http_v2_module                               \
+            --with-cc-opt='-O3'                                 \
             --with-openssl=../openssl-"$openssl_version"
     judge "编译检查"
     make && make install
