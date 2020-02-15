@@ -1,3 +1,22 @@
+## 2020-2-16
+1.1.0
+* 修复 证书更新后未正确应用的问题
+* 添加 旧配置文件保留
+* 添加 安装流程 TLS 版本选择
+* 变更 v2ray_qr_config_file位置
+* 修复 v2ray daemon判断逻辑错误
+* 添加 Nginx 冲突检测
+
+## 2020-2-7
+1.0.7
+* 修复 自动更新证书 Nginx 重启异常
+* 修复 bbr4合1 403 forbidden 问题
+* 修复 部分临时文件清理异常 问题
+* 变更 默认仅保留 TLS1.3
+* 添加 卸载提供 Nginx 保留选项
+* 添加 Nginx配置文件 XFF 感谢 tg:@Cliwired
+* 添加 ws DOH配置 感谢 tg:@auth_chain_b
+
 ## 2020-01-25
 * 修复 curl依赖确实
 * 添加 MT-proxy-go 安装代码，在此感谢 whunt1 的贡献
