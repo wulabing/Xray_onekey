@@ -26,7 +26,7 @@ OK="${Green}[OK]${Font}"
 Error="${Red}[错误]${Font}"
 
 # 版本
-shell_version="1.0.8"
+shell_version="1.1.0"
 shell_mode="None"
 version_cmp="/tmp/version_cmp.tmp"
 v2ray_conf_dir="/etc/v2ray"
@@ -683,8 +683,9 @@ judge "Nginx systemd ServerFile 添加"
 tls_type(){
     if [[ -f "/etc/nginx/sbin/nginx" ]] && [[ -f "$nginx_conf" ]] && [[ "$shell_mode" == "ws" ]];then
         echo "请选择支持的 TLS 版本（default:3）:"
-        echo "1: TLS1.1 TLS1.2 and TLS1.3"
-        echo "2: TLS1.2 and TLS1.3"
+        echo "请注意,如果你使用 Quantaumlt X / 路由器 / 旧版 Shadowrocket / 低于 4.18.1 版本的 V2ray core 请选择 兼容模式"
+        echo "1: TLS1.1 TLS1.2 and TLS1.3（兼容模式）"
+        echo "2: TLS1.2 and TLS1.3 (兼容模式)"
         echo "3: TLS1.3 only"
         read -p  "请输入：" tls_version
         [[ -z ${tls_version} ]] && tls_version=3
@@ -772,6 +773,7 @@ install_v2ray_ws_tls(){
     v2ray_conf_add_tls
     nginx_conf_add
     web_camouflage
+    tls_type
     ssl_judge_and_install
     nginx_systemd
     vmess_qr_config_tls_ws
