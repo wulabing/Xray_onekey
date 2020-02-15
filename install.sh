@@ -843,6 +843,7 @@ install_v2_h2(){
     dependency_install
     basic_optimization
     domain_check
+    old_config_exist_check
     port_alterid_set
     v2ray_install
     port_exist_check 80
