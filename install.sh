@@ -55,7 +55,7 @@ v2ray_plugin_version="$(wget -qO- "https://github.com/shadowsocks/v2ray-plugin/t
 [[ -f "/etc/v2ray/vmess_qr.json" ]] && mv /etc/v2ray/vmess_qr.json $v2ray_qr_config_file
 
 #生成伪装路径
-camouflage=`cat /dev/urandom | head -n 10 | md5sum | head -c 8`
+camouflage="/`cat /dev/urandom | head -n 10 | md5sum | head -c 8`/"
 
 source /etc/os-release
 
@@ -240,13 +240,13 @@ modify_path(){
     then
         camouflage="$(cat $v2ray_qr_config_file | grep '\"path\"' | awk -F '"' '{print $4}')"
     fi
-    sed -i "/\"path\"/c \\\t  \"path\":\"\/${camouflage}\/\"" ${v2ray_conf}
+    sed -i "/\"path\"/c \\\t  \"path\":\"${camouflage}\"" ${v2ray_conf}
     judge "V2ray 伪装路径 修改"
 }
 modify_alterid(){
     if [[ "on" == "$old_config_status" ]]
     then
-        alterID="$(cat $v2ray_qr_config_file | grep '\"id\"' | awk -F '"' '{print $4}')"
+        alterID="$(cat $v2ray_qr_config_file | grep '\"aid\"' | awk -F '"' '{print $4}')"
     fi
     sed -i "/\"alterId\"/c \\\t  \"alterId\":${alterID}" ${v2ray_conf}
     judge "V2ray alterid 修改"
@@ -290,7 +290,7 @@ modify_nginx_port(){
 }
 modify_nginx_other(){
     sed -i "/server_name/c \\\tserver_name ${domain};" ${nginx_conf}
-    sed -i "/location/c \\\tlocation \/${camouflage}\/" ${nginx_conf}
+    sed -i "/location/c \\\tlocation ${camouflage}" ${nginx_conf}
     sed -i "/proxy_pass/c \\\tproxy_pass http://127.0.0.1:${PORT};" ${nginx_conf}
     sed -i "/return/c \\\treturn 301 https://${domain}\$request_uri;" ${nginx_conf}
     #sed -i "27i \\\tproxy_intercept_errors on;"  ${nginx_dir}/conf/nginx.conf
@@ -632,7 +632,7 @@ vmess_qr_config_tls_ws(){
   "net": "ws",
   "type": "none",
   "host": "${domain}",
-  "path": "/${camouflage}/",
+  "path": "${camouflage}",
   "tls": "tls"
 }
 EOF
@@ -649,7 +649,7 @@ vmess_qr_config_h2(){
   "aid": "${alterID}",
   "net": "h2",
   "type": "none",
-  "path": "/${camouflage}/",
+  "path": "${camouflage}",
   "tls": "tls"
 }
 EOF
@@ -869,9 +869,9 @@ update_sh(){
             [yY][eE][sS]|[yY])
                 wget -N --no-check-certificate https://raw.githubusercontent.com/wulabing/V2Ray_ws-tls_bash_onekey/master/install.sh
                 echo -e "${OK} ${Green} 更新完成 ${Font}"
+                exit 0
                 ;;
             *)
-                exit 0
                 ;;
         esac
     else
@@ -905,6 +905,7 @@ list(){
 }
 
 menu(){
+    update_sh
     echo -e "\t V2ray 安装管理脚本 ${Red}[${shell_version}]${Font}"
     echo -e "\t---authored by wulabing---"
     echo -e "\thttps://github.com/wulabing\n"
@@ -932,7 +933,6 @@ menu(){
     echo -e "${Green}15.${Font} 更新 证书crontab计划任务"
     echo -e "${Green}16.${Font} 退出 \n"
 
-    update_sh
     read -p "请输入数字：" menu_num
     case $menu_num in
         0)
