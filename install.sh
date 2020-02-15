@@ -504,16 +504,16 @@ v2ray_conf_add_h2(){
 old_config_exist_check(){
     if [[ -f $v2ray_qr_config_file ]]
     then
-        echo -e "${OK} ${Green} 检测到旧配置文件，是否读取旧文件配置 [Y/N]?"
-        read -r ""
+        echo -e "${OK} ${Green} 检测到旧配置文件，是否读取旧文件配置 [Y/N]? ${Font}"
+        read -r ssl_delete
         case $ssl_delete in
             [yY][eE][sS]|[yY])
-                echo -e "${OK} ${Green} 已保留旧配置 [Y/N]?"
+                echo -e "${OK} ${Green} 已保留旧配置 [Y/N]? ${Font}"
                 old_config_status="on"
                 ;;
             *)
                 rm -rf $v2ray_qr_config_file
-                echo -e "${OK} ${Green} 已删除旧配置 [Y/N]?"
+                echo -e "${OK} ${Green} 已删除旧配置 [Y/N]? ${Font}"
                 ;;
         esac
     fi
