@@ -312,6 +312,7 @@ v2ray_install(){
 
     if [[ -f go.sh ]];then
         rm -rf $v2ray_systemd_file
+        systemctl daemon-reload
         bash go.sh --force
         judge "安装 V2ray"
     else
