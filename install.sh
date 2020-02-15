@@ -392,7 +392,6 @@ nginx_install(){
             --with-http_v2_module                               \
             --with-cc-opt='-O3'                                 \
             --with-ld-opt="-ljemalloc"                          \
-
             --with-openssl=../openssl-"$openssl_version"
     judge "编译检查"
     make && make install
