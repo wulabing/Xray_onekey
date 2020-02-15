@@ -516,6 +516,7 @@ old_config_exist_check(){
             [yY][eE][sS]|[yY])
                 echo -e "${OK} ${Green} 已保留旧配置  ${Font}"
                 old_config_status="on"
+                port=$(info_extraction '\"port\"')
                 ;;
             *)
                 rm -rf $v2ray_qr_config_file
@@ -608,7 +609,7 @@ nginx_process_disabled(){
 #    judge "rc.local 配置"
 #}
 acme_cron_update(){
-    [ ! -f ${ssl_update_file} ] && wget -P --no-check-certificate /usr/bin "https://raw.githubusercontent.com/wulabing/V2Ray_ws-tls_bash_onekey/dev/ssl_update.sh"
+    wget -P --no-check-certificate /usr/bin "https://raw.githubusercontent.com/wulabing/V2Ray_ws-tls_bash_onekey/dev/ssl_update.sh"
     if [[ "${ID}" == "centos" ]];then
 #        sed -i "/acme.sh/c 0 3 * * 0 \"/root/.acme.sh\"/acme.sh --cron --home \"/root/.acme.sh\" \
 #        &> /dev/null" /var/spool/cron/root
