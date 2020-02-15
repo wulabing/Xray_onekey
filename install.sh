@@ -464,6 +464,20 @@ acme(){
 v2ray_conf_add_tls(){
     cd /etc/v2ray
     wget https://raw.githubusercontent.com/wulabing/V2Ray_ws-tls_bash_onekey/master/tls/config.json -O config.json
+    if [[ -f $v2ray_qr_config_file ]]
+    then
+        echo -e "${OK} ${Green} 检测到旧配置文件，是否读取旧文件配置 [Y/N]?"
+        read -r ""
+        case $ssl_delete in
+            [yY][eE][sS]|[yY])
+                echo -e "${OK} ${Green} 已保留旧配置 [Y/N]?"
+                ;;
+            *)
+                rm -rf $v2ray_qr_config_file
+                echo -e "${OK} ${Green} 已删除旧配置 [Y/N]?"
+                ;;
+        esac
+    fi
     modify_path
     modify_alterid
     modify_inbound_port
@@ -682,6 +696,7 @@ WantedBy=multi-user.target
 EOF
 
 judge "Nginx systemd ServerFile 添加"
+systemctl daemon-reload
 }
 
 tls_type(){
