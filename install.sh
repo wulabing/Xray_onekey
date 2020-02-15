@@ -48,6 +48,7 @@ ssl_update_file="/usr/bin/ssl_update.sh"
 nginx_version="1.16.1"
 openssl_version="1.1.1d"
 jemalloc_version="5.2.1"
+old_config_status="off"
 v2ray_plugin_version="$(wget -qO- "https://github.com/shadowsocks/v2ray-plugin/tags" |grep -E "/shadowsocks/v2ray-plugin/releases/tag/" |head -1|sed -r 's/.*tag\/v(.+)\">.*/\1/')"
 
 #生成伪装路径
@@ -194,7 +195,7 @@ dependency_install(){
     ${INS} -y install haveged
 #    judge "haveged 安装"
 
-    sed -i -r '/^HRNGDEVICE/d;/#HRNGDEVICE=\/dev\/null/a HRNGDEVICE=/dev/urandom' /etc/default/rng-tools
+#    sed -i -r '/^HRNGDEVICE/d;/#HRNGDEVICE=\/dev\/null/a HRNGDEVICE=/dev/urandom' /etc/default/rng-tools
 
     if [[ "${ID}" == "centos" ]];then
 #       systemctl start rngd && systemctl enable rngd
@@ -229,16 +230,28 @@ port_alterid_set(){
     [[ -z ${alterID} ]] && alterID="2"
 }
 modify_path(){
+    if [[ "on" == "$old_config_status" ]]
+    then
+        camouflage="$(cat $v2ray_qr_config_file | grep '\"net\"' | awk -F '"' '{print $4}')"
+    fi
     sed -i "/\"path\"/c \\\t  \"path\":\"\/${camouflage}\/\"" ${v2ray_conf}
     judge "V2ray 伪装路径 修改"
 }
 modify_alterid(){
+    if [[ "on" == "$old_config_status" ]]
+    then
+        alterID="$(cat $v2ray_qr_config_file | grep '\"id\"' | awk -F '"' '{print $4}')"
+    fi
     sed -i "/\"alterId\"/c \\\t  \"alterId\":${alterID}" ${v2ray_conf}
     judge "V2ray alterid 修改"
     [ -f ${v2ray_qr_config_file} ] && sed -i "/\"aid\"/c \\  \"aid\": \"${alterID}\"," ${v2ray_qr_config_file}
     echo -e "${GreenBG} alterID:${alterID} ${Font}"
 }
 modify_inbound_port(){
+    if [[ "on" == "$old_config_status" ]]
+    then
+        port="$(cat $v2ray_qr_config_file | grep '\"port\"' | awk -F '"' '{print $4}')"
+    fi
     if [[ "$shell_mode" != "h2" ]]
     then
         let PORT=$RANDOM+10000
@@ -250,12 +263,20 @@ modify_inbound_port(){
 }
 modify_UUID(){
     [ -z $UUID ] && UUID=$(cat /proc/sys/kernel/random/uuid)
+    if [[ "on" == "$old_config_status" ]]
+    then
+        UUID="$(cat $v2ray_qr_config_file | grep '\"id\"' | awk -F '"' '{print $4}')"
+    fi
     sed -i "/\"id\"/c \\\t  \"id\":\"${UUID}\"," ${v2ray_conf}
     judge "V2ray UUID 修改"
     [ -f ${v2ray_qr_config_file} ] && sed -i "/\"id\"/c \\  \"id\": \"${UUID}\"," ${v2ray_qr_config_file}
     echo -e "${GreenBG} UUID:${UUID} ${Font}"
 }
 modify_nginx_port(){
+    if [[ "on" == "$old_config_status" ]]
+    then
+        port="$(cat $v2ray_qr_config_file | grep '\"port\"' | awk -F '"' '{print $4}')"
+    fi
     sed -i "/ssl http2;$/c \\\tlisten ${port} ssl http2;" ${nginx_conf}
     judge "V2ray port 修改"
     [ -f ${v2ray_qr_config_file} ] && sed -i "/\"port\"/c \\  \"port\": \"${port}\"," ${v2ray_qr_config_file}
@@ -471,6 +492,7 @@ v2ray_conf_add_tls(){
         case $ssl_delete in
             [yY][eE][sS]|[yY])
                 echo -e "${OK} ${Green} 已保留旧配置 [Y/N]?"
+                old_config_status="on"
                 ;;
             *)
                 rm -rf $v2ray_qr_config_file
