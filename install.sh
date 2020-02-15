@@ -224,10 +224,13 @@ basic_optimization(){
 
 }
 port_alterid_set(){
-    read -p "请输入连接端口（default:443）:" port
-    [[ -z ${port} ]] && port="443"
-    read -p "请输入alterID（default:2 仅允许填数字）:" alterID
-    [[ -z ${alterID} ]] && alterID="2"
+    if [[ "on" != "$old_config_status" ]]
+    then
+        read -p "请输入连接端口（default:443）:" port
+        [[ -z ${port} ]] && port="443"
+        read -p "请输入alterID（default:2 仅允许填数字）:" alterID
+        [[ -z ${alterID} ]] && alterID="2"
+    fi
 }
 modify_path(){
     if [[ "on" == "$old_config_status" ]]
@@ -485,6 +488,20 @@ acme(){
 v2ray_conf_add_tls(){
     cd /etc/v2ray
     wget https://raw.githubusercontent.com/wulabing/V2Ray_ws-tls_bash_onekey/master/tls/config.json -O config.json
+    modify_path
+    modify_alterid
+    modify_inbound_port
+    modify_UUID
+}
+v2ray_conf_add_h2(){
+    cd /etc/v2ray
+    wget https://raw.githubusercontent.com/wulabing/V2Ray_ws-tls_bash_onekey/master/http2/config.json -O config.json
+    modify_path
+    modify_alterid
+    modify_inbound_port
+    modify_UUID
+}
+old_config_exist_check(){
     if [[ -f $v2ray_qr_config_file ]]
     then
         echo -e "${OK} ${Green} 检测到旧配置文件，是否读取旧文件配置 [Y/N]?"
@@ -500,18 +517,6 @@ v2ray_conf_add_tls(){
                 ;;
         esac
     fi
-    modify_path
-    modify_alterid
-    modify_inbound_port
-    modify_UUID
-}
-v2ray_conf_add_h2(){
-    cd /etc/v2ray
-    wget https://raw.githubusercontent.com/wulabing/V2Ray_ws-tls_bash_onekey/master/http2/config.json -O config.json
-    modify_path
-    modify_alterid
-    modify_inbound_port
-    modify_UUID
 }
 nginx_conf_add(){
     touch ${nginx_conf_dir}/v2ray.conf
@@ -806,6 +811,7 @@ install_v2ray_ws_tls(){
     dependency_install
     basic_optimization
     domain_check
+    old_config_exist_check
     port_alterid_set
     v2ray_install
     port_exist_check 80
