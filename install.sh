@@ -38,7 +38,7 @@ web_dir="/home/wwwroot"
 nginx_openssl_src="/usr/local/src"
 v2ray_bin_file="/usr/bin/v2ray"
 v2ray_info_file="$HOME/v2ray_info.inf"
-v2ray_qr_config_file="/etc/v2ray/vmess_qr.json"
+v2ray_qr_config_file="/usr/local/vmess_qr.json"
 nginx_systemd_file="/etc/systemd/system/nginx.service"
 v2ray_systemd_file="/etc/systemd/system/v2ray.service"
 v2ray_access_log="/var/log/v2ray/access.log"
@@ -50,6 +50,9 @@ openssl_version="1.1.1d"
 jemalloc_version="5.2.1"
 old_config_status="off"
 v2ray_plugin_version="$(wget -qO- "https://github.com/shadowsocks/v2ray-plugin/tags" |grep -E "/shadowsocks/v2ray-plugin/releases/tag/" |head -1|sed -r 's/.*tag\/v(.+)\">.*/\1/')"
+
+#移动旧版本配置信息 对小于 1.1.0 版本适配
+[[ -f "/etc/v2ray/vmess_qr.json" ]] && mv /etc/v2ray/vmess_qr.json $v2ray_qr_config_file
 
 #生成伪装路径
 camouflage=`cat /dev/urandom | head -n 10 | md5sum | head -c 8`
@@ -510,12 +513,12 @@ old_config_exist_check(){
         read -r ssl_delete
         case $ssl_delete in
             [yY][eE][sS]|[yY])
-                echo -e "${OK} ${Green} 已保留旧配置 [Y/N]? ${Font}"
+                echo -e "${OK} ${Green} 已保留旧配置  ${Font}"
                 old_config_status="on"
                 ;;
             *)
                 rm -rf $v2ray_qr_config_file
-                echo -e "${OK} ${Green} 已删除旧配置 [Y/N]? ${Font}"
+                echo -e "${OK} ${Green} 已删除旧配置  ${Font}"
                 ;;
         esac
     fi
