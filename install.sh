@@ -379,6 +379,7 @@ nginx_install(){
     sleep 4
 
     cd ../nginx-${nginx_version}
+
     ./configure --prefix="${nginx_dir}"                         \
             --with-http_ssl_module                              \
             --with-http_gzip_static_module                      \
@@ -389,7 +390,9 @@ nginx_install(){
             --with-http_mp4_module                              \
             --with-http_secure_link_module                      \
             --with-http_v2_module                               \
+            --with-cc-opt='-O3'                                 \
             --with-ld-opt="-ljemalloc"                          \
+
             --with-openssl=../openssl-"$openssl_version"
     judge "编译检查"
     make && make install
@@ -670,14 +673,14 @@ info_extraction(){
 basic_information(){
     echo -e "${OK} ${Green} V2ray+ws+tls 安装成功" > ${v2ray_info_file}
     echo -e "${Red} V2ray 配置信息 ${Font}" >> ${v2ray_info_file}
-    echo -e "${Red} 地址（address）:${Font} $(info_extraction "add") " >> ${v2ray_info_file}
-    echo -e "${Red} 端口（port）：${Font} $(info_extraction "port") " >> ${v2ray_info_file}
+    echo -e "${Red} 地址（address）:${Font} $(info_extraction '\"add\"') " >> ${v2ray_info_file}
+    echo -e "${Red} 端口（port）：${Font} $(info_extraction '\"port\"') " >> ${v2ray_info_file}
     echo -e "${Red} 用户id（UUID）：${Font} $(info_extraction '\"id\"')" >> ${v2ray_info_file}
     echo -e "${Red} 额外id（alterId）：${Font} $(info_extraction '\"aid\"')" >> ${v2ray_info_file}
     echo -e "${Red} 加密方式（security）：${Font} 自适应 " >> ${v2ray_info_file}
-    echo -e "${Red} 传输协议（network）：${Font} $(info_extraction "net") " >> ${v2ray_info_file}
+    echo -e "${Red} 传输协议（network）：${Font} $(info_extraction '\"net\"') " >> ${v2ray_info_file}
     echo -e "${Red} 伪装类型（type）：${Font} none " >> ${v2ray_info_file}
-    echo -e "${Red} 路径（不要落下/）：${Font} $(info_extraction "path") " >> ${v2ray_info_file}
+    echo -e "${Red} 路径（不要落下/）：${Font} $(info_extraction '\"path\"') " >> ${v2ray_info_file}
     echo -e "${Red} 底层传输安全：${Font} tls " >> ${v2ray_info_file}
 }
 show_information(){
