@@ -257,7 +257,7 @@ modify_alterid(){
 modify_inbound_port(){
     if [[ "on" == "$old_config_status" ]]
     then
-        port="$(cat $v2ray_qr_config_file | grep '\"port\"' | awk -F '"' '{print $4}')"
+        port="$(info_extraction '\"port\"')"
     fi
     if [[ "$shell_mode" != "h2" ]]
     then
@@ -272,7 +272,7 @@ modify_UUID(){
     [ -z $UUID ] && UUID=$(cat /proc/sys/kernel/random/uuid)
     if [[ "on" == "$old_config_status" ]]
     then
-        UUID="$(cat $v2ray_qr_config_file | grep '\"id\"' | awk -F '"' '{print $4}')"
+        UUID="$(info_extraction '\"id\"')"
     fi
     sed -i "/\"id\"/c \\\t  \"id\":\"${UUID}\"," ${v2ray_conf}
     judge "V2ray UUID 修改"
@@ -282,7 +282,7 @@ modify_UUID(){
 modify_nginx_port(){
     if [[ "on" == "$old_config_status" ]]
     then
-        port="$(cat $v2ray_qr_config_file | grep '\"port\"' | awk -F '"' '{print $4}')"
+        port="$(info_extraction '\"port\"')"
     fi
     sed -i "/ssl http2;$/c \\\tlisten ${port} ssl http2;" ${nginx_conf}
     judge "V2ray port 修改"
@@ -765,6 +765,8 @@ show_error_log(){
 }
 ssl_update_manuel(){
     [ -f ${amce_sh_file} ] && "/root/.acme.sh"/acme.sh --cron --home "/root/.acme.sh" || echo -e  "${RedBG}证书签发工具不存在，请确认你是否使用了自己的证书${Font}"
+    domain="$(info_extraction '\"add\"')"
+    $HOME/.acme.sh/acme.sh --installcert -d ${domain} --fullchainpath /data/v2ray.crt --keypath /data/v2ray.key --ecc
 }
 bbr_boost_sh(){
     [ -f "tcp.sh" ] && rm -rf ./tcp.sh
