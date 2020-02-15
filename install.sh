@@ -492,7 +492,7 @@ acme(){
 }
 v2ray_conf_add_tls(){
     cd /etc/v2ray
-    wget https://raw.githubusercontent.com/wulabing/V2Ray_ws-tls_bash_onekey/master/tls/config.json -O config.json
+    wget --no-check-certificate https://raw.githubusercontent.com/wulabing/V2Ray_ws-tls_bash_onekey/master/tls/config.json -O config.json
     modify_path
     modify_alterid
     modify_inbound_port
@@ -500,7 +500,7 @@ v2ray_conf_add_tls(){
 }
 v2ray_conf_add_h2(){
     cd /etc/v2ray
-    wget https://raw.githubusercontent.com/wulabing/V2Ray_ws-tls_bash_onekey/master/http2/config.json -O config.json
+    wget --no-check-certificate https://raw.githubusercontent.com/wulabing/V2Ray_ws-tls_bash_onekey/master/http2/config.json -O config.json
     modify_path
     modify_alterid
     modify_inbound_port
@@ -607,7 +607,7 @@ nginx_process_disabled(){
 #    judge "rc.local 配置"
 #}
 acme_cron_update(){
-    [ ! -f ${ssl_update_file} ] && wget -P /usr/bin "https://raw.githubusercontent.com/wulabing/V2Ray_ws-tls_bash_onekey/dev/ssl_update.sh"
+    [ ! -f ${ssl_update_file} ] && wget -P --no-check-certificate /usr/bin "https://raw.githubusercontent.com/wulabing/V2Ray_ws-tls_bash_onekey/dev/ssl_update.sh"
     if [[ "${ID}" == "centos" ]];then
 #        sed -i "/acme.sh/c 0 3 * * 0 \"/root/.acme.sh\"/acme.sh --cron --home \"/root/.acme.sh\" \
 #        &> /dev/null" /var/spool/cron/root
