@@ -28,7 +28,7 @@ Error="${Red}[错误]${Font}"
 # 版本
 shell_version="1.1.0"
 shell_mode="None"
-github_branch="dev"
+github_branch="master"
 version_cmp="/tmp/version_cmp.tmp"
 v2ray_conf_dir="/etc/v2ray"
 nginx_conf_dir="/etc/nginx/conf/conf.d"
