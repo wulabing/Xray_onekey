@@ -238,7 +238,7 @@ port_alterid_set(){
 modify_path(){
     if [[ "on" == "$old_config_status" ]]
     then
-        camouflage="$(cat $v2ray_qr_config_file | grep '\"net\"' | awk -F '"' '{print $4}')"
+        camouflage="$(cat $v2ray_qr_config_file | grep '\"path\"' | awk -F '"' '{print $4}')"
     fi
     sed -i "/\"path\"/c \\\t  \"path\":\"\/${camouflage}\/\"" ${v2ray_conf}
     judge "V2ray 伪装路径 修改"
@@ -671,7 +671,7 @@ basic_information(){
     echo -e "${Red} 地址（address）:${Font} $(info_extraction "add") " >> ${v2ray_info_file}
     echo -e "${Red} 端口（port）：${Font} $(info_extraction "port") " >> ${v2ray_info_file}
     echo -e "${Red} 用户id（UUID）：${Font} $(info_extraction '\"id\"')" >> ${v2ray_info_file}
-    echo -e "${Red} 额外id（alterId）：${Font} $(info_extraction "aid")" >> ${v2ray_info_file}
+    echo -e "${Red} 额外id（alterId）：${Font} $(info_extraction '\"aid\"')" >> ${v2ray_info_file}
     echo -e "${Red} 加密方式（security）：${Font} 自适应 " >> ${v2ray_info_file}
     echo -e "${Red} 传输协议（network）：${Font} $(info_extraction "net") " >> ${v2ray_info_file}
     echo -e "${Red} 伪装类型（type）：${Font} none " >> ${v2ray_info_file}
