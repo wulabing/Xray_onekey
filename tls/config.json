@@ -40,12 +40,23 @@
   ], 
   "dns": {
     "servers": [
-      "https+local://1.1.1.1/dns-query",
-	  "1.1.1.1",
-	  "1.0.0.1",
-	  "8.8.8.8",
-	  "8.8.4.4",
-	  "localhost"
+        {
+            "address": "223.5.5.5",
+            "expectIPs": [
+                "geoip:cn"
+            ]
+        },
+        {
+            "address": "https+local://1.1.1.1/dns-query",
+            "domains": [
+                "geosite:geolocation-!cn"
+            ]
+        },
+        "localhost",
+        "1.1.1.1",
+        "1.0.0.1",
+        "8.8.8.8",
+        "8.8.4.4",
     ]
   },
   "routing": {
