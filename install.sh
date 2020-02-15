@@ -777,12 +777,12 @@ install_v2ray_ws_tls(){
     v2ray_conf_add_tls
     nginx_conf_add
     web_camouflage
-    tls_type
     ssl_judge_and_install
     nginx_systemd
     vmess_qr_config_tls_ws
     basic_information
     vmess_qr_link_image
+    tls_type
     show_information
     start_process_systemd
     enable_process_systemd
