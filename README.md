@@ -40,7 +40,7 @@ wget -N --no-check-certificate -q -O install.sh "https://raw.githubusercontent.c
 脚本支持自动生成 let's encrypted 证书，有效期3个月，理论上自动生成的证书支持自动续签
 
 ### 查看客户端配置
-`cat ~/v2ray_info.txt`
+`cat ~/v2ray_info.inf`
 
 ### V2ray 简介
 
