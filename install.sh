@@ -613,14 +613,25 @@ nginx_process_disabled(){
 #}
 acme_cron_update(){
     wget -N -P /usr/bin --no-check-certificate "https://raw.githubusercontent.com/wulabing/V2Ray_ws-tls_bash_onekey/dev/ssl_update.sh"
-    if [[ "${ID}" == "centos" ]];then
-#        sed -i "/acme.sh/c 0 3 * * 0 \"/root/.acme.sh\"/acme.sh --cron --home \"/root/.acme.sh\" \
-#        &> /dev/null" /var/spool/cron/root
-        sed -i "/acme.sh/c 0 3 * * 0 bash ${ssl_update_file}" /var/spool/cron/root
+
+    if [[ "${ID}" == "centos" ]]; then
+        # sed -i "/acme.sh/c 0 3 * * 0 \"/root/.acme.sh\"/acme.sh --cron --home \"/root/.acme.sh\" \
+        # &> /dev/null" /var/spool/cron/crontabs/root
+        sed -i "/acme.sh/c 0 3 * * 0 bash ${ssl_update_file} > /dev/null 2>&1" /var/spool/cron/root
+
+        if [ -e "/var/spool/cron/root" -o -z "$(grep upgrade_ssl /var/spool/cron/root 2>/dev/null)" ]; then
+            echo "0 3 * * 0 bash ${ssl_update_file} > /dev/null 2>&1" >> /var/spool/cron/root
+            chmod 600 /var/spool/cron/root
+        fi
     else
-#        sed -i "/acme.sh/c 0 3 * * 0 \"/root/.acme.sh\"/acme.sh --cron --home \"/root/.acme.sh\" \
-#        &> /dev/null" /var/spool/cron/crontabs/root
-        sed -i "/acme.sh/c 0 3 * * 0 bash ${ssl_update_file}" /var/spool/cron/crontabs/root
+        # sed -i "/acme.sh/c 0 3 * * 0 \"/root/.acme.sh\"/acme.sh --cron --home \"/root/.acme.sh\" \
+        # &> /dev/null" /var/spool/cron/crontabs/root
+        sed -i "/acme.sh/c 0 3 * * 0 bash ${ssl_update_file} > /dev/null 2>&1" /var/spool/cron/crontabs/root
+
+        if [ -e "/var/spool/cron/crontabs/root" -o -z "$(grep upgrade_ssl /var/spool/cron/crontabs/root 2>/dev/null)" ]; then
+            echo "0 3 * * 0 bash ${ssl_update_file} > /dev/null 2>&1" >> /var/spool/cron/crontabs/root
+            chmod 600 /var/spool/cron/crontabs/root
+        fi
     fi
     judge "cron 计划任务更新"
 }
