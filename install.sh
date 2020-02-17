@@ -330,7 +330,8 @@ nginx_install(){
             --with-http_mp4_module                              \
             --with-http_secure_link_module                      \
             --with-http_v2_module                               \
-            --with-openssl=../openssl-"$openssl_version"
+            --with-openssl=../openssl-"$openssl_version"        \
+            --with-ipv6  
     judge "编译检查"
     make && make install
     judge "Nginx 编译安装"
@@ -452,6 +453,7 @@ nginx_conf_add(){
     cat>${nginx_conf_dir}/v2ray.conf<<EOF
     server {
         listen 443 ssl http2;
+        listen [::]:443 ssl http2;
         ssl_certificate       /data/v2ray.crt;
         ssl_certificate_key   /data/v2ray.key;
         ssl_protocols         TLSv1.2 TLSv1.3;
@@ -472,6 +474,7 @@ nginx_conf_add(){
 }
     server {
         listen 80;
+        listen [::]:80;
         server_name serveraddr.com;
         return 301 https://use.shadowsocksr.win\$request_uri;
     }
