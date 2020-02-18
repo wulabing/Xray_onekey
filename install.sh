@@ -918,7 +918,7 @@ menu(){
     echo -e "\thttps://github.com/wulabing\n"
     echo -e "Currently installed version: ${shell_mode}\n"
 
-    echo -e "—————————————— Installation Wizard ——————————————"""
+    echo -e "—————————————— Installation Wizard ——————————————"
     echo -e "${Green}0.${Font}  upgrade script"
     echo -e "${Green}1.${Font}  Install V2Ray (Nginx + ws + tls)"
     echo -e "${Green}2.${Font}  Install  V2Ray (http/2)"
