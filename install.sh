@@ -26,7 +26,7 @@ OK="${Green}[OK]${Font}"
 Error="${Red}[错误]${Font}"
 
 # 版本
-shell_version="1.1.1"
+shell_version="1.1.2"
 shell_mode="None"
 github_branch="master"
 version_cmp="/tmp/version_cmp.tmp"
@@ -467,18 +467,18 @@ port_exist_check(){
     fi
 }
 acme(){
-    $HOME/.acme.sh/acme.sh --issue -d ${domain} --standalone -k ec-256 --force --test
-    if [[ $? -eq 0 ]];then
-        echo -e "${OK} ${GreenBG} SSL 证书测试签发成功，开始正式签发 ${Font}"
-        rm -rf "$HOME/.acme.sh/${domain}_ecc/${domain}.key"
-        rm -rf "$HOME/.acme.sh/${domain}_ecc/${domain}.cer"
-        sleep 2
-    else
-        echo -e "${Error} ${RedBG} SSL 证书测试签发失败 ${Font}"
-        rm -rf "$HOME/.acme.sh/${domain}_ecc/${domain}.key"
-        rm -rf "$HOME/.acme.sh/${domain}_ecc/${domain}.cer"
-        exit 1
-    fi
+#    $HOME/.acme.sh/acme.sh --issue -d ${domain} --standalone -k ec-256 --force --test
+#    if [[ $? -eq 0 ]];then
+#        echo -e "${OK} ${GreenBG} SSL 证书测试签发成功，开始正式签发 ${Font}"
+#        rm -rf "$HOME/.acme.sh/${domain}_ecc/${domain}.key"
+#        rm -rf "$HOME/.acme.sh/${domain}_ecc/${domain}.cer"
+#        sleep 2
+#    else
+#        echo -e "${Error} ${RedBG} SSL 证书测试签发失败 ${Font}"
+#        rm -rf "$HOME/.acme.sh/${domain}_ecc/${domain}.key"
+#        rm -rf "$HOME/.acme.sh/${domain}_ecc/${domain}.cer"
+#        exit 1
+#    fi
 
     $HOME/.acme.sh/acme.sh --issue -d ${domain} --standalone -k ec-256 --force
     if [[ $? -eq 0 ]];then
