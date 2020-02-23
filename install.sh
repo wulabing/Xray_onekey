@@ -803,11 +803,12 @@ uninstall_all(){
     fi
     [[ -d $v2ray_conf_dir ]] && rm -rf $v2ray_conf_dir
     [[ -d $web_dir ]] && rm -rf $web_dir
+    [[ -d $HOME/.acme.sh]] && acme.sh uninstall
     systemctl daemon-reload
     echo -e "${OK} ${GreenBG} 已卸载，SSL证书文件已保留 ${Font}"
 }
 judge_mode(){
-    if [ -f $v2ray_qr_config_file ]
+    if [ -f $v2ray_bin_file ]
     then
         if [[ -n $(grep "ws" $v2ray_qr_config_file) ]]
         then
