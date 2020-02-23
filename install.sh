@@ -801,12 +801,13 @@ uninstall_all(){
     fi
     [[ -d $v2ray_conf_dir ]] && rm -rf $v2ray_conf_dir
     [[ -d $web_dir ]] && rm -rf $web_dir
-    [[ -d $HOME/.acme.sh ]] && /root/.acme.sh/acme.sh uninstall
+    [[ -d $HOME/.acme.sh ]] && /root/.acme.sh/acme.sh uninstall > /dev/null 2>&1
     systemctl daemon-reload
     echo -e "${OK} ${GreenBG} 已卸载，SSL证书文件已保留 ${Font}"
 }
 delete_tls_key_and_crt(){
-   [[ -d $HOME/.acme.sh ]] && rm -rf $HOME/.acme.sh
+   [[ -f $HOME/.acme.sh/acme.sh ]] && /root/.acme.sh/acme.sh uninstall > /dev/null 2>&1
+   [[ -d $HOME/.acme.sh ]] && rm -rf "$HOME/.acme.sh"
    echo -e "${OK} ${GreenBG} 已清空证书遗留文件 ${Font}"
 }
 judge_mode(){
