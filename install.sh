@@ -252,7 +252,7 @@ modify_alterid(){
     sed -i "/\"alterId\"/c \\\t  \"alterId\":${alterID}" ${v2ray_conf}
     judge "V2ray alterid 修改"
     [ -f ${v2ray_qr_config_file} ] && sed -i "/\"aid\"/c \\  \"aid\": \"${alterID}\"," ${v2ray_qr_config_file}
-    echo -e "${GreenBG} alterID:${alterID} ${Font}"
+    echo -e "${OK} ${GreenBG} alterID:${alterID} ${Font}"
 }
 modify_inbound_port(){
     if [[ "on" == "$old_config_status" ]]
@@ -277,7 +277,7 @@ modify_UUID(){
     sed -i "/\"id\"/c \\\t  \"id\":\"${UUID}\"," ${v2ray_conf}
     judge "V2ray UUID 修改"
     [ -f ${v2ray_qr_config_file} ] && sed -i "/\"id\"/c \\  \"id\": \"${UUID}\"," ${v2ray_qr_config_file}
-    echo -e "${GreenBG} UUID:${UUID} ${Font}"
+    echo -e "${OK} ${GreenBG} UUID:${UUID} ${Font}"
 }
 modify_nginx_port(){
     if [[ "on" == "$old_config_status" ]]
@@ -287,7 +287,7 @@ modify_nginx_port(){
     sed -i "/ssl http2;$/c \\\tlisten ${port} ssl http2;" ${nginx_conf}
     judge "V2ray port 修改"
     [ -f ${v2ray_qr_config_file} ] && sed -i "/\"port\"/c \\  \"port\": \"${port}\"," ${v2ray_qr_config_file}
-    echo -e "${GreenBG} 端口号:${port} ${Font}"
+    echo -e "${OK} ${GreenBG} 端口号:${port} ${Font}"
 }
 modify_nginx_other(){
     sed -i "/server_name/c \\\tserver_name ${domain};" ${nginx_conf}
@@ -437,7 +437,7 @@ domain_check(){
         echo -e "${OK} ${GreenBG} 域名dns解析IP 与 本机IP 匹配 ${Font}"
         sleep 2
     else
-        echo -e "${Error} ${RedBG} 请确保域名添加了正确的 A 记录，否则将无法正常使用 V2ray"
+        echo -e "${Error} ${RedBG} 请确保域名添加了正确的 A 记录，否则将无法正常使用 V2ray ${Font}"
         echo -e "${Error} ${RedBG} 域名dns解析IP 与 本机IP 不匹配 是否继续安装？（y/n）${Font}" && read install
         case $install in
         [yY][eE][sS]|[yY])
@@ -513,17 +513,17 @@ v2ray_conf_add_h2(){
 old_config_exist_check(){
     if [[ -f $v2ray_qr_config_file ]]
     then
-        echo -e "${OK} ${Green} 检测到旧配置文件，是否读取旧文件配置 [Y/N]? ${Font}"
+        echo -e "${OK} ${GreenBG} 检测到旧配置文件，是否读取旧文件配置 [Y/N]? ${Font}"
         read -r ssl_delete
         case $ssl_delete in
             [yY][eE][sS]|[yY])
-                echo -e "${OK} ${Green} 已保留旧配置  ${Font}"
+                echo -e "${OK} ${GreenBG} 已保留旧配置  ${Font}"
                 old_config_status="on"
                 port=$(info_extraction '\"port\"')
                 ;;
             *)
                 rm -rf $v2ray_qr_config_file
-                echo -e "${OK} ${Green} 已删除旧配置  ${Font}"
+                echo -e "${OK} ${GreenBG} 已删除旧配置  ${Font}"
                 ;;
         esac
     fi
@@ -671,7 +671,7 @@ info_extraction(){
     grep $1 $v2ray_qr_config_file | awk -F '"' '{print $4}'
 }
 basic_information(){
-    echo -e "${OK} ${Green} V2ray+ws+tls 安装成功" > ${v2ray_info_file}
+    echo -e "${OK} ${GreenBG} V2ray+ws+tls 安装成功" > ${v2ray_info_file}
     echo -e "${Red} V2ray 配置信息 ${Font}" >> ${v2ray_info_file}
     echo -e "${Red} 地址（address）:${Font} $(info_extraction '\"add\"') " >> ${v2ray_info_file}
     echo -e "${Red} 端口（port）：${Font} $(info_extraction '\"port\"') " >> ${v2ray_info_file}
@@ -877,19 +877,19 @@ update_sh(){
     echo "$shell_version" >> $version_cmp
     if [[ "$shell_version" < "$(sort -rV $version_cmp | head -1)" ]]
     then
-        echo -e "${OK} ${Green} 存在新版本，是否更新 [Y/N]? ${Font}"
+        echo -e "${OK} ${GreenBG} 存在新版本，是否更新 [Y/N]? ${Font}"
         read -r update_confirm
         case $update_confirm in
             [yY][eE][sS]|[yY])
                 wget -N --no-check-certificate https://raw.githubusercontent.com/wulabing/V2Ray_ws-tls_bash_onekey/${github_branch}/install.sh
-                echo -e "${OK} ${Green} 更新完成 ${Font}"
+                echo -e "${OK} ${GreenBG} 更新完成 ${Font}"
                 exit 0
                 ;;
             *)
                 ;;
         esac
     else
-        echo -e "${OK} ${Green} 当前版本为最新版本 ${Font}"
+        echo -e "${OK} ${GreenBG} 当前版本为最新版本 ${Font}"
     fi
 
 }
