@@ -467,18 +467,16 @@ port_exist_check(){
     fi
 }
 acme(){
-#    $HOME/.acme.sh/acme.sh --issue -d ${domain} --standalone -k ec-256 --force --test
-#    if [[ $? -eq 0 ]];then
-#        echo -e "${OK} ${GreenBG} SSL 证书测试签发成功，开始正式签发 ${Font}"
-#        rm -rf "$HOME/.acme.sh/${domain}_ecc/${domain}.key"
-#        rm -rf "$HOME/.acme.sh/${domain}_ecc/${domain}.cer"
-#        sleep 2
-#    else
-#        echo -e "${Error} ${RedBG} SSL 证书测试签发失败 ${Font}"
-#        rm -rf "$HOME/.acme.sh/${domain}_ecc/${domain}.key"
-#        rm -rf "$HOME/.acme.sh/${domain}_ecc/${domain}.cer"
-#        exit 1
-#    fi
+    $HOME/.acme.sh/acme.sh --issue -d ${domain} --standalone -k ec-256 --force --test
+    if [[ $? -eq 0 ]];then
+        echo -e "${OK} ${GreenBG} SSL 证书测试签发成功，开始正式签发 ${Font}"
+        rm -rf "$HOME/.acme.sh/${domain}_ecc"
+        sleep 2
+    else
+        echo -e "${Error} ${RedBG} SSL 证书测试签发失败 ${Font}"
+        rm -rf "$HOME/.acme.sh/${domain}_ecc"
+        exit 1
+    fi
 
     $HOME/.acme.sh/acme.sh --issue -d ${domain} --standalone -k ec-256 --force
     if [[ $? -eq 0 ]];then
@@ -492,7 +490,7 @@ acme(){
         fi
     else
         echo -e "${Error} ${RedBG} SSL 证书生成失败 ${Font}"
-        rm -rf "$HOME/.acme.sh/${domain}_ecc/${domain}.key" && rm -rf "$HOME/.acme.sh/${domain}_ecc/${domain}.cer"
+        rm -rf "$HOME/.acme.sh/${domain}_ecc"
         exit 1
     fi
 }
@@ -807,6 +805,7 @@ uninstall_all(){
     systemctl daemon-reload
     echo -e "${OK} ${GreenBG} 已卸载，SSL证书文件已保留 ${Font}"
 }
+
 judge_mode(){
     if [ -f $v2ray_bin_file ]
     then
