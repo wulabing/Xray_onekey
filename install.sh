@@ -26,7 +26,7 @@ OK="${Green}[OK]${Font}"
 Error="${Red}[错误]${Font}"
 
 # 版本
-shell_version="1.1.2"
+shell_version="1.1.3"
 shell_mode="None"
 github_branch="master"
 version_cmp="/tmp/version_cmp.tmp"
@@ -803,7 +803,7 @@ uninstall_all(){
     fi
     [[ -d $v2ray_conf_dir ]] && rm -rf $v2ray_conf_dir
     [[ -d $web_dir ]] && rm -rf $web_dir
-    [[ -d $HOME/.acme.sh]] && acme.sh uninstall
+    [[ -d $HOME/.acme.sh ]] && acme.sh uninstall
     systemctl daemon-reload
     echo -e "${OK} ${GreenBG} 已卸载，SSL证书文件已保留 ${Font}"
 }
