@@ -805,7 +805,10 @@ uninstall_all(){
     systemctl daemon-reload
     echo -e "${OK} ${GreenBG} 已卸载，SSL证书文件已保留 ${Font}"
 }
-
+delete_tls_key_and_crt(){
+   [[ -d $HOME/.acme.sh ]] && rm -rf $HOME/.acme.sh
+   echo -e "${OK} ${GreenBG} 已清空证书遗留文件 ${Font}"
+}
 judge_mode(){
     if [ -f $v2ray_bin_file ]
     then
@@ -941,7 +944,8 @@ menu(){
     echo -e "${Green}13.${Font} 证书 有效期更新"
     echo -e "${Green}14.${Font} 卸载 V2Ray"
     echo -e "${Green}15.${Font} 更新 证书crontab计划任务"
-    echo -e "${Green}16.${Font} 退出 \n"
+    echo -e "${Green}16.${Font} 清空 证书遗留文件"
+    echo -e "${Green}17.${Font} 退出 \n"
 
     read -p "请输入数字：" menu_num
     case $menu_num in
@@ -1012,6 +1016,9 @@ menu(){
           acme_cron_update
           ;;
         16)
+          delete_tls_key_and_crt
+          ;;
+        17)
           exit 0
           ;;
         *)
