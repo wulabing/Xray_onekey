@@ -525,7 +525,14 @@ nginx_conf_add() {
         ssl_certificate       /data/v2ray.crt;
         ssl_certificate_key   /data/v2ray.key;
         ssl_protocols         TLSv1.3;
-        ssl_ciphers           TLS13-AES-256-GCM-SHA384:TLS13-CHACHA20-POLY1305-SHA256:TLS13-AES-128-GCM-SHA256:TLS13-AES-128-CCM-8-SHA256:TLS13-AES-128-CCM-SHA256:EECDH+CHACHA20:EECDH+CHACHA20-draft:EECDH+ECDSA+AES128:EECDH+aRSA+AES128:RSA+AES128:EECDH+ECDSA+AES256:EECDH+aRSA+AES256:RSA+AES256:EECDH+ECDSA+3DES:EECDH+aRSA+3DES:RSA+3DES:!MD5;
+        ssl_early_data on; 
+        ssl_stapling on;
+        ssl_stapling_verify on; 
+        ssl_trusted_certificate /data/v2ray.crt; 
+        resolver 233.5.5.5 233.6.6.6 valid=300s; 
+        resolver_timeout 5s;
+        ssl_ciphers           TLS13-AES-256-GCM-SHA384:TLS13-CHACHA20-POLY1305-SHA256:TLS13-AES-128-GCM-SHA256:TLS13-AES-128-CCM-8-SHA256:TLS13-AES-128-CCM-SHA256:EECDH+CHACHA20:EECDH+CHACHA20-draft:EECDH+ECDSA+AES128:EECDH+aRSA+AES128:RSA+AES128:EECDH+ECDSA+AES256:EECDH+aRSA+AES256:RSA+AES256:EECDH+ECDSA+3DES:EECDH+aRSA+3DES:RSA+3DES:!MD5; 
+        add_header Strict-Transport-Security "max-age=31536000"; 
         server_name           serveraddr.com;
         index index.html index.htm;
         root  /home/wwwroot/3DCEList;
@@ -540,6 +547,7 @@ nginx_conf_add() {
         proxy_set_header Upgrade \$http_upgrade;
         proxy_set_header Connection "upgrade";
         proxy_set_header Host \$http_host;
+        proxy_set_header Early-Data $ssl_early_data;
         }
 }
     server {
@@ -764,11 +772,10 @@ ssl_update_manuel() {
 }
 bbr_boost_sh() {
     [ -f "tcp.sh" ] && rm -rf ./tcp.sh
-    wget -N --no-check-certificate "https://github.com/ylx2016/Linux-NetSpeed/releases/download/sh/tcp.sh" && chmod +x tcp.sh && ./tcp.sh
+    wget -N --no-check-certificate https://github.000060000.xyz/tcp.sh && chmod +x tcp.sh && ./tcp.sh
 }
 mtproxy_sh() {
-    [ -f "mtproxy_go.sh" ] && rm -rf ./mtproxy_go.sh
-    wget -N --no-check-certificate https://github.com/whunt1/onekeymakemtg/raw/master/mtproxy_go.sh && chmod +x mtproxy_go.sh && ./mtproxy_go.sh
+    wget --no-check-certificate -O mtproxy.sh https://raw.githubusercontent.com/chummumm/one-key-mtp/master/mtproxy.sh && bash mtproxy.sh
 }
 
 uninstall_all() {
