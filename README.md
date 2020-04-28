@@ -3,9 +3,6 @@
 > 感谢 JetBrains 提供的非商业开源软件开发授权
 
 > Thanks for non-commercial open source development authorization by JetBrains
-### Telegram 群组
-* telegram 交流群:https://t.me/wulabing_v2ray 
-* telegram 更新公告频道：https://t.me/wulabing_channel
 
 ### 准备工作
 * 准备一个域名，并将A记录添加好。
@@ -91,8 +88,8 @@ Nginx 目录： `/etc/nginx`
 
 𝒘𝒖𝒍𝒂𝒃𝒊𝒏𝒈 邀请您使用麻瓜宝，基于Telegram的电子钱包，匿名支付0手续费秒级到账。https://telegram.me/MugglePayBot?start=T3Y78AZ3
 
-您可以通过Telegram向我匿名捐赠：发送 /pay @wulabing xxx  到 @MugglePayBot 即可 默认货币为 USDT 
+您可以通过Telegram向我匿名捐赠：发送 /pay @jacksunhack xxx  到 @MugglePayBot 即可 默认货币为 USDT 
 
-如需要通过支付宝/微信捐赠，请Telegram私聊 @wulabing 感谢您的支持
+如需要通过支付宝/微信捐赠，请Telegram私聊 @jacksunhack 感谢您的支持
 
 
