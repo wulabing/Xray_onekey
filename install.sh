@@ -522,6 +522,7 @@ nginx_conf_add() {
     cat >${nginx_conf_dir}/v2ray.conf <<EOF
     server {
         listen 443 ssl http2;
+        listen [::]:443 http2;
         ssl_certificate       /data/v2ray.crt;
         ssl_certificate_key   /data/v2ray.key;
         ssl_protocols         TLSv1.3;
@@ -530,6 +531,13 @@ nginx_conf_add() {
         index index.html index.htm;
         root  /home/wwwroot/3DCEList;
         error_page 400 = /400.html;
+
+        # Config for 0-RTT in TLSv1.3
+        ssl_early_data on;
+        ssl_stapling on;
+        ssl_stapling_verify on; 
+        add_header Strict-Transport-Security "max-age=31536000";
+
         location /ray/
         {
         proxy_redirect off;
@@ -540,10 +548,14 @@ nginx_conf_add() {
         proxy_set_header Upgrade \$http_upgrade;
         proxy_set_header Connection "upgrade";
         proxy_set_header Host \$http_host;
+        
+        # Config for 0-RTT in TLSv1.3
+        proxy_set_header Early-Data $ssl_early_data;
         }
 }
     server {
         listen 80;
+        listen [::]:80;
         server_name serveraddr.com;
         return 301 https://use.shadowsocksr.win\$request_uri;
     }
