@@ -179,7 +179,7 @@ dependency_install() {
     judge "安装 qrencode"
 
     ${INS} -y install curl
-    judge "安装 crul"
+    judge "安装 curl"
 
     if [[ "${ID}" == "centos" ]]; then
         ${INS} -y groupinstall "Development tools"
