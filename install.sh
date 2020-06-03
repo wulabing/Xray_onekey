@@ -553,7 +553,7 @@ nginx_conf_add() {
         proxy_set_header Host \$http_host;
         
         # Config for 0-RTT in TLSv1.3
-        proxy_set_header Early-Data $ssl_early_data;
+        proxy_set_header Early-Data \$ssl_early_data;
         }
 }
     server {
