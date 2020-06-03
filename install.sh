@@ -58,8 +58,10 @@ old_config_status="off"
 #移动旧版本配置信息 对小于 1.1.0 版本适配
 [[ -f "/etc/v2ray/vmess_qr.json" ]] && mv /etc/v2ray/vmess_qr.json $v2ray_qr_config_file
 
+#简易随机数
+random_num=$((RANDOM%12+4))
 #生成伪装路径
-camouflage="/$(head -n 10 /dev/urandom | md5sum | head -c 8)/"
+camouflage="/$(head -n 10 /dev/urandom | md5sum | head -c ${random_num})/"
 
 source '/etc/os-release'
 
