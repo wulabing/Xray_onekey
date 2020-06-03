@@ -764,7 +764,7 @@ ssl_update_manuel() {
 }
 bbr_boost_sh() {
     [ -f "tcp.sh" ] && rm -rf ./tcp.sh
-    wget -N --no-check-certificate "https://github.com/ylx2016/Linux-NetSpeed/releases/download/sh/tcp.sh" && chmod +x tcp.sh && ./tcp.sh
+    wget -N --no-check-certificate "https://raw.githubusercontent.com/ylx2016/Linux-NetSpeed/master/tcp.sh" && chmod +x tcp.sh && ./tcp.sh
 }
 mtproxy_sh() {
     [ -f "mtproxy_go.sh" ] && rm -rf ./mtproxy_go.sh
