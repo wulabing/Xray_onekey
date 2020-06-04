@@ -63,6 +63,8 @@ random_num=$((RANDOM%12+4))
 #生成伪装路径
 camouflage="/$(head -n 10 /dev/urandom | md5sum | head -c ${random_num})/"
 
+THREAD=$(grep 'processor' /proc/cpuinfo | sort -u | wc -l)
+
 source '/etc/os-release'
 
 #从VERSION中提取发行版系统的英文名称，为了在debian/ubuntu下添加相对应的Nginx apt源
@@ -368,7 +370,7 @@ nginx_install() {
     cd jemalloc-${jemalloc_version} || exit
     ./configure
     judge "编译检查"
-    make && make install
+    make -j "${THREAD}" && make install
     judge "jemalloc 编译安装"
     echo '/usr/local/lib' >/etc/ld.so.conf.d/local.conf
     ldconfig
@@ -392,7 +394,7 @@ nginx_install() {
         --with-ld-opt="-ljemalloc" \
         --with-openssl=../openssl-"$openssl_version"
     judge "编译检查"
-    make && make install
+    make -j "${THREAD}" && make install
     judge "Nginx 编译安装"
 
     # 修改基本配置
