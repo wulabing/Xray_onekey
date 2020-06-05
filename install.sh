@@ -686,6 +686,20 @@ vmess_quan_link_image() {
     } >>"${v2ray_info_file}"
 }
 
+vmess_link_image_choice() {
+        echo "请选择生成的链接种类"
+        echo "1: V2RayNG/V2RayN"
+        echo "2: Quantaumlt"
+        read -rp "请输入：" link_version
+        [[ -z ${link_version} ]] && link_version=1
+        if [[ $link_version == 1 ]]; then
+            vmess_qr_link_image
+        elif [[ $link_version == 2 ]]; then
+            vmess_quan_link_image
+        else
+            vmess_qr_link_image
+        fi
+}
 info_extraction() {
     grep "$1" $v2ray_qr_config_file | awk -F '"' '{print $4}'
 }
@@ -858,7 +872,7 @@ install_v2ray_ws_tls() {
     nginx_systemd
     vmess_qr_config_tls_ws
     basic_information
-    vmess_qr_link_image
+    vmess_link_image_choice
     tls_type
     show_information
     start_process_systemd
@@ -1009,7 +1023,7 @@ menu() {
         ;;
     10)
         basic_information
-        vmess_qr_link_image
+        vmess_link_image_choice
         show_information
         ;;
     11)
