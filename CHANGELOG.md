@@ -1,3 +1,7 @@
+## 2020-6-5
+* 添加 ws tls Quantmumult 导入
+* 添加 多线程编译
+* 修复 重复添加 cron 问题
 ## 2020-6-3
 * 添加 Nginx ipv6 监听 TLS1.3 0 RTT (merge)
 * 适配 Nginx ipv6 监听端口修改
