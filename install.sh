@@ -540,7 +540,7 @@ nginx_conf_add() {
         # Config for 0-RTT in TLSv1.3
         ssl_early_data on;
         ssl_stapling on;
-        ssl_stapling_verify on; 
+        ssl_stapling_verify on;
         add_header Strict-Transport-Security "max-age=31536000";
 
         location /ray/
@@ -553,7 +553,7 @@ nginx_conf_add() {
         proxy_set_header Upgrade \$http_upgrade;
         proxy_set_header Connection "upgrade";
         proxy_set_header Host \$http_host;
-        
+
         # Config for 0-RTT in TLSv1.3
         proxy_set_header Early-Data \$ssl_early_data;
         }
@@ -667,6 +667,18 @@ EOF
 
 vmess_qr_link_image() {
     vmess_link="vmess://$(base64 -w 0 $v2ray_qr_config_file)"
+    {
+        echo -e "$Red 二维码: $Font"
+        echo -n "${vmess_link}" | qrencode -o - -t utf8
+        echo -e "${Red} URL导入链接:${vmess_link} ${Font}"
+    } >>"${v2ray_info_file}"
+}
+
+vmess_quan_link_image() {
+    echo "$(info_extraction '\"ps\"') = vmess, $(info_extraction '\"add\"'), \
+    $(info_extraction '\"port\"'), chacha20-ietf-poly1305, "\"$(info_extraction '\"id\"')\"", over-tls=true, \
+    certificate=1, obfs=ws, obfs-path="\"$(info_extraction '\"path\"')\"", " > /tmp/vmess_quan.tmp
+    vmess_link="vmess://$(base64 -w 0 /tmp/vmess_quan.tmp)"
     {
         echo -e "$Red 二维码: $Font"
         echo -n "${vmess_link}" | qrencode -o - -t utf8
