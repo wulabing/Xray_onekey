@@ -1023,7 +1023,11 @@ menu() {
         ;;
     10)
         basic_information
-        vmess_link_image_choice
+        if [[ $shell_mode == "ws" ]]; then
+            vmess_link_image_choice
+        else
+            vmess_qr_link_image
+        fi
         show_information
         ;;
     11)
