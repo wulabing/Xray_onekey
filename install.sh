@@ -689,7 +689,7 @@ vmess_quan_link_image() {
 vmess_link_image_choice() {
         echo "请选择生成的链接种类"
         echo "1: V2RayNG/V2RayN"
-        echo "2: Quantaumlt"
+        echo "2: quantumult"
         read -rp "请输入：" link_version
         [[ -z ${link_version} ]] && link_version=1
         if [[ $link_version == 1 ]]; then
