@@ -1,3 +1,7 @@
+## 2020-06-11
+* 从 v2ray 切换至 v2fly
+* mtproxy 安装下线
+
 ## 2020-6-5
 * 添加 ws tls Quantmumult 导入
 * 添加 多线程编译
