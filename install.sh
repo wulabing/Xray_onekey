@@ -29,9 +29,9 @@ OK="${Green}[OK]${Font}"
 Error="${Red}[错误]${Font}"
 
 # 版本
-shell_version="1.1.4.1"
+shell_version="1.1.5.0"
 shell_mode="None"
-github_branch="master"
+github_branch="dev"
 version_cmp="/tmp/version_cmp.tmp"
 v2ray_conf_dir="/etc/v2ray"
 nginx_conf_dir="/etc/nginx/conf/conf.d"
@@ -312,14 +312,12 @@ v2ray_install() {
     fi
     mkdir -p /root/v2ray
     cd /root/v2ray || exit
-    wget -N --no-check-certificate https://install.direct/go.sh
+    wget -N --no-check-certificate https://raw.githubusercontent.com/wulabing/V2Ray_ws-tls_bash_onekey/${github_branch}/v2ray.sh
 
-    ## wget http://install.direct/go.sh
-
-    if [[ -f go.sh ]]; then
+    if [[ -f v2ray.sh ]]; then
         rm -rf $v2ray_systemd_file
         systemctl daemon-reload
-        bash go.sh --force
+        bash v2ray.sh --force
         judge "安装 V2ray"
     else
         echo -e "${Error} ${RedBG} V2ray 安装文件下载失败，请检查下载地址是否可用 ${Font}"
@@ -812,8 +810,7 @@ bbr_boost_sh() {
     wget -N --no-check-certificate "https://raw.githubusercontent.com/ylx2016/Linux-NetSpeed/master/tcp.sh" && chmod +x tcp.sh && ./tcp.sh
 }
 mtproxy_sh() {
-    [ -f "mtproxy_go.sh" ] && rm -rf ./mtproxy_go.sh
-    wget -N --no-check-certificate https://github.com/whunt1/onekeymakemtg/raw/master/mtproxy_go.sh && chmod +x mtproxy_go.sh && ./mtproxy_go.sh
+    echo -e "${Error} ${RedBG} 功能维护，暂不可用 ${Font}"
 }
 
 uninstall_all() {
@@ -991,7 +988,7 @@ menu() {
         install_v2_h2
         ;;
     3)
-        bash <(curl -L -s https://install.direct/go.sh)
+        bash <(curl -L -s https://raw.githubusercontent.com/wulabing/V2Ray_ws-tls_bash_onekey/${github_branch}/v2ray.sh)
         ;;
     4)
         read -rp "请输入UUID:" UUID
