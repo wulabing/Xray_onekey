@@ -31,7 +31,7 @@ Error="${Red}[错误]${Font}"
 Warning="${Red}[警告]${Font}"
 
 # 版本
-shell_version="1.1.6.4"
+shell_version="1.1.6.5"
 shell_mode="None"
 github_branch="dev"
 version_cmp="/tmp/version_cmp.tmp"
@@ -156,7 +156,7 @@ chrony_install() {
 }
 
 dependency_install() {
-    ${INS} install wget git lsof -y
+    ${INS} install wget git lsof iputils -y
 
     if [[ "${ID}" == "centos" ]]; then
         ${INS} -y install crontabs
@@ -263,7 +263,7 @@ modify_path() {
     judge "V2ray 伪装路径 修改"
 }
 modify_alterid() {
-    if [[ $(grep -c 'VLESS' ${v2ray_conf}) == 0 ]]; then
+    if [[ $(grep -ic 'VLESS' ${v2ray_conf}) == 0 ]]; then
         if [[ "on" == "$old_config_status" ]]; then
             alterID="$(grep '\"aid\"' $v2ray_qr_config_file | awk -F '"' '{print $4}')"
         fi
@@ -732,11 +732,11 @@ basic_information() {
         echo -e "${Red} 端口（port）：${Font} $(info_extraction '\"port\"') "
         echo -e "${Red} 用户id（UUID）：${Font} $(info_extraction '\"id\"')"
 
-        if [[ $(grep -c 'VLESS' ${v2ray_conf}) == 0 ]]; then
+        if [[ $(grep -ic 'VLESS' ${v2ray_conf}) == 0 ]]; then
             echo -e "${Red} 额外id（alterId）：${Font} $(info_extraction '\"aid\"')"
         fi
 
-        echo -e "${Red} 加密方式（security）：${Font} 自适应 "
+        echo -e "${Red} 加密（encryption）：${Font} none "
         echo -e "${Red} 传输协议（network）：${Font} $(info_extraction '\"net\"') "
         echo -e "${Red} 伪装类型（type）：${Font} none "
         echo -e "${Red} 路径（不要落下/）：${Font} $(info_extraction '\"path\"') "
@@ -879,7 +879,7 @@ judge_mode() {
 install_v2ray_ws_tls() {
     is_root
     check_system
-    chrony_install
+#    chrony_install
     dependency_install
     basic_optimization
     domain_check
@@ -906,7 +906,7 @@ install_v2ray_ws_tls() {
 install_v2_h2() {
     is_root
     check_system
-    chrony_install
+#    chrony_install
     dependency_install
     basic_optimization
     domain_check
