@@ -1,0 +1,50 @@
+{
+  "log": {
+        "access": "/var/log/v2ray/access.log",
+        "error": "/var/log/v2ray/error.log",
+        "loglevel": "warning"
+    },
+  "inbound": {
+    "port": 443,
+    "protocol": "vless",
+    "settings": {
+      "clients": [
+        {
+          "id":"UUID",
+          "level": 0,
+          "email": "wulabing@gmail.com"
+        }
+      ],
+      "decryption": "none",
+      "fallback": {
+        "port": 65534
+      },
+      "fallback_h2": {
+        "port": 65535
+      }
+    },
+    "streamSettings": {
+      "network": "h2",
+      "httpSettings": {
+        "path": "/ray/"
+      },
+      "security": "tls",
+      "tlsSettings": {
+        "alpn": [
+            "h2",
+            "http/1.1"
+        ],
+        "certificates": [
+          {
+            "certificateFile": "/data/v2ray.crt",
+            "keyFile": "/data/v2ray.key"
+          }
+        ]
+      }
+    }
+  },
+  "outbound": {
+    "protocol": "freedom",
+    "settings": {}
+  }
+}

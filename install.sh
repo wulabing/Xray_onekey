@@ -281,9 +281,11 @@ modify_inbound_port() {
     fi
     if [[ "$shell_mode" != "h2" ]]; then
         PORT=$((RANDOM + 10000))
-        sed -i "/\"port\"/c  \    \"port\":${PORT}," ${v2ray_conf}
+#        sed -i "/\"port\"/c  \    \"port\":${PORT}," ${v2ray_conf}
+        sed -i "9c \    \"port\":${PORT}," ${v2ray_conf}
     else
-        sed -i "/\"port\"/c  \    \"port\":${port}," ${v2ray_conf}
+#        sed -i "/\"port\"/c  \    \"port\":${port}," ${v2ray_conf}
+        sed -i "8c \    \"port\":${port}," ${v2ray_conf}
     fi
     judge "V2ray inbound_port 修改"
 }
@@ -516,7 +518,7 @@ v2ray_conf_add_tls() {
 }
 v2ray_conf_add_h2() {
     cd /etc/v2ray || exit
-    wget --no-check-certificate https://raw.githubusercontent.com/wulabing/V2Ray_ws-tls_bash_onekey/${github_branch}/http2/config.json -O config.json
+    wget --no-check-certificate https://raw.githubusercontent.com/wulabing/V2Ray_ws-tls_bash_onekey/${github_branch}/VLESS_h2/config.json -O config.json
     modify_path
     modify_alterid
     modify_inbound_port
@@ -708,7 +710,7 @@ vmess_quan_link_image() {
 vmess_link_image_choice() {
         echo "请选择生成的链接种类"
         echo "1: V2RayNG/V2RayN"
-        echo "2: Quantaumlt"
+        echo "2: quantumult"
         read -rp "请输入：" link_version
         [[ -z ${link_version} ]] && link_version=1
         if [[ $link_version == 1 ]]; then
@@ -909,7 +911,7 @@ install_v2_h2() {
     basic_optimization
     domain_check
     old_config_exist_check
-    port_alterid_set
+    port_set
     v2ray_install
     port_exist_check 80
     port_exist_check "${port}"
@@ -1010,8 +1012,7 @@ menu() {
         ;;
     2)
         shell_mode="h2"
-#        install_v2_h2
-        echo -e "${Error} ${RedBG} 此功能正在进行 VLESS 适配维护 ${Font}"
+        install_v2_h2
         ;;
     3)
         bash <(curl -L -s https://raw.githubusercontent.com/wulabing/V2Ray_ws-tls_bash_onekey/${github_branch}/v2ray.sh)
