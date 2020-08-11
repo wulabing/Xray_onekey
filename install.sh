@@ -29,9 +29,9 @@ OK="${Green}[OK]${Font}"
 Error="${Red}[错误]${Font}"
 
 # 版本
-shell_version="1.1.5.1"
+shell_version="1.1.6.0"
 shell_mode="None"
-github_branch="master"
+github_branch="dev"
 version_cmp="/tmp/version_cmp.tmp"
 v2ray_conf_dir="/etc/v2ray"
 nginx_conf_dir="/etc/nginx/conf/conf.d"
@@ -489,7 +489,7 @@ acme() {
 }
 v2ray_conf_add_tls() {
     cd /etc/v2ray || exit
-    wget --no-check-certificate https://raw.githubusercontent.com/wulabing/V2Ray_ws-tls_bash_onekey/${github_branch}/tls/config.json -O config.json
+    wget --no-check-certificate https://raw.githubusercontent.com/wulabing/V2Ray_ws-tls_bash_onekey/${github_branch}/VLESS_tls/config.json -O config.json
     modify_path
     modify_alterid
     modify_inbound_port
@@ -857,7 +857,6 @@ install_v2ray_ws_tls() {
     basic_optimization
     domain_check
     old_config_exist_check
-    port_alterid_set
     v2ray_install
     port_exist_check 80
     port_exist_check "${port}"
