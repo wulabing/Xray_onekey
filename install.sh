@@ -684,7 +684,7 @@ EOF
 
 vmess_qr_link_image() {
     vmess_link="vmess://$(base64 -w 0 $v2ray_qr_config_file)"
-    echo -e "${OK} VLESS 目前无分享链接规范 请手动复制粘贴配置信息至客户端 ${Font}"
+    echo -e "${OK} ${GreenBG} VLESS 目前无分享链接规范 请手动复制粘贴配置信息至客户端 ${Font}"
 #    {
 #        echo -e "$Red 二维码: $Font"
 #        echo -n "${vmess_link}" | qrencode -o - -t utf8
@@ -697,7 +697,7 @@ vmess_quan_link_image() {
     $(info_extraction '\"port\"'), chacha20-ietf-poly1305, "\"$(info_extraction '\"id\"')\"", over-tls=true, \
     certificate=1, obfs=ws, obfs-path="\"$(info_extraction '\"path\"')\"", " > /tmp/vmess_quan.tmp
     vmess_link="vmess://$(base64 -w 0 /tmp/vmess_quan.tmp)"
-    echo -e "${OK} VLESS 目前无分享链接规范 请手动复制粘贴配置信息至客户端 ${Font}"
+    echo -e "${OK} ${GreenBG} VLESS 目前无分享链接规范 请手动复制粘贴配置信息至客户端 ${Font}"
 #    {
 #        echo -e "$Red 二维码: $Font"
 #        echo -n "${vmess_link}" | qrencode -o - -t utf8
@@ -1011,7 +1011,7 @@ menu() {
     2)
         shell_mode="h2"
 #        install_v2_h2
-        echo -e "${RedBG}此功能正在进行 VLESS 适配维护${Font}"
+        echo -e "${Error} ${RedBG} 此功能正在进行 VLESS 适配维护 ${Font}"
         ;;
     3)
         bash <(curl -L -s https://raw.githubusercontent.com/wulabing/V2Ray_ws-tls_bash_onekey/${github_branch}/v2ray.sh)
