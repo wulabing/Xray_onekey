@@ -31,7 +31,7 @@ Error="${Red}[错误]${Font}"
 Warning="${Red}[警告]${Font}"
 
 # 版本
-shell_version="1.1.6.1"
+shell_version="1.1.6.2"
 shell_mode="None"
 github_branch="dev"
 version_cmp="/tmp/version_cmp.tmp"
@@ -684,11 +684,12 @@ EOF
 
 vmess_qr_link_image() {
     vmess_link="vmess://$(base64 -w 0 $v2ray_qr_config_file)"
-    {
-        echo -e "$Red 二维码: $Font"
-        echo -n "${vmess_link}" | qrencode -o - -t utf8
-        echo -e "${Red} URL导入链接:${vmess_link} ${Font}"
-    } >>"${v2ray_info_file}"
+    # VLESS 目前无分享连接规范 此部分功能暂时关闭
+#    {
+#        echo -e "$Red 二维码: $Font"
+#        echo -n "${vmess_link}" | qrencode -o - -t utf8
+#        echo -e "${Red} URL导入链接:${vmess_link} ${Font}"
+#    } >>"${v2ray_info_file}"
 }
 
 vmess_quan_link_image() {
@@ -727,7 +728,11 @@ basic_information() {
         echo -e "${Red} 地址（address）:${Font} $(info_extraction '\"add\"') "
         echo -e "${Red} 端口（port）：${Font} $(info_extraction '\"port\"') "
         echo -e "${Red} 用户id（UUID）：${Font} $(info_extraction '\"id\"')"
-        echo -e "${Red} 额外id（alterId）：${Font} $(info_extraction '\"aid\"')"
+
+        if [[ $(grep -c 'VLESS' ${v2ray_conf}) == 0 ]]; then
+            echo -e "${Red} 额外id（alterId）：${Font} $(info_extraction '\"aid\"')"
+        fi
+
         echo -e "${Red} 加密方式（security）：${Font} 自适应 "
         echo -e "${Red} 传输协议（network）：${Font} $(info_extraction '\"net\"') "
         echo -e "${Red} 伪装类型（type）：${Font} none "
@@ -972,7 +977,7 @@ menu() {
 
     echo -e "—————————————— 安装向导 ——————————————"""
     echo -e "${Green}0.${Font}  升级 脚本"
-    echo -e "${Green}1.${Font}  安装 V2Ray (Nginx+ws+tls)"
+    echo -e "${Green}1.${Font}  安装 V2Ray (VLESS+Nginx+ws+tls)"
     echo -e "${Green}2.${Font}  安装 V2Ray (http/2)"
     echo -e "${Green}3.${Font}  升级 V2Ray core"
     echo -e "—————————————— 配置变更 ——————————————"
