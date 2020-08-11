@@ -31,7 +31,7 @@ Error="${Red}[错误]${Font}"
 Warning="${Red}[警告]${Font}"
 
 # 版本
-shell_version="1.1.6.2"
+shell_version="1.1.6.3"
 shell_mode="None"
 github_branch="dev"
 version_cmp="/tmp/version_cmp.tmp"
@@ -684,7 +684,7 @@ EOF
 
 vmess_qr_link_image() {
     vmess_link="vmess://$(base64 -w 0 $v2ray_qr_config_file)"
-    # VLESS 目前无分享连接规范 此部分功能暂时关闭
+    echo -e "${OK} VLESS 目前无分享链接规范 请手动复制粘贴配置信息至客户端 ${Font}"
 #    {
 #        echo -e "$Red 二维码: $Font"
 #        echo -n "${vmess_link}" | qrencode -o - -t utf8
@@ -697,11 +697,12 @@ vmess_quan_link_image() {
     $(info_extraction '\"port\"'), chacha20-ietf-poly1305, "\"$(info_extraction '\"id\"')\"", over-tls=true, \
     certificate=1, obfs=ws, obfs-path="\"$(info_extraction '\"path\"')\"", " > /tmp/vmess_quan.tmp
     vmess_link="vmess://$(base64 -w 0 /tmp/vmess_quan.tmp)"
-    {
-        echo -e "$Red 二维码: $Font"
-        echo -n "${vmess_link}" | qrencode -o - -t utf8
-        echo -e "${Red} URL导入链接:${vmess_link} ${Font}"
-    } >>"${v2ray_info_file}"
+    echo -e "${OK} VLESS 目前无分享链接规范 请手动复制粘贴配置信息至客户端 ${Font}"
+#    {
+#        echo -e "$Red 二维码: $Font"
+#        echo -n "${vmess_link}" | qrencode -o - -t utf8
+#        echo -e "${Red} URL导入链接:${vmess_link} ${Font}"
+#    } >>"${v2ray_info_file}"
 }
 
 vmess_link_image_choice() {
@@ -723,7 +724,7 @@ info_extraction() {
 }
 basic_information() {
     {
-        echo -e "${OK} ${GreenBG} V2ray+ws+tls 安装成功"
+        echo -e "${OK} ${GreenBG} V2ray+ws+tls 安装成功 ${Font}"
         echo -e "${Red} V2ray 配置信息 ${Font}"
         echo -e "${Red} 地址（address）:${Font} $(info_extraction '\"add\"') "
         echo -e "${Red} 端口（port）：${Font} $(info_extraction '\"port\"') "
@@ -1009,7 +1010,8 @@ menu() {
         ;;
     2)
         shell_mode="h2"
-        install_v2_h2
+#        install_v2_h2
+        echo -e "${RedBG}此功能正在进行 VLESS 适配维护${Font}"
         ;;
     3)
         bash <(curl -L -s https://raw.githubusercontent.com/wulabing/V2Ray_ws-tls_bash_onekey/${github_branch}/v2ray.sh)
