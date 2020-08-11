@@ -240,6 +240,19 @@ port_alterid_set() {
         [[ -z ${alterID} ]] && alterID="2"
     fi
 }
+port_set(){
+    if [[ "on" != "$old_config_status" ]]; then
+        read -rp "请输入连接端口（default:443）:" port
+        [[ -z ${port} ]] && port="443"
+    fi
+}
+alterid_set() {
+    if [[ "on" != "$old_config_status" ]]; then
+        read -rp "请输入alterID（default:2 仅允许填数字）:" alterID
+        [[ -z ${alterID} ]] && alterID="2"
+    fi
+}
+
 modify_path() {
     if [[ "on" == "$old_config_status" ]]; then
         camouflage="$(grep '\"path\"' $v2ray_qr_config_file | awk -F '"' '{print $4}')"
@@ -857,6 +870,7 @@ install_v2ray_ws_tls() {
     basic_optimization
     domain_check
     old_config_exist_check
+    port_set
     v2ray_install
     port_exist_check 80
     port_exist_check "${port}"
