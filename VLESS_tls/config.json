@@ -13,7 +13,8 @@
       "settings": {
         "clients": [
           {
-            "id": "3f3effce-2640-4f29-b95b-a2106df6d96d"
+            "id": "3f3effce-2640-4f29-b95b-a2106df6d96d",
+            "alterId": 0
           }
         ],
 	    "decryption": "none"

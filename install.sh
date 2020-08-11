@@ -29,7 +29,7 @@ OK="${Green}[OK]${Font}"
 Error="${Red}[错误]${Font}"
 
 # 版本
-shell_version="1.1.6.0"
+shell_version="1.1.6.1"
 shell_mode="None"
 github_branch="dev"
 version_cmp="/tmp/version_cmp.tmp"
@@ -261,13 +261,17 @@ modify_path() {
     judge "V2ray 伪装路径 修改"
 }
 modify_alterid() {
-    if [[ "on" == "$old_config_status" ]]; then
-        alterID="$(grep '\"aid\"' $v2ray_qr_config_file | awk -F '"' '{print $4}')"
+    if [[ $(grep -c 'VLESS' ${v2ray_conf}) == 0 ]]; then
+        if [[ "on" == "$old_config_status" ]]; then
+            alterID="$(grep '\"aid\"' $v2ray_qr_config_file | awk -F '"' '{print $4}')"
+        fi
+        sed -i "/\"alterId\"/c \\\t  \"alterId\":${alterID}" ${v2ray_conf}
+        judge "V2ray alterid 修改"
+        [ -f ${v2ray_qr_config_file} ] && sed -i "/\"aid\"/c \\  \"aid\": \"${alterID}\"," ${v2ray_qr_config_file}
+        echo -e "${OK} ${GreenBG} alterID:${alterID} ${Font}"
+    else
+        echo -e "${Error} ${RedBG} VLESS 不支持修改 alterid ${alterID} ${Font}"
     fi
-    sed -i "/\"alterId\"/c \\\t  \"alterId\":${alterID}" ${v2ray_conf}
-    judge "V2ray alterid 修改"
-    [ -f ${v2ray_qr_config_file} ] && sed -i "/\"aid\"/c \\  \"aid\": \"${alterID}\"," ${v2ray_qr_config_file}
-    echo -e "${OK} ${GreenBG} alterID:${alterID} ${Font}"
 }
 modify_inbound_port() {
     if [[ "on" == "$old_config_status" ]]; then
