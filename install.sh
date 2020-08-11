@@ -18,15 +18,17 @@ cd "$(
 #fonts color
 Green="\033[32m"
 Red="\033[31m"
-# Yellow="\033[33m"
+#Yellow="\033[33m"
 GreenBG="\033[42;37m"
 RedBG="\033[41;37m"
+YellowBG="\033[43;37m"
 Font="\033[0m"
 
 #notification information
 # Info="${Green}[信息]${Font}"
 OK="${Green}[OK]${Font}"
 Error="${Red}[错误]${Font}"
+Warning="${Red}[警告]${Font}"
 
 # 版本
 shell_version="1.1.6.1"
@@ -270,7 +272,7 @@ modify_alterid() {
         [ -f ${v2ray_qr_config_file} ] && sed -i "/\"aid\"/c \\  \"aid\": \"${alterID}\"," ${v2ray_qr_config_file}
         echo -e "${OK} ${GreenBG} alterID:${alterID} ${Font}"
     else
-        echo -e "${Error} ${RedBG} VLESS 不支持修改 alterid ${alterID} ${Font}"
+        echo -e "${Warning} ${YellowBG} VLESS 不支持修改 alterid ${Font}"
     fi
 }
 modify_inbound_port() {
