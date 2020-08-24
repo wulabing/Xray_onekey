@@ -31,7 +31,7 @@ Error="${Red}[错误]${Font}"
 Warning="${Red}[警告]${Font}"
 
 # 版本
-shell_version="1.1.6.6"
+shell_version="1.1.6.7"
 shell_mode="None"
 github_branch="dev"
 version_cmp="/tmp/version_cmp.tmp"
@@ -156,7 +156,14 @@ chrony_install() {
 }
 
 dependency_install() {
-    ${INS} install wget git lsof iputils -y
+    ${INS} install wget git lsof -y
+
+    if [[ "${ID}" == "centos" ]]; then
+        ${INS} -y install iputils
+    else
+        ${INS} -y install iputils-ping
+    fi
+    judge "安装 iputils-ping"
 
     if [[ "${ID}" == "centos" ]]; then
         ${INS} -y install crontabs
