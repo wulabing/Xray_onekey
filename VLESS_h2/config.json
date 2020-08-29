@@ -16,12 +16,12 @@
         }
       ],
       "decryption": "none",
-      "fallback": [
+      "fallbacks": [
         {
         "dest": 65534
         }
       ],
-      "fallback_h2": [
+      "fallbacks_h2": [
         {
         "dest": 65535
         }
