@@ -393,7 +393,7 @@ User=nobody
 CapabilityBoundingSet=CAP_NET_ADMIN CAP_NET_BIND_SERVICE
 AmbientCapabilities=CAP_NET_ADMIN CAP_NET_BIND_SERVICE
 NoNewPrivileges=true
-Environment=V2RAY_LOCATION_ASSET=/usr/local/share/v2ray/
+Environment=V2RAY_LOCATION_ASSET=/usr/local/lib/v2ray/
 ExecStart=/usr/local/bin/v2ray -config /etc/v2ray/config.json
 Restart=on-failure
 
@@ -410,7 +410,7 @@ User=nobody
 CapabilityBoundingSet=CAP_NET_ADMIN CAP_NET_BIND_SERVICE
 AmbientCapabilities=CAP_NET_ADMIN CAP_NET_BIND_SERVICE
 NoNewPrivileges=true
-Environment=V2RAY_LOCATION_ASSET=/usr/local/share/v2ray/
+Environment=V2RAY_LOCATION_ASSET=/usr/local/lib/v2ray/
 ExecStart=/usr/local/bin/v2ray -config /etc/v2ray/%i.json
 Restart=on-failure
 
