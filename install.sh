@@ -31,7 +31,7 @@ Error="${Red}[错误]${Font}"
 Warning="${Red}[警告]${Font}"
 
 # 版本
-shell_version="1.1.6.13"
+shell_version="1.1.6.14"
 shell_mode="None"
 github_branch="dev"
 version_cmp="/tmp/version_cmp.tmp"
@@ -600,6 +600,7 @@ EOF
 
 start_process_systemd() {
     systemctl daemon-reload
+    chown -R root.root /var/log/v2ray/
     if [[ "$shell_mode" != "h2" ]]; then
         systemctl restart nginx
         judge "Nginx 启动"
