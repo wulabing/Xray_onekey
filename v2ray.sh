@@ -389,7 +389,7 @@ Description=V2Ray Service
 After=network.target nss-lookup.target
 
 [Service]
-User=nobody
+User=root
 CapabilityBoundingSet=CAP_NET_ADMIN CAP_NET_BIND_SERVICE
 AmbientCapabilities=CAP_NET_ADMIN CAP_NET_BIND_SERVICE
 NoNewPrivileges=true
@@ -406,7 +406,7 @@ Description=V2Ray Service
 After=network.target nss-lookup.target
 
 [Service]
-User=nobody
+User=root
 CapabilityBoundingSet=CAP_NET_ADMIN CAP_NET_BIND_SERVICE
 AmbientCapabilities=CAP_NET_ADMIN CAP_NET_BIND_SERVICE
 NoNewPrivileges=true
