@@ -371,7 +371,7 @@ install_v2ray() {
             install -m 644 -o root -g root /dev/null /var/log/v2ray/access.log
             install -m 644 -o root -g root /dev/null /var/log/v2ray/error.log
         else
-            install -d -m 700 -o root -g root /var/log/v2ray/
+            install -d -m 755 -o root -g root /var/log/v2ray/
             install -m 644 -o root -g root /dev/null /var/log/v2ray/access.log
             install -m 644 -o root -g root /dev/null /var/log/v2ray/error.log
         fi
