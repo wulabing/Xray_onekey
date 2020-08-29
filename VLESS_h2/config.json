@@ -16,12 +16,16 @@
         }
       ],
       "decryption": "none",
-      "fallback": {
-        "port": 65534
-      },
-      "fallback_h2": {
-        "port": 65535
-      }
+      "fallback": [
+        {
+        "dest": 65534
+        }
+      ],
+      "fallback_h2": [
+        {
+        "dest": 65535
+        }
+      ]
     },
     "streamSettings": {
       "network": "h2",
