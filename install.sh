@@ -218,13 +218,13 @@ function modify_UUID() {
   [ -z "$UUID" ] && UUID=$(cat /proc/sys/kernel/random/uuid)
   cat ${xray_conf_dir}/config.json | jq 'setpath(["inbounds",0,"settings","clients",0,"id"];"'${UUID}'")' >${xray_conf_dir}/config_tmp.json
   mv -f ${xray_conf_dir}/config_tmp.json ${xray_conf_dir}/config.json
-  judge "Xray UUID 修改成功"
+  judge "Xray UUID 修改"
 }
 
 function modify_tls_version() {
-  cat ${xray_conf_dir}/config.json | jq 'setpath(["inbounds",0,"streamSettings","xtlsSettings","minVersion"];"'$1'")' >${xray_conf_dir}/config.json
+  cat ${xray_conf_dir}/config.json | jq 'setpath(["inbounds",0,"streamSettings","xtlsSettings","minVersion"];"'$1'")' >${xray_conf_dir}/config_tmp.json
   mv -f ${xray_conf_dir}/config_tmp.json ${xray_conf_dir}/config.json
-  judge "Xray TLS_version 修改成功"
+  judge "Xray TLS_version 修改"
 }
 
 function modify_nginx() {
@@ -253,7 +253,7 @@ function tls_type() {
 function configure_xray() {
   cd /usr/local/etc/xray && rm -f config.json && wget -O config.json https://raw.githubusercontent.com/wulabing/V2Ray_ws-tls_bash_onekey/xray/config/xray_xtls-rprx-direct.json
   modify_UUID
-  #  tls_type
+  tls_type
 }
 
 function xray_install() {
@@ -321,9 +321,7 @@ function ssl_judge_and_install() {
 }
 
 function basic_information() {
-  {
-    echo -e "${OK} ${GreenBG} VLESS+tcp+xtls+nginx 安装成功" ${Font}
-  } >"${xray_info_file}"
+  print_ok "vless+tcp+xtls+nginx 安装成功"
 }
 
 function install_xray() {
