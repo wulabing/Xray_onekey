@@ -229,7 +229,7 @@ function modify_tls_version() {
 
 function modify_nginx() {
   nginx_conf="/etc/nginx/conf.d/${domain}.conf"
-  cd /usr/local/etc/xray && rm -f config.json && wget -O config.json https://raw.githubusercontent.com/wulabing/V2Ray_ws-tls_bash_onekey/xray/config/xray_xtls-rprx-direct.json
+  cd /etc/nginx/conf.d/ && rm -f ${domain}.conf && wget -O ${domain}.conf https://raw.githubusercontent.com/wulabing/V2Ray_ws-tls_bash_onekey/xray/config/xray_xtls-rprx-direct.json
   sed -i "/server_name/c \\\tserver_name ${domain};" ${nginx_conf}
   judge "Nginx config modify"
 }
