@@ -229,7 +229,7 @@ function modify_tls_version() {
 
 function modify_nginx() {
   nginx_conf="/etc/nginx/conf.d/${domain}.conf"
-  cd /etc/nginx/conf.d/ && rm -f ${domain}.conf && wget -O ${domain}.conf https://raw.githubusercontent.com/wulabing/V2Ray_ws-tls_bash_onekey/xray/config/xray_xtls-rprx-direct.json
+  cd /etc/nginx/conf.d/ && rm -f ${domain}.conf && wget -O ${domain}.conf https://raw.githubusercontent.com/wulabing/V2Ray_ws-tls_bash_onekey/xray/config/web.conf
   sed -i "/server_name/c \\\tserver_name ${domain};" ${nginx_conf}
   judge "Nginx config modify"
 }
@@ -292,7 +292,7 @@ function acme() {
 }
 
 function ssl_judge_and_install() {
-  if [[ -f "/ssl/v2ray.key" || -f "/ssl/v2ray.crt" ]]; then
+  if [[ -f "/ssl/xray.key" || -f "/ssl/xray.crt" ]]; then
     echo "/ssl 目录下证书文件已存在"
     echo -e "${OK} ${GreenBG} 是否删除 [Y/N]? ${Font}"
     read -r ssl_delete
@@ -306,11 +306,11 @@ function ssl_judge_and_install() {
     esac
   fi
 
-  if [[ -f "/ssl/v2ray.key" || -f "/ssl/v2ray.crt" ]]; then
+  if [[ -f "/ssl/xray.key" || -f "/ssl/xray.crt" ]]; then
     echo "证书文件已存在"
   elif [[ -f "$HOME/.acme.sh/${domain}_ecc/${domain}.key" && -f "$HOME/.acme.sh/${domain}_ecc/${domain}.cer" ]]; then
     echo "证书文件已存在"
-    "$HOME"/.acme.sh/acme.sh --installcert -d "${domain}" --fullchainpath /ssl/v2ray.key --keypath /ssl/v2ray.crt --ecc
+    "$HOME"/.acme.sh/acme.sh --installcert -d "${domain}" --fullchainpath /ssl/xray.key --keypath /ssl/xray.crt --ecc
     judge "证书应用"
   else
     ssl_install
