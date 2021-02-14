@@ -252,13 +252,12 @@ function tls_type() {
 
 function configure_xray() {
   cd /usr/local/etc/xray && rm -f config.json && wget -O config.json https://raw.githubusercontent.com/wulabing/V2Ray_ws-tls_bash_onekey/xray/config/xray_xtls-rprx-direct.json
-  rm -f $xray_conf_dir/config.json
   modify_UUID
   #  tls_type
 }
 
 function xray_install() {
-  print_ok "安装 xary"
+  print_ok "安装 xray"
   curl -L https://github.com/XTLS/Xray-install/raw/main/install-release.sh | bash -s -- install
   judge "xray 安装"
 }
