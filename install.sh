@@ -1,5 +1,12 @@
 #!/usr/bin/env bash
 
+#====================================================
+#	System Request:Debian 9+/Ubuntu 18.04+/Centos 7+
+#	Author:	wulabing
+#	Dscription: xray onekey Management
+#	email:admin@wulabing.com
+#====================================================
+
 cd "$(
   cd "$(dirname "$0")" || exit
   pwd
@@ -16,7 +23,7 @@ OK="${Green}[OK]${Font}"
 ERROR="${Red}[ERROR]${Font}"
 
 # 变量
-shell_version="0.0.3"
+shell_version="0.0.4"
 github_branch="xray"
 version_cmp="/tmp/version_cmp.tmp"
 xray_conf_dir="/usr/local/etc/xray"
@@ -25,6 +32,7 @@ xray_access_log="/var/log/xray/access.log"
 xray_error_log="/var/log/xray/error.log"
 cert_dir="/usr/local/etc/xray"
 domain_tmp_dir="/usr/local/etc/xray"
+cert_group="nobody"
 
 VERSION=$(echo "${VERSION}" | awk -F "[()]" '{print $2}')
 
@@ -64,14 +72,18 @@ function system_check() {
   elif [[ "${ID}" == "debian" && ${VERSION_ID} -ge 9 ]]; then
     print_ok "当前系统为 Debian ${VERSION_ID} ${VERSION}"
     INS="apt install -y"
-    $INS update
-  elif [[ "${ID}" == "ubuntu" && $(echo "${VERSION_ID}" | cut -d '.' -f1) -ge 16 ]]; then
+    apt update
+  elif [[ "${ID}" == "ubuntu" && $(echo "${VERSION_ID}" | cut -d '.' -f1) -ge 18 ]]; then
     print_ok "当前系统为 Ubuntu ${VERSION_ID} ${UBUNTU_CODENAME}"
     INS="apt install -y"
-    $INS update
+    apt update
   else
     print_error "当前系统为 ${ID} ${VERSION_ID} 不在支持的系统列表内"
     exit 1
+  fi
+
+  if [[ $(grep "nogroup" /etc/group) ]]; then
+    cert_group="nogroup"
   fi
 
   $INS dbus
@@ -114,8 +126,6 @@ function dependency_install() {
   fi
   judge "crontab 自启动配置 "
 
-  ${INS} bc
-  judge "安装 bc"
 
   ${INS} unzip
   judge "安装 unzip"
@@ -123,8 +133,9 @@ function dependency_install() {
   ${INS} curl
   judge "安装 curl"
 
-  ${INS} openssl openssl-devel
-  judge "安装 openssl"
+  # upgrade systemd
+  ${INS} systemd
+  judge "安装/升级 systemd"
 
   # Nginx 后置 无需编译 不再需要
   #  if [[ "${ID}" == "centos" ]]; then
@@ -135,9 +146,9 @@ function dependency_install() {
   #  judge "编译工具包 安装"
 
   if [[ "${ID}" == "centos" ]]; then
-    ${INS} pcre pcre-devel zlib-devel epel-release
+    ${INS} pcre pcre-devel zlib-devel epel-release openssl openssl-devel
   else
-    ${INS} libpcre3 libpcre3-dev zlib1g-dev
+    ${INS} libpcre3 libpcre3-dev zlib1g-dev openssl libssl-dev
   fi
 
   ${INS} jq
@@ -169,7 +180,7 @@ function domain_check() {
   echo -e "域名dns解析IP：${domain_ip}"
   echo -e "本机IP: ${local_ip}"
   sleep 2
-  if [[ $(echo "${local_ip}" | tr '.' '+' | bc) -eq $(echo "${domain_ip}" | tr '.' '+' | bc) ]]; then
+  if [[ ${domain_ip} == "${local_ip}" ]]; then
     print_ok "域名dns解析IP 与 本机IP 匹配"
     sleep 2
   else
@@ -270,7 +281,7 @@ function xray_install() {
   judge "xray 安装"
 
   # 用于生成 xray 的导入链接
-  echo $domain > $domain_tmp_dir/domain
+  echo $domain >$domain_tmp_dir/domain
   judge "域名记录"
 }
 
@@ -329,7 +340,7 @@ function ssl_judge_and_install() {
   fi
 
   # xray 默认以 nobody 用户运行，证书权限适配
-  chown -R nobody.nobody /ssl/*
+  chown -R nobody.$cert_group /ssl/*
 }
 
 generate_certificate() {
@@ -341,9 +352,8 @@ generate_certificate() {
   rm -rf server.csr
   [[ ! -f "$cert_dir/self_signed_cert.pem" || ! -f "$cert_dir/self_signed_key.pem" ]] && print_error "生成自签名证书失败"
   print_ok "生成自签名证书成功"
-
-  chown nobody.nobody $cert_dir/self_signed_cert.pem
-  chown nobody.nobody $cert_dir/self_signed_key.pem
+  chown nobody.$cert_group $cert_dir/self_signed_cert.pem
+  chown nobody.$cert_group $cert_dir/self_signed_key.pem
 }
 
 function configure_web() {
