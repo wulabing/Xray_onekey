@@ -123,7 +123,11 @@ function dependency_install() {
   ${INS} curl
   judge "安装 curl"
 
-  ${INS} openssl openssl-devel
+  if [[ "${ID}" == "centos" ]]; then
+    ${INS} openssl openssl-devel
+  else
+    ${INS} openssl
+  fi
   judge "安装 openssl"
 
   # Nginx 后置 无需编译 不再需要
