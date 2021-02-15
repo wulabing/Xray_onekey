@@ -16,12 +16,13 @@ OK="${Green}[OK]${Font}"
 ERROR="${Red}[ERROR]${Font}"
 
 # 变量
-shell_version="0.1"
+shell_version="0.0.2"
 github_branch="xray"
 version_cmp="/tmp/version_cmp.tmp"
 xray_conf_dir="/usr/local/etc/xray"
-xray_info_file="$HOME/v2ray_info.inf"
-
+website_dir="/www/xray_web/"
+xray_access_log="/var/log/xray/access.log"
+xray_error_log="/var/log/xray/error.log"
 VERSION=$(echo "${VERSION}" | awk -F "[()]" '{print $2}')
 
 function print_ok() {
@@ -119,12 +120,13 @@ function dependency_install() {
   ${INS} curl
   judge "安装 curl"
 
-  if [[ "${ID}" == "centos" ]]; then
-    yum -y groupinstall "Development tools"
-  else
-    ${INS} build-essential
-  fi
-  judge "编译工具包 安装"
+# Nginx 后置 无需编译 不再需要
+#  if [[ "${ID}" == "centos" ]]; then
+#    yum -y groupinstall "Development tools"
+#  else
+#    ${INS} build-essential
+#  fi
+#  judge "编译工具包 安装"
 
   if [[ "${ID}" == "centos" ]]; then
     ${INS} pcre pcre-devel zlib-devel epel-release
@@ -165,7 +167,7 @@ function domain_check() {
     print_ok "域名dns解析IP 与 本机IP 匹配"
     sleep 2
   else
-    print_error "请确保域名添加了正确的 A 记录，否则将无法正常使用 V2ray"
+    print_error "请确保域名添加了正确的 A 记录，否则将无法正常使用 xray"
     print_error "域名dns解析IP 与 本机IP 不匹配 是否继续安装？（y/n）" && read -r install
     case $install in
     [yY][eE][sS] | [yY])
@@ -227,7 +229,7 @@ function modify_tls_version() {
   judge "Xray TLS_version 修改"
 }
 
-function modify_nginx() {
+function configure_nginx() {
   nginx_conf="/etc/nginx/conf.d/${domain}.conf"
   cd /etc/nginx/conf.d/ && rm -f ${domain}.conf && wget -O ${domain}.conf https://raw.githubusercontent.com/wulabing/V2Ray_ws-tls_bash_onekey/xray/config/web.conf
   sed -i "/server_name/c \\\tserver_name ${domain};" ${nginx_conf}
@@ -276,15 +278,15 @@ function ssl_install() {
 
 function acme() {
   if "$HOME"/.acme.sh/acme.sh --issue -d "${domain}" --standalone -k ec-256 --force; then
-    echo -e "${OK} ${GreenBG} SSL 证书生成成功 ${Font}"
+    print_ok "SSL 证书生成成功"
     sleep 2
     mkdir /ssl
     if "$HOME"/.acme.sh/acme.sh --installcert -d "${domain}" --fullchainpath /ssl/xray.crt --keypath /ssl/xray.key --ecc --force; then
-      echo -e "${OK} ${GreenBG} 证书配置成功 ${Font}"
+      print_ok "SSL 证书配置成功"
       sleep 2
     fi
   else
-    echo -e "${Error} ${RedBG} SSL 证书生成失败 ${Font}"
+    print_error "SSL 证书生成失败"
     rm -rf "$HOME/.acme.sh/${domain}_ecc"
     exit 1
   fi
@@ -320,8 +322,41 @@ function ssl_judge_and_install() {
   chown -R nobody.nobody /ssl/*
 }
 
+function configure_web() {
+  rm -rf /www/xray_web
+  mkdir -p /www/xray_web
+  # 该处保留引用源
+  wget -O web.tar.gz https://github.com/jiuqi9997/xray-yes/raw/main/web.tar.gz
+  tar xzf web.tar.gz -C /www/xray_web
+  judge "站点伪装"
+  rm -f web.tar.gz
+}
+function xray_uninstall() {
+  curl -L https://github.com/XTLS/Xray-install/raw/main/install-release.sh | bash -s -- remove --purge
+  systemctl stop nginx
+  rm -rf $website_dir
+  print_ok "卸载完成"
+  exit 0
+}
 function basic_information() {
   print_ok "vless+tcp+xtls+nginx 安装成功"
+}
+
+function show_access_log() {
+  [ -f ${xray_access_log} ] && tail -f ${xray_access_log} || echo -e "${RedBG}log文件不存在${Font}"
+}
+
+function show_error_log() {
+  [ -f ${xray_error_log} ] && tail -f ${xray_error_log} || echo -e "${RedBG}log文件不存在${Font}"
+}
+
+function bbr_boost_sh() {
+    [ -f "tcp.sh" ] && rm -rf ./tcp.sh
+    wget -N --no-check-certificate "https://raw.githubusercontent.com/ylx2016/Linux-NetSpeed/master/tcp.sh" && chmod +x tcp.sh && ./tcp.sh
+}
+
+function mtproxy_sh() {
+     wget -N --no-check-certificate "https://github.com/whunt1/onekeymakemtg/raw/master/mtproxy_go.sh" && chmod +x mtproxy_go.sh && bash mtproxy_go.sh
 }
 
 function install_xray() {
@@ -335,10 +370,66 @@ function install_xray() {
   xray_install
   configure_xray
   nginx_install
-  modify_nginx
+  configure_nginx
+  configure_web
   ssl_judge_and_install
   #  xray_qr_config
   basic_information
 }
 
-install_xray "$@"
+menu() {
+  update_sh
+  echo -e "\t xray 安装管理脚本 ${Red}[${shell_version}]${Font}"
+  echo -e "\t---authored by wulabing---"
+  echo -e "\thttps://github.com/wulabing\n"
+
+  echo -e "—————————————— 安装向导 ——————————————"""
+  echo -e "${Green}0.${Font}  升级 脚本"
+  echo -e "${Green}1.${Font}  安装 xray (vless+tcp+xtls+nginx)"
+  echo -e "—————————————— 配置变更 ——————————————"
+  echo -e "${Green}11.${Font} 变更 UUID"
+  echo -e "${Green}12.${Font} 变更 TLS 最低适配版本"
+  echo -e "—————————————— 查看信息 ——————————————"
+  echo -e "${Green}21.${Font} 查看 实时访问日志"
+  echo -e "${Green}22.${Font} 查看 实时错误日志"
+  #    echo -e "${Green}23.${Font}  查看 V2Ray 配置信息"
+  echo -e "—————————————— 其他选项 ——————————————"
+  echo -e "${Green}31.${Font} 安装 4合1 bbr 锐速安装脚本"
+  echo -e "${Green}32.${Font} 安装 MTproxy(支持TLS混淆)"
+  echo -e "${Green}33.${Font} 卸载 xray"
+
+  read -rp "请输入数字：" menu_num
+  case $menu_num in
+  0)
+    update_sh
+    ;;
+  1)
+    install_xray
+    ;;
+  11)
+    modify_UUID
+    ;;
+  13)
+    modify_tls_version
+    ;;
+  21)
+    xray_access_log
+    ;;
+  22)
+    xray_error_log
+    ;;
+  31)
+    bbr_boost_sh
+    ;;
+  32)
+    mtproxy_sh
+    ;;
+  33)
+    xray_uninstall
+    ;;
+  *)
+    echo -e "${RedBG}请输入正确的数字${Font}"
+    ;;
+  esac
+}
+menu "$@"

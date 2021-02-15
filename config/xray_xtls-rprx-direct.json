@@ -38,8 +38,7 @@
           "certificates": [
             {
               "certificateFile": "/ssl/xray.crt",
-              "keyFile": "/ssl/xray.key",
-              "ocspStapling": 3600
+              "keyFile": "/ssl/xray.key"
             }
           ]
         }
