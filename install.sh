@@ -23,7 +23,7 @@ OK="${Green}[OK]${Font}"
 ERROR="${Red}[ERROR]${Font}"
 
 # 变量
-shell_version="0.0.6"
+shell_version="0.0.7"
 github_branch="xray"
 version_cmp="/tmp/version_cmp.tmp"
 xray_conf_dir="/usr/local/etc/xray"
@@ -125,7 +125,6 @@ function dependency_install() {
 
   fi
   judge "crontab 自启动配置 "
-
 
   ${INS} unzip
   judge "安装 unzip"
@@ -251,6 +250,8 @@ function configure_nginx() {
   cd /etc/nginx/conf.d/ && rm -f ${domain}.conf && wget -O ${domain}.conf https://raw.githubusercontent.com/wulabing/V2Ray_ws-tls_bash_onekey/xray/config/web.conf
   sed -i "/server_name/c \\\tserver_name ${domain};" ${nginx_conf}
   judge "Nginx config modify"
+
+  systemctl restart nginx
 }
 
 function tls_type() {
@@ -286,23 +287,30 @@ function xray_install() {
 }
 
 function ssl_install() {
-  if [[ "${ID}" == "centos" ]]; then
-    ${INS} socat nc
-  else
-    ${INS} socat netcat
-  fi
-  judge "安装 SSL 证书生成脚本依赖"
+  #  使用 Nginx 配合签发 无需安装相关依赖
+  #  if [[ "${ID}" == "centos" ]]; then
+  #    ${INS} socat nc
+  #  else
+  #    ${INS} socat netcat
+  #  fi
+  #  judge "安装 SSL 证书生成脚本依赖"
 
   curl https://get.acme.sh | sh
   judge "安装 SSL 证书生成脚本"
 }
 
 function acme() {
-  if "$HOME"/.acme.sh/acme.sh --issue -d "${domain}" --standalone -k ec-256 --force; then
+
+  sed -i "6s/^/#/" "$nginx_conf"
+
+  # 启动 Nginx xray 并使用 Nginx 配合 acme 进行证书签发
+  systemctl restart nginx
+  systemctl restart xray
+
+  if "$HOME"/.acme.sh/acme.sh --issue -d "${domain}" --nginx -k ec-256 --force; then
     print_ok "SSL 证书生成成功"
     sleep 2
-    mkdir /ssl
-    if "$HOME"/.acme.sh/acme.sh --installcert -d "${domain}" --fullchainpath /ssl/xray.crt --keypath /ssl/xray.key --ecc --force; then
+    if "$HOME"/.acme.sh/acme.sh --installcert -d "${domain}" --fullchainpath /ssl/xray.crt --keypath /ssl/xray.key --reloadcmd "service nginx force-reload" --ecc --force; then
       print_ok "SSL 证书配置成功"
       sleep 2
     fi
@@ -311,11 +319,11 @@ function acme() {
     rm -rf "$HOME/.acme.sh/${domain}_ecc"
     exit 1
   fi
+
+  sed -i "6s/#//" "$nginx_conf"
 }
 
 function ssl_judge_and_install() {
-  # 停止 Nginx 防止端口占用
-  systemctl stop nginx
 
   if [[ -f "/ssl/xray.key" || -f "/ssl/xray.crt" ]]; then
     echo "/ssl 目录下证书文件已存在"
@@ -338,6 +346,9 @@ function ssl_judge_and_install() {
     "$HOME"/.acme.sh/acme.sh --installcert -d "${domain}" --fullchainpath /ssl/xray.key --keypath /ssl/xray.crt --ecc
     judge "证书应用"
   else
+    mkdir /ssl
+    cp -a $cert_dir/self_signed_cert.pem /ssl/xray.crt
+    cp -a $cert_dir/self_signed_key.pem /ssl/xray.key
     ssl_install
     acme
   fi
@@ -346,7 +357,7 @@ function ssl_judge_and_install() {
   chown -R nobody.$cert_group /ssl/*
 }
 
-generate_certificate() {
+function generate_certificate() {
   openssl genrsa -des3 -passout pass:xxxx -out server.pass.key 2048
   openssl rsa -passin pass:xxxx -in server.pass.key -out "$cert_dir/self_signed_key.pem"
   rm -rf server.pass.key
