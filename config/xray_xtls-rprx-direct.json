@@ -19,7 +19,7 @@
         "fallbacks": [
           {
             "dest": 60000,
-            "alpn": "http/1.1",
+            "alpn": "",
             "xver": 1
           },
           {
