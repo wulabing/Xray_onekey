@@ -23,7 +23,7 @@ OK="${Green}[OK]${Font}"
 ERROR="${Red}[ERROR]${Font}"
 
 # 变量
-shell_version="0.0.8"
+shell_version="0.0.9"
 github_branch="xray"
 version_cmp="/tmp/version_cmp.tmp"
 xray_conf_dir="/usr/local/etc/xray"
@@ -325,6 +325,7 @@ function acme() {
 
 function ssl_judge_and_install() {
 
+  mkdir -p /ssl
   if [[ -f "/ssl/xray.key" || -f "/ssl/xray.crt" ]]; then
     echo "/ssl 目录下证书文件已存在"
     echo -e "${OK} ${GreenBG} 是否删除 [Y/N]? ${Font}"
