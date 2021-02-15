@@ -341,6 +341,9 @@ generate_certificate() {
   rm -rf server.csr
   [[ ! -f "$cert_dir/self_signed_cert.pem" || ! -f "$cert_dir/self_signed_key.pem" ]] && print_error "生成自签名证书失败"
   print_ok "生成自签名证书成功"
+
+  chown nobody.nobody $cert_dir/self_signed_cert.pem
+  chown nobody.nobody $cert_dir/self_signed_key.pem
 }
 
 function configure_web() {
