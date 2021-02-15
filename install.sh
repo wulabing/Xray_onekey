@@ -23,7 +23,7 @@ OK="${Green}[OK]${Font}"
 ERROR="${Red}[ERROR]${Font}"
 
 # 变量
-shell_version="0.0.7"
+shell_version="0.0.8"
 github_branch="xray"
 version_cmp="/tmp/version_cmp.tmp"
 xray_conf_dir="/usr/local/etc/xray"
@@ -310,7 +310,7 @@ function acme() {
   if "$HOME"/.acme.sh/acme.sh --issue -d "${domain}" --nginx -k ec-256 --force; then
     print_ok "SSL 证书生成成功"
     sleep 2
-    if "$HOME"/.acme.sh/acme.sh --installcert -d "${domain}" --fullchainpath /ssl/xray.crt --keypath /ssl/xray.key --reloadcmd "service nginx force-reload" --ecc --force; then
+    if "$HOME"/.acme.sh/acme.sh --installcert -d "${domain}" --fullchainpath /ssl/xray.crt --keypath /ssl/xray.key --reloadcmd "systemctl restart xray" --ecc --force; then
       print_ok "SSL 证书配置成功"
       sleep 2
     fi
