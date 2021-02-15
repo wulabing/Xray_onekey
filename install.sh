@@ -23,6 +23,8 @@ xray_conf_dir="/usr/local/etc/xray"
 website_dir="/www/xray_web/"
 xray_access_log="/var/log/xray/access.log"
 xray_error_log="/var/log/xray/error.log"
+cert_dir="/usr/local/etc/xray"
+
 VERSION=$(echo "${VERSION}" | awk -F "[()]" '{print $2}')
 
 function print_ok() {
@@ -91,8 +93,8 @@ function nginx_install() {
   fi
 }
 function dependency_install() {
-  ${INS} wget git lsof
-  judge "安装 wget git lsof"
+  ${INS} wget lsof
+  judge "安装 wget lsof"
 
   if [[ "${ID}" == "centos" ]]; then
     ${INS} crontabs
@@ -120,6 +122,10 @@ function dependency_install() {
   ${INS} curl
   judge "安装 curl"
 
+  ${INS} openssl openssl-devel
+  judge "安装 openssl"
+
+
 # Nginx 后置 无需编译 不再需要
 #  if [[ "${ID}" == "centos" ]]; then
 #    yum -y groupinstall "Development tools"
@@ -131,7 +137,7 @@ function dependency_install() {
   if [[ "${ID}" == "centos" ]]; then
     ${INS} pcre pcre-devel zlib-devel epel-release
   else
-    ${INS} libpcre3 libpcre3-dev zlib1g-dev dbus
+    ${INS} libpcre3 libpcre3-dev zlib1g-dev
   fi
 
   ${INS} jq
@@ -322,6 +328,17 @@ function ssl_judge_and_install() {
   chown -R nobody.nobody /ssl/*
 }
 
+generate_certificate() {
+	openssl genrsa -des3 -passout pass:xxxx -out server.pass.key 2048
+	openssl rsa -passin pass:xxxx -in server.pass.key -out "$cert_dir/self_signed_key.pem"
+	rm -rf server.pass.key
+	openssl req -new -key "$cert_dir/self_signed_key.pem" -out server.csr -subj "/CN=$local_ip"
+	openssl x509 -req -days 3650 -in server.csr -signkey "$cert_dir/self_signed_key.pem" -out "$cert_dir/self_signed_cert.pem"
+	rm -rf server.csr
+	[[ ! -f "$cert_dir/self_signed_cert.pem" || ! -f "$cert_dir/self_signed_key.pem" ]] && print_error "生成自签名证书失败"
+	print_ok "生成自签名证书成功"
+}
+
 function configure_web() {
   rm -rf /www/xray_web
   mkdir -p /www/xray_web
@@ -372,6 +389,7 @@ function install_xray() {
   nginx_install
   configure_nginx
   configure_web
+  generate_certificate
   ssl_judge_and_install
   #  xray_qr_config
   basic_information
