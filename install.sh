@@ -16,7 +16,7 @@ OK="${Green}[OK]${Font}"
 ERROR="${Red}[ERROR]${Font}"
 
 # 变量
-shell_version="0.0.2"
+shell_version="0.0.3"
 github_branch="xray"
 version_cmp="/tmp/version_cmp.tmp"
 xray_conf_dir="/usr/local/etc/xray"
@@ -24,6 +24,7 @@ website_dir="/www/xray_web/"
 xray_access_log="/var/log/xray/access.log"
 xray_error_log="/var/log/xray/error.log"
 cert_dir="/usr/local/etc/xray"
+domain_tmp_dir="/usr/local/etc/xray"
 
 VERSION=$(echo "${VERSION}" | awk -F "[()]" '{print $2}')
 
@@ -125,14 +126,13 @@ function dependency_install() {
   ${INS} openssl openssl-devel
   judge "安装 openssl"
 
-
-# Nginx 后置 无需编译 不再需要
-#  if [[ "${ID}" == "centos" ]]; then
-#    yum -y groupinstall "Development tools"
-#  else
-#    ${INS} build-essential
-#  fi
-#  judge "编译工具包 安装"
+  # Nginx 后置 无需编译 不再需要
+  #  if [[ "${ID}" == "centos" ]]; then
+  #    yum -y groupinstall "Development tools"
+  #  else
+  #    ${INS} build-essential
+  #  fi
+  #  judge "编译工具包 安装"
 
   if [[ "${ID}" == "centos" ]]; then
     ${INS} pcre pcre-devel zlib-devel epel-release
@@ -268,6 +268,10 @@ function xray_install() {
   print_ok "安装 xray"
   curl -L https://github.com/XTLS/Xray-install/raw/main/install-release.sh | bash -s -- install
   judge "xray 安装"
+
+  # 用于生成 xray 的导入链接
+  echo $domain > $domain_tmp_dir/domain
+  judge "域名记录"
 }
 
 function ssl_install() {
@@ -329,14 +333,14 @@ function ssl_judge_and_install() {
 }
 
 generate_certificate() {
-	openssl genrsa -des3 -passout pass:xxxx -out server.pass.key 2048
-	openssl rsa -passin pass:xxxx -in server.pass.key -out "$cert_dir/self_signed_key.pem"
-	rm -rf server.pass.key
-	openssl req -new -key "$cert_dir/self_signed_key.pem" -out server.csr -subj "/CN=$local_ip"
-	openssl x509 -req -days 3650 -in server.csr -signkey "$cert_dir/self_signed_key.pem" -out "$cert_dir/self_signed_cert.pem"
-	rm -rf server.csr
-	[[ ! -f "$cert_dir/self_signed_cert.pem" || ! -f "$cert_dir/self_signed_key.pem" ]] && print_error "生成自签名证书失败"
-	print_ok "生成自签名证书成功"
+  openssl genrsa -des3 -passout pass:xxxx -out server.pass.key 2048
+  openssl rsa -passin pass:xxxx -in server.pass.key -out "$cert_dir/self_signed_key.pem"
+  rm -rf server.pass.key
+  openssl req -new -key "$cert_dir/self_signed_key.pem" -out server.csr -subj "/CN=$local_ip"
+  openssl x509 -req -days 3650 -in server.csr -signkey "$cert_dir/self_signed_key.pem" -out "$cert_dir/self_signed_cert.pem"
+  rm -rf server.csr
+  [[ ! -f "$cert_dir/self_signed_cert.pem" || ! -f "$cert_dir/self_signed_key.pem" ]] && print_error "生成自签名证书失败"
+  print_ok "生成自签名证书成功"
 }
 
 function configure_web() {
@@ -355,8 +359,29 @@ function xray_uninstall() {
   print_ok "卸载完成"
   exit 0
 }
+function restart_all() {
+  systemctl restart nginx
+  judge "Nginx 启动"
+  systemctl restart xray
+  judge "xray 启动"
+}
+
+function vless_xtls-rprx-direct_link() {
+  UUID=$(cat ${xray_conf_dir}/config.json | jq .inbounds[0].settings.clients[0].id | tr -d '"')
+  PORT=$(cat ${xray_conf_dir}/config.json | jq .inbounds[0].port)
+  FLOW=$(cat ${xray_conf_dir}/config.json | jq .inbounds[0].settings.clients[0].flow | tr -d '"')
+  DOMAIN=$(cat ${domain_tmp_dir}/domain)
+
+  print_ok "URL 链接"
+  print_ok "vless://$UUID@$DOMAIN:$PORT?security=xtls&flow=$FLOW#wulabing-$DOMAIN"
+
+  print_ok "URL 二维码 (请在浏览器中访问)"
+  print_ok "https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=vless://$UUID@$DOMAIN:$PORT?security=xtls%26flow=$FLOW%23wulabing-$DOMAIN"
+}
+
 function basic_information() {
   print_ok "vless+tcp+xtls+nginx 安装成功"
+  vless_xtls-rprx-direct_link
 }
 
 function show_access_log() {
@@ -368,12 +393,12 @@ function show_error_log() {
 }
 
 function bbr_boost_sh() {
-    [ -f "tcp.sh" ] && rm -rf ./tcp.sh
-    wget -N --no-check-certificate "https://raw.githubusercontent.com/ylx2016/Linux-NetSpeed/master/tcp.sh" && chmod +x tcp.sh && ./tcp.sh
+  [ -f "tcp.sh" ] && rm -rf ./tcp.sh
+  wget -N --no-check-certificate "https://raw.githubusercontent.com/ylx2016/Linux-NetSpeed/master/tcp.sh" && chmod +x tcp.sh && ./tcp.sh
 }
 
 function mtproxy_sh() {
-     wget -N --no-check-certificate "https://github.com/whunt1/onekeymakemtg/raw/master/mtproxy_go.sh" && chmod +x mtproxy_go.sh && bash mtproxy_go.sh
+  wget -N --no-check-certificate "https://github.com/whunt1/onekeymakemtg/raw/master/mtproxy_go.sh" && chmod +x mtproxy_go.sh && bash mtproxy_go.sh
 }
 
 function install_xray() {
@@ -392,6 +417,7 @@ function install_xray() {
   generate_certificate
   ssl_judge_and_install
   #  xray_qr_config
+  restart_all
   basic_information
 }
 
@@ -410,6 +436,7 @@ menu() {
   echo -e "—————————————— 查看信息 ——————————————"
   echo -e "${Green}21.${Font} 查看 实时访问日志"
   echo -e "${Green}22.${Font} 查看 实时错误日志"
+  echo -e "${Green}23.${Font} 查看 xray 配置链接"
   #    echo -e "${Green}23.${Font}  查看 V2Ray 配置信息"
   echo -e "—————————————— 其他选项 ——————————————"
   echo -e "${Green}31.${Font} 安装 4合1 bbr 锐速安装脚本"
@@ -425,16 +452,22 @@ menu() {
     install_xray
     ;;
   11)
+    read -rp "请输入UUID:" UUID
     modify_UUID
+    restart_all
     ;;
   13)
     modify_tls_version
+    restart_all
     ;;
   21)
     xray_access_log
     ;;
   22)
     xray_error_log
+    ;;
+  23)
+    vless_xtls-rprx-direct_link
     ;;
   31)
     bbr_boost_sh
