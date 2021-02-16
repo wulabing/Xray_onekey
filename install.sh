@@ -23,7 +23,7 @@ OK="${Green}[OK]${Font}"
 ERROR="${Red}[ERROR]${Font}"
 
 # 变量
-shell_version="0.0.9"
+shell_version="0.0.10"
 github_branch="xray"
 version_cmp="/tmp/version_cmp.tmp"
 xray_conf_dir="/usr/local/etc/xray"
@@ -400,15 +400,32 @@ function vless_xtls-rprx-direct_link() {
   FLOW=$(cat ${xray_conf_dir}/config.json | jq .inbounds[0].settings.clients[0].flow | tr -d '"')
   DOMAIN=$(cat ${domain_tmp_dir}/domain)
 
-  print_ok "URL 链接"
+  print_ok "URL 链接(V2RayN/NG)"
   print_ok "vless://$UUID@$DOMAIN:$PORT?security=xtls&flow=$FLOW#wulabing-$DOMAIN"
 
-  print_ok "URL 二维码 (请在浏览器中访问)"
+  print_ok "URL 二维码(V2RayN/NG)(请在浏览器中访问)"
   print_ok "https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=vless://$UUID@$DOMAIN:$PORT?security=xtls%26flow=$FLOW%23wulabing-$DOMAIN"
 }
 
+function vless_xtls-rprx-direct_information() {
+  UUID=$(cat ${xray_conf_dir}/config.json | jq .inbounds[0].settings.clients[0].id | tr -d '"')
+  PORT=$(cat ${xray_conf_dir}/config.json | jq .inbounds[0].port)
+  FLOW=$(cat ${xray_conf_dir}/config.json | jq .inbounds[0].settings.clients[0].flow | tr -d '"')
+  DOMAIN=$(cat ${domain_tmp_dir}/domain)
+
+  echo -e "${Red} xray 配置信息 ${Font}"
+  echo -e "${Red} 地址（address）:${Font}  $DOMAIN"
+  echo -e "${Red} 端口（port）：${Font}  $PORT"
+  echo -e "${Red} 用户id（UUID）：${Font} $UUID"
+  echo -e "${Red} 流控（flow）：${Font} $FLOW"
+  echo -e "${Red} 加密方式（security）：${Font} none "
+  echo -e "${Red} 传输协议（network）：${Font} tcp "
+  echo -e "${Red} 伪装类型（type）：${Font} none "
+  echo -e "${Red} 底层传输安全：${Font} xtls "
+}
 function basic_information() {
   print_ok "vless+tcp+xtls+nginx 安装成功"
+  vless_xtls-rprx-direct_information
   vless_xtls-rprx-direct_link
 }
 
@@ -484,8 +501,8 @@ menu() {
     modify_UUID
     restart_all
     ;;
-  13)
-    modify_tls_version
+  12)
+    tls_type
     restart_all
     ;;
   21)
@@ -495,7 +512,7 @@ menu() {
     xray_error_log
     ;;
   23)
-    vless_xtls-rprx-direct_link
+    [[ -f $xray_conf_dir/config.json ]] && basic_information || print_error "xray 配置文件不存在"
     ;;
   31)
     bbr_boost_sh
