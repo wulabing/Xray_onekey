@@ -33,7 +33,6 @@
         "network": "tcp",
         "security": "xtls",
         "xtlsSettings": {
-          "allowInsecure": false,
           "minVersion": "1.2",
           "certificates": [
             {
