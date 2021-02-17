@@ -83,6 +83,10 @@ check_system() {
     elif [[ "${ID}" == "ubuntu" && $(echo "${VERSION_ID}" | cut -d '.' -f1) -ge 16 ]]; then
         echo -e "${OK} ${GreenBG} 当前系统为 Ubuntu ${VERSION_ID} ${UBUNTU_CODENAME} ${Font}"
         INS="apt"
+        rm /var/lib/dpkg/lock
+        dpkg --configure -a
+        rm /var/lib/apt/lists/lock
+        rm /var/cache/apt/archives/lock
         $INS update
     else
         echo -e "${Error} ${RedBG} 当前系统为 ${ID} ${VERSION_ID} 不在支持的系统列表内，安装中断 ${Font}"
