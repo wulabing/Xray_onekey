@@ -23,7 +23,7 @@ OK="${Green}[OK]${Font}"
 ERROR="${Red}[ERROR]${Font}"
 
 # 变量
-shell_version="1.0.0"
+shell_version="1.0.1"
 github_branch="xray"
 version_cmp="/tmp/version_cmp.tmp"
 xray_conf_dir="/usr/local/etc/xray"
@@ -533,10 +533,10 @@ menu() {
     restart_all
     ;;
   21)
-    xray_access_log
+    tail -f $xray_access_log
     ;;
   22)
-    xray_error_log
+    tail -f $xray_error_log
     ;;
   23)
     [[ -f $xray_conf_dir/config.json ]] && basic_information || print_error "xray 配置文件不存在"

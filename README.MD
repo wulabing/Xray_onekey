@@ -50,7 +50,7 @@ xray 服务端配置：/usr/local/etc/xray/config.json
 
 Nginx 目录： /etc/nginx
 
-证书文件: /ssl/v2ray.key 和 /ssl/v2ray.crt
+证书文件: /ssl/xray.key 和 /ssl/xray.crt
 
 ### 捐赠
 
