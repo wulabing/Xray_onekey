@@ -545,6 +545,7 @@ nginx_conf_add() {
         location /ray/
         {
         proxy_redirect off;
+        proxy_read_timeout 1200s;
         proxy_pass http://127.0.0.1:10000;
         proxy_http_version 1.1;
         proxy_set_header X-Real-IP \$remote_addr;
