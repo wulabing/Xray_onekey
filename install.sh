@@ -23,7 +23,7 @@ OK="${Green}[OK]${Font}"
 ERROR="${Red}[ERROR]${Font}"
 
 # 变量
-shell_version="0.0.10"
+shell_version="1.0.0"
 github_branch="xray"
 version_cmp="/tmp/version_cmp.tmp"
 xray_conf_dir="/usr/local/etc/xray"
@@ -232,16 +232,25 @@ function update_sh() {
     echo -e "${OK} ${GreenBG} 当前版本为最新版本 ${Font}"
   fi
 }
+
+function xray_tmp_config_file_check_and_use() {
+  if [[ -s ${xray_conf_dir}/config_tmp.json ]]; then
+    mv -f ${xray_conf_dir}/config_tmp.json ${xray_conf_dir}/config.json
+  else
+    print_error "xray 配置文件修改异常"
+  fi
+}
+
 function modify_UUID() {
   [ -z "$UUID" ] && UUID=$(cat /proc/sys/kernel/random/uuid)
   cat ${xray_conf_dir}/config.json | jq 'setpath(["inbounds",0,"settings","clients",0,"id"];"'${UUID}'")' >${xray_conf_dir}/config_tmp.json
-  mv -f ${xray_conf_dir}/config_tmp.json ${xray_conf_dir}/config.json
+  xray_tmp_config_file_check_and_use
   judge "Xray UUID 修改"
 }
 
 function modify_tls_version() {
   cat ${xray_conf_dir}/config.json | jq 'setpath(["inbounds",0,"streamSettings","xtlsSettings","minVersion"];"'$1'")' >${xray_conf_dir}/config_tmp.json
-  mv -f ${xray_conf_dir}/config_tmp.json ${xray_conf_dir}/config.json
+  xray_tmp_config_file_check_and_use
   judge "Xray TLS_version 修改"
 }
 
@@ -270,9 +279,23 @@ function tls_type() {
   fi
 }
 
+function modify_port() {
+  read -rp "请输入端口号(default:443)：" PORT
+  [ -z "$PORT" ] && PORT="443"
+  if [[ $PORT -le 0 ]] || [[ $PORT -gt 65535 ]]; then
+    print_error "请输入0-65535之间的值"
+    exit 1
+  fi
+  port_exist_check $PORT
+  cat ${xray_conf_dir}/config.json | jq 'setpath(["inbounds",0,"port"];'${PORT}')' >${xray_conf_dir}/config_tmp.json
+  xray_tmp_config_file_check_and_use
+  judge "xray 端口 修改"
+}
+
 function configure_xray() {
   cd /usr/local/etc/xray && rm -f config.json && wget -O config.json https://raw.githubusercontent.com/wulabing/V2Ray_ws-tls_bash_onekey/xray/config/xray_xtls-rprx-direct.json
   modify_UUID
+  modify_port
   tls_type
 }
 
@@ -453,7 +476,6 @@ function install_xray() {
   basic_optimization
   domain_check
   port_exist_check 80
-  port_exist_check 443
   xray_install
   configure_xray
   nginx_install
@@ -478,6 +500,7 @@ menu() {
   echo -e "—————————————— 配置变更 ——————————————"
   echo -e "${Green}11.${Font} 变更 UUID"
   echo -e "${Green}12.${Font} 变更 TLS 最低适配版本"
+  echo -e "${Green}13.${Font} 变更 连接端口"
   echo -e "—————————————— 查看信息 ——————————————"
   echo -e "${Green}21.${Font} 查看 实时访问日志"
   echo -e "${Green}22.${Font} 查看 实时错误日志"
@@ -505,6 +528,10 @@ menu() {
     tls_type
     restart_all
     ;;
+  13)
+    modify_port
+    restart_all
+    ;;
   21)
     xray_access_log
     ;;
@@ -524,7 +551,7 @@ menu() {
     xray_uninstall
     ;;
   *)
-    echo -e "${RedBG}请输入正确的数字${Font}"
+    print_error "请输入正确的数字"
     ;;
   esac
 }
