@@ -4,7 +4,7 @@
 #	System Request:Debian 9+/Ubuntu 18.04+/Centos 7+
 #	Author:	wulabing
 #	Dscription: xray onekey Management
-#	email:admin@wulabing.com
+#	email: admin@wulabing.com
 #====================================================
 
 cd "$(
@@ -46,9 +46,9 @@ function print_error() {
 
 function is_root() {
   if [[ 0 == "$UID" ]]; then
-    print_ok "当前用户是root用户，开始安装流程"
+    print_ok "当前用户是 root 用户，开始安装流程"
   else
-    print_error "当前用户不是root用户，请切换到root用户后重新执行脚本"
+    print_error "当前用户不是 root 用户，请切换到 root 用户后重新执行脚本"
     exit 1
   fi
 }
@@ -172,19 +172,19 @@ function basic_optimization() {
   fi
 }
 function domain_check() {
-  read -rp "请输入你的域名信息(eg:www.wulabing.com):" domain
+  read -rp "请输入你的域名信息(eg: www.wulabing.com):" domain
   domain_ip=$(ping "${domain}" -c 1 | sed '1{s/[^(]*(//;s/).*//;q}')
-  print_ok "正在获取 公网ip 信息，请耐心等待"
+  print_ok "正在获取 IP 地址信息，请耐心等待"
   local_ip=$(curl https://api-ipv4.ip.sb/ip)
-  echo -e "域名dns解析IP：${domain_ip}"
-  echo -e "本机IP: ${local_ip}"
+  echo -e "域名通过 DNS 解析的 IP 地址：${domain_ip}"
+  echo -e "本机公网 IP 地址： ${local_ip}"
   sleep 2
   if [[ ${domain_ip} == "${local_ip}" ]]; then
-    print_ok "域名dns解析IP 与 本机IP 匹配"
+    print_ok "域名通过 DNS 解析的 IP 地址与 本机 IP 地址匹配"
     sleep 2
   else
     print_error "请确保域名添加了正确的 A 记录，否则将无法正常使用 xray"
-    print_error "域名dns解析IP 与 本机IP 不匹配 是否继续安装？（y/n）" && read -r install
+    print_error "域名通过 DNS 解析的 IP 地址与 本机 IP 地址不匹配，是否继续安装？（y/n）" && read -r install
     case $install in
     [yY][eE][sS] | [yY])
       print_ok "继续安装"
@@ -264,8 +264,8 @@ function configure_nginx() {
 }
 
 function tls_type() {
-  echo "请选择支持的 TLS 版本（default:3）:"
-  echo "1: TLS1.1 TLS1.2 and TLS1.3（兼容模式）"
+  echo "请选择支持的 TLS 版本（默认：TLS1.3 only）:"
+  echo "1: TLS1.1, TLS1.2 and TLS1.3（兼容模式）"
   echo "2: TLS1.2 and TLS1.3 (兼容模式)"
   echo "3: TLS1.3 only"
   read -rp "请输入：" tls_version
@@ -280,10 +280,10 @@ function tls_type() {
 }
 
 function modify_port() {
-  read -rp "请输入端口号(default:443)：" PORT
+  read -rp "请输入端口号(默认：443)：" PORT
   [ -z "$PORT" ] && PORT="443"
   if [[ $PORT -le 0 ]] || [[ $PORT -gt 65535 ]]; then
-    print_error "请输入0-65535之间的值"
+    print_error "请输入 0-65535 之间的值"
     exit 1
   fi
   port_exist_check $PORT
@@ -423,10 +423,10 @@ function vless_xtls-rprx-direct_link() {
   FLOW=$(cat ${xray_conf_dir}/config.json | jq .inbounds[0].settings.clients[0].flow | tr -d '"')
   DOMAIN=$(cat ${domain_tmp_dir}/domain)
 
-  print_ok "URL 链接(V2RayN/NG)"
+  print_ok "URL 链接（V2RayN/V2RayNG）"
   print_ok "vless://$UUID@$DOMAIN:$PORT?security=xtls&flow=$FLOW#wulabing-$DOMAIN"
 
-  print_ok "URL 二维码(V2RayN/NG)(请在浏览器中访问)"
+  print_ok "URL 二维码（V2RayN/V2RayNG）（请在浏览器中访问）"
   print_ok "https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=vless://$UUID@$DOMAIN:$PORT?security=xtls%26flow=$FLOW%23wulabing-$DOMAIN"
 }
 
@@ -439,7 +439,7 @@ function vless_xtls-rprx-direct_information() {
   echo -e "${Red} xray 配置信息 ${Font}"
   echo -e "${Red} 地址（address）:${Font}  $DOMAIN"
   echo -e "${Red} 端口（port）：${Font}  $PORT"
-  echo -e "${Red} 用户id（UUID）：${Font} $UUID"
+  echo -e "${Red} 用户 ID（UUID）：${Font} $UUID"
   echo -e "${Red} 流控（flow）：${Font} $FLOW"
   echo -e "${Red} 加密方式（security）：${Font} none "
   echo -e "${Red} 传输协议（network）：${Font} tcp "
@@ -447,7 +447,7 @@ function vless_xtls-rprx-direct_information() {
   echo -e "${Red} 底层传输安全：${Font} xtls "
 }
 function basic_information() {
-  print_ok "vless+tcp+xtls+nginx 安装成功"
+  print_ok "VLESS+tcp+xtls+nginx 安装成功"
   vless_xtls-rprx-direct_information
   vless_xtls-rprx-direct_link
 }
@@ -496,7 +496,7 @@ menu() {
 
   echo -e "—————————————— 安装向导 ——————————————"""
   echo -e "${Green}0.${Font}  升级 脚本"
-  echo -e "${Green}1.${Font}  安装 xray (vless+tcp+xtls+nginx)"
+  echo -e "${Green}1.${Font}  安装 xray (VLESS+tcp+xtls+nginx)"
   echo -e "—————————————— 配置变更 ——————————————"
   echo -e "${Green}11.${Font} 变更 UUID"
   echo -e "${Green}12.${Font} 变更 TLS 最低适配版本"
@@ -507,8 +507,8 @@ menu() {
   echo -e "${Green}23.${Font} 查看 xray 配置链接"
   #    echo -e "${Green}23.${Font}  查看 V2Ray 配置信息"
   echo -e "—————————————— 其他选项 ——————————————"
-  echo -e "${Green}31.${Font} 安装 4合1 bbr 锐速安装脚本"
-  echo -e "${Green}32.${Font} 安装 MTproxy(支持TLS混淆)"
+  echo -e "${Green}31.${Font} 安装 4 合 1 BBR、锐速安装脚本"
+  echo -e "${Green}32.${Font} 安装 MTproxy（支持 TLS 混淆）"
   echo -e "${Green}33.${Font} 卸载 xray"
 
   read -rp "请输入数字：" menu_num
