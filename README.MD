@@ -34,31 +34,31 @@ wget -N --no-check-certificate -q -O install.sh "https://raw.githubusercontent.c
 
 ### 启动方式
 
-启动 xray：systemctl start xray
+启动 xray：`systemctl start xray`
 
-停止 xray：systemctl stop xray
+停止 xray：`systemctl stop xray`
 
-启动 Nginx：systemctl start nginx
+启动 Nginx：`systemctl start nginx`
 
-停止 Nginx：systemctl stop nginx
+停止 Nginx：`systemctl stop nginx`
 
 ### 相关目录
 
-Web 目录：/www/xray_web
+Web 目录：`/www/xray_web`
 
-xray 服务端配置：/usr/local/etc/xray/config.json
+xray 服务端配置：`/usr/local/etc/xray/config.json`
 
-Nginx 目录： /etc/nginx
+Nginx 目录： `/etc/nginx`
 
-证书文件： /ssl/xray.key（私钥）和 /ssl/xray.crt（证书公钥）
+证书文件： `/ssl/xray.key`（私钥）和 `/ssl/xray.crt`（证书公钥）
 
 ### 捐赠
 
 目前支持通过 MugglePay 接受虚拟货币捐赠。
 
-您可以通过 Telegram 向我匿名捐赠：发送 /pay @wulabing xxx 到 @MugglePayBot 即可 默认货币为 USDT。
+您可以通过 Telegram 向我匿名捐赠：发送 `/pay @wulabing xxx` 到 @MugglePayBot 即可，默认货币为 USDT。
 
-如需要通过支付宝/微信捐赠，请在 Telegram 私聊 @wulabing ，感谢您的支持！
+如需要通过支付宝/微信捐赠，请在 Telegram 私聊 [@wulabing](https://t.me/wulabing)，感谢您的支持！
 
 ## Stargazers over time
 
