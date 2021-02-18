@@ -23,7 +23,7 @@ OK="${Green}[OK]${Font}"
 ERROR="${Red}[ERROR]${Font}"
 
 # 变量
-shell_version="1.0.2"
+shell_version="1.0.3"
 github_branch="xray"
 version_cmp="/tmp/version_cmp.tmp"
 xray_conf_dir="/usr/local/etc/xray"
@@ -69,13 +69,18 @@ function system_check() {
   if [[ "${ID}" == "centos" && ${VERSION_ID} -ge 7 ]]; then
     print_ok "当前系统为 Centos ${VERSION_ID} ${VERSION}"
     INS="yum install -y"
+    wget -N -P /etc/yum.repos.d/ https://raw.githubusercontent.com/wulabing/V2Ray_ws-tls_bash_onekey/xray/basic/nginx.repo
   elif [[ "${ID}" == "debian" && ${VERSION_ID} -ge 9 ]]; then
     print_ok "当前系统为 Debian ${VERSION_ID} ${VERSION}"
+    echo "deb http://nginx.org/packages/debian $(lsb_release -cs) nginx" > /etc/apt/sources.list.d/nginx.list
+    curl -fsSL https://nginx.org/keys/nginx_signing.key | sudo apt-key add -
     INS="apt install -y"
     apt update
   elif [[ "${ID}" == "ubuntu" && $(echo "${VERSION_ID}" | cut -d '.' -f1) -ge 18 ]]; then
     print_ok "当前系统为 Ubuntu ${VERSION_ID} ${UBUNTU_CODENAME}"
     INS="apt install -y"
+    echo "deb http://nginx.org/packages/ubuntu $(lsb_release -cs) nginx" > /etc/apt/sources.list.d/nginx.list
+    curl -fsSL https://nginx.org/keys/nginx_signing.key | sudo apt-key add -
     apt update
   else
     print_error "当前系统为 ${ID} ${VERSION_ID} 不在支持的系统列表内"
