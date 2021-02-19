@@ -3,7 +3,7 @@
 #====================================================
 #	System Request:Debian 9+/Ubuntu 18.04+/Centos 7+
 #	Author:	wulabing
-#	Dscription: xray onekey Management
+#	Dscription: Xray onekey Management
 #	email: admin@wulabing.com
 #====================================================
 
@@ -303,7 +303,7 @@ function modify_port() {
   port_exist_check $PORT
   cat ${xray_conf_dir}/config.json | jq 'setpath(["inbounds",0,"port"];'${PORT}')' >${xray_conf_dir}/config_tmp.json
   xray_tmp_config_file_check_and_use
-  judge "xray 端口 修改"
+  judge "Xray 端口 修改"
 }
 
 function configure_xray() {
@@ -314,11 +314,11 @@ function configure_xray() {
 }
 
 function xray_install() {
-  print_ok "安装 xray"
+  print_ok "安装 Xray"
   curl -L https://github.com/XTLS/Xray-install/raw/main/install-release.sh | bash -s -- install
-  judge "xray 安装"
+  judge "Xray 安装"
 
-  # 用于生成 xray 的导入链接
+  # 用于生成 Xray 的导入链接
   echo $domain >$domain_tmp_dir/domain
   judge "域名记录"
 }
@@ -340,7 +340,7 @@ function acme() {
 
   sed -i "6s/^/#/" "$nginx_conf"
 
-  # 启动 Nginx xray 并使用 Nginx 配合 acme 进行证书签发
+  # 启动 Nginx Xray 并使用 Nginx 配合 acme 进行证书签发
   systemctl restart nginx
   systemctl restart xray
 
@@ -391,7 +391,7 @@ function ssl_judge_and_install() {
     acme
   fi
 
-  # xray 默认以 nobody 用户运行，证书权限适配
+  # Xray 默认以 nobody 用户运行，证书权限适配
   chown -R nobody.$cert_group /ssl/*
 }
 
@@ -428,7 +428,7 @@ function restart_all() {
   systemctl restart nginx
   judge "Nginx 启动"
   systemctl restart xray
-  judge "xray 启动"
+  judge "Xray 启动"
 }
 
 function vless_xtls-rprx-direct_link() {
@@ -450,7 +450,7 @@ function vless_xtls-rprx-direct_information() {
   FLOW=$(cat ${xray_conf_dir}/config.json | jq .inbounds[0].settings.clients[0].flow | tr -d '"')
   DOMAIN=$(cat ${domain_tmp_dir}/domain)
 
-  echo -e "${Red} xray 配置信息 ${Font}"
+  echo -e "${Red} Xray 配置信息 ${Font}"
   echo -e "${Red} 地址（address）:${Font}  $DOMAIN"
   echo -e "${Red} 端口（port）：${Font}  $PORT"
   echo -e "${Red} 用户 ID（UUID）：${Font} $UUID"
@@ -497,20 +497,20 @@ function install_xray() {
   configure_web
   generate_certificate
   ssl_judge_and_install
-  #  xray_qr_config
+  #  Xray_qr_config
   restart_all
   basic_information
 }
 
 menu() {
   update_sh
-  echo -e "\t xray 安装管理脚本 ${Red}[${shell_version}]${Font}"
+  echo -e "\t Xray 安装管理脚本 ${Red}[${shell_version}]${Font}"
   echo -e "\t---authored by wulabing---"
   echo -e "\thttps://github.com/wulabing\n"
 
   echo -e "—————————————— 安装向导 ——————————————"""
   echo -e "${Green}0.${Font}  升级 脚本"
-  echo -e "${Green}1.${Font}  安装 xray (VLESS+tcp+xtls+nginx)"
+  echo -e "${Green}1.${Font}  安装 Xray (VLESS+tcp+xtls+nginx)"
   echo -e "—————————————— 配置变更 ——————————————"
   echo -e "${Green}11.${Font} 变更 UUID"
   echo -e "${Green}12.${Font} 变更 TLS 最低适配版本"
@@ -518,12 +518,12 @@ menu() {
   echo -e "—————————————— 查看信息 ——————————————"
   echo -e "${Green}21.${Font} 查看 实时访问日志"
   echo -e "${Green}22.${Font} 查看 实时错误日志"
-  echo -e "${Green}23.${Font} 查看 xray 配置链接"
+  echo -e "${Green}23.${Font} 查看 Xray 配置链接"
   #    echo -e "${Green}23.${Font}  查看 V2Ray 配置信息"
   echo -e "—————————————— 其他选项 ——————————————"
   echo -e "${Green}31.${Font} 安装 4 合 1 BBR、锐速安装脚本"
   echo -e "${Green}32.${Font} 安装 MTproxy（支持 TLS 混淆）"
-  echo -e "${Green}33.${Font} 卸载 xray"
+  echo -e "${Green}33.${Font} 卸载 Xray"
 
   read -rp "请输入数字：" menu_num
   case $menu_num in

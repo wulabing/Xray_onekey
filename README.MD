@@ -1,4 +1,4 @@
-## xray 基于 Nginx 的 VLESS + xtls 一键安装脚本
+## Xray 基于 Nginx 的 VLESS + xtls 一键安装脚本
 > 感谢 JetBrains 提供的非商业开源软件开发授权！
 
 > Thanks for non-commercial open source development authorization by JetBrains!
@@ -11,11 +11,11 @@
 * 准备一个域名，并将 A 记录添加好；
 * 安装好 wget。
 
-### 安装/更新方式（xray）
+### 安装/更新方式（Xray）
 VLESS + xtls + nginx + Web
 
 ```
-wget -N --no-check-certificate -q -O install.sh "https://raw.githubusercontent.com/wulabing/V2Ray_ws-tls_bash_onekey/xray/install.sh" && chmod +x install.sh && bash install.sh
+wget -N --no-check-certificate -q -O install.sh "https://raw.githubusercontent.com/wulabing/V2Ray_ws-tls_bash_onekey/Xray/install.sh" && chmod +x install.sh && bash install.sh
 ```
 
 ### 注意事项
@@ -34,9 +34,9 @@ wget -N --no-check-certificate -q -O install.sh "https://raw.githubusercontent.c
 
 ### 启动方式
 
-启动 xray：`systemctl start xray`
+启动 Xray：`systemctl start xray`
 
-停止 xray：`systemctl stop xray`
+停止 Xray：`systemctl stop xray`
 
 启动 Nginx：`systemctl start nginx`
 
@@ -46,7 +46,7 @@ wget -N --no-check-certificate -q -O install.sh "https://raw.githubusercontent.c
 
 Web 目录：`/www/xray_web`
 
-xray 服务端配置：`/usr/local/etc/xray/config.json`
+Xray 服务端配置：`/usr/local/etc/xray/config.json`
 
 Nginx 目录： `/etc/nginx`
 
@@ -66,4 +66,4 @@ https://bandwagonhost.com/aff.php?aff=63939
 
 ## Stargazers over time
 
-[![Stargazers over time](https://starchart.cc/wulabing/V2Ray_ws-tls_bash_onekey.svg)](https://starchart.cc/wulabing/V2Ray_ws-tls_bash_onekey)
+[![Stargazers over time](https://starchart.cc/wulXiaohanabing/V2Ray_ws-tls_bash_onekey.svg)](https://starchart.cc/wulabing/V2Ray_ws-tls_bash_onekey)
