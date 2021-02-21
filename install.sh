@@ -16,6 +16,7 @@ cd "$(
 Green="\033[32m"
 Red="\033[31m"
 Yellow="\033[33m"
+Blue="\033[36m"
 Font="\033[0m"
 GreenBG="\033[42;37m"
 RedBG="\033[41;37m"
@@ -23,7 +24,7 @@ OK="${Green}[OK]${Font}"
 ERROR="${Red}[ERROR]${Font}"
 
 # 变量
-shell_version="1.0.9"
+shell_version="1.0.10"
 github_branch="xray"
 version_cmp="/tmp/version_cmp.tmp"
 xray_conf_dir="/usr/local/etc/xray"
@@ -37,7 +38,7 @@ cert_group="nobody"
 VERSION=$(echo "${VERSION}" | awk -F "[()]" '{print $2}')
 
 function print_ok() {
-  echo -e "${OK} ${GreenBG} $1 ${Font}"
+  echo -e "${OK} ${Blue} $1 ${Font}"
 }
 
 function print_error() {
@@ -231,19 +232,19 @@ function update_sh() {
   echo "$ol_version" >$version_cmp
   echo "$shell_version" >>$version_cmp
   if [[ "$shell_version" < "$(sort -rV $version_cmp | head -1)" ]]; then
-    echo -e "${OK} ${GreenBG} 存在新版本，是否更新 [Y/N]? ${Font}"
+    print_ok "存在新版本，是否更新 [Y/N]?"
     read -r update_confirm
     case $update_confirm in
     [yY][eE][sS] | [yY])
       wget -N --no-check-certificate https://raw.githubusercontent.com/wulabing/Xray_onkey/${github_branch}/install.sh
-      echo -e "${OK} ${GreenBG} 更新完成 ${Font}"
+      print_ok "更新完成"
       exit 0
       ;;
     *) ;;
 
     esac
   else
-    echo -e "${OK} ${GreenBG} 当前版本为最新版本 ${Font}"
+    print_ok "当前版本为最新版本"
   fi
 }
 
@@ -365,12 +366,12 @@ function ssl_judge_and_install() {
   mkdir -p /ssl
   if [[ -f "/ssl/xray.key" || -f "/ssl/xray.crt" ]]; then
     echo "/ssl 目录下证书文件已存在"
-    echo -e "${OK} ${GreenBG} 是否删除 [Y/N]? ${Font}"
+    print_ok "是否删除 [Y/N]?"
     read -r ssl_delete
     case $ssl_delete in
     [yY][eE][sS] | [yY])
       rm -rf /ssl/*
-      echo -e "${OK} ${GreenBG} 已删除 ${Font}"
+      print_ok "已删除"
       ;;
     *) ;;
 
