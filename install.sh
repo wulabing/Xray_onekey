@@ -23,7 +23,7 @@ OK="${Green}[OK]${Font}"
 ERROR="${Red}[ERROR]${Font}"
 
 # 变量
-shell_version="1.0.6"
+shell_version="1.0.7"
 github_branch="xray"
 version_cmp="/tmp/version_cmp.tmp"
 xray_conf_dir="/usr/local/etc/xray"
@@ -69,7 +69,7 @@ function system_check() {
   if [[ "${ID}" == "centos" && ${VERSION_ID} -ge 7 ]]; then
     print_ok "当前系统为 Centos ${VERSION_ID} ${VERSION}"
     INS="yum install -y"
-    wget -N -P /etc/yum.repos.d/ https://raw.githubusercontent.com/wulabing/V2Ray_ws-tls_bash_onekey/xray/basic/nginx.repo
+    wget -N -P /etc/yum.repos.d/ https://raw.githubusercontent.com/wulabing/Xray_onkey/xray/basic/nginx.repo
   elif [[ "${ID}" == "debian" && ${VERSION_ID} -ge 9 ]]; then
     print_ok "当前系统为 Debian ${VERSION_ID} ${VERSION}"
     INS="apt install -y"
@@ -167,7 +167,7 @@ function dependency_install() {
   ${INS} jq
 
   if ! command -v jq; then
-    wget -P /usr/bin https://raw.githubusercontent.com/wulabing/V2Ray_ws-tls_bash_onekey/xray/binary/jq && chmod +x /usr/bin/jq
+    wget -P /usr/bin https://raw.githubusercontent.com/wulabing/Xray_onkey/xray/binary/jq && chmod +x /usr/bin/jq
     judge "安装 jq"
   fi
 }
@@ -227,7 +227,7 @@ function port_exist_check() {
   fi
 }
 function update_sh() {
-  ol_version=$(curl -L -s https://raw.githubusercontent.com/wulabing/V2Ray_ws-tls_bash_onekey/${github_branch}/install.sh | grep "shell_version=" | head -1 | awk -F '=|"' '{print $3}')
+  ol_version=$(curl -L -s https://raw.githubusercontent.com/wulabing/Xray_onkey/${github_branch}/install.sh | grep "shell_version=" | head -1 | awk -F '=|"' '{print $3}')
   echo "$ol_version" >$version_cmp
   echo "$shell_version" >>$version_cmp
   if [[ "$shell_version" < "$(sort -rV $version_cmp | head -1)" ]]; then
@@ -235,7 +235,7 @@ function update_sh() {
     read -r update_confirm
     case $update_confirm in
     [yY][eE][sS] | [yY])
-      wget -N --no-check-certificate https://raw.githubusercontent.com/wulabing/V2Ray_ws-tls_bash_onekey/${github_branch}/install.sh
+      wget -N --no-check-certificate https://raw.githubusercontent.com/wulabing/Xray_onkey/${github_branch}/install.sh
       echo -e "${OK} ${GreenBG} 更新完成 ${Font}"
       exit 0
       ;;
@@ -270,7 +270,7 @@ function modify_tls_version() {
 
 function configure_nginx() {
   nginx_conf="/etc/nginx/conf.d/${domain}.conf"
-  cd /etc/nginx/conf.d/ && rm -f ${domain}.conf && wget -O ${domain}.conf https://raw.githubusercontent.com/wulabing/V2Ray_ws-tls_bash_onekey/xray/config/web.conf
+  cd /etc/nginx/conf.d/ && rm -f ${domain}.conf && wget -O ${domain}.conf https://raw.githubusercontent.com/wulabing/Xray_onkey/xray/config/web.conf
   sed -i "/server_name/c \\\tserver_name ${domain};" ${nginx_conf}
   judge "Nginx config modify"
 
@@ -307,7 +307,7 @@ function modify_port() {
 }
 
 function configure_xray() {
-  cd /usr/local/etc/xray && rm -f config.json && wget -O config.json https://raw.githubusercontent.com/wulabing/V2Ray_ws-tls_bash_onekey/xray/config/xray_xtls-rprx-direct.json
+  cd /usr/local/etc/xray && rm -f config.json && wget -O config.json https://raw.githubusercontent.com/wulabing/Xray_onkey/xray/config/xray_xtls-rprx-direct.json
   modify_UUID
   modify_port
   tls_type
