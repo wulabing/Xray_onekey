@@ -23,7 +23,7 @@ OK="${Green}[OK]${Font}"
 ERROR="${Red}[ERROR]${Font}"
 
 # 变量
-shell_version="1.0.8"
+shell_version="1.0.9"
 github_branch="xray"
 version_cmp="/tmp/version_cmp.tmp"
 xray_conf_dir="/usr/local/etc/xray"
@@ -525,7 +525,7 @@ menu() {
   echo -e "${Green}32.${Font} 安装 MTproxy（支持 TLS 混淆）"
   echo -e "${Green}33.${Font} 卸载 Xray"
   echo -e "${Green}34.${Font} 更新 Xray-core"
-
+  echo -e "${Green}40.${Font} 退出"
   read -rp "请输入数字：" menu_num
   case $menu_num in
   0)
@@ -568,6 +568,9 @@ menu() {
   34)
     curl -L https://github.com/XTLS/Xray-install/raw/main/install-release.sh | bash -s -- install
     restart_all
+    ;;
+  40)
+    exit 0
     ;;
   *)
     print_error "请输入正确的数字"
