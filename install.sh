@@ -24,7 +24,7 @@ OK="${Green}[OK]${Font}"
 ERROR="${Red}[ERROR]${Font}"
 
 # 变量
-shell_version="1.2.1"
+shell_version="1.2.2"
 github_branch="main"
 version_cmp="/tmp/version_cmp.tmp"
 xray_conf_dir="/usr/local/etc/xray"
@@ -347,7 +347,7 @@ function configure_xray() {
 }
 
 function configure_xray_ws() {
-  cd /usr/local/etc/xray && rm -f config.json && wget -O config.json https://raw.githubusercontent.com/wulabing/Xray_onekey/ws/config/xray_tls_ws_mix-rprx-direct.json
+  cd /usr/local/etc/xray && rm -f config.json && wget -O config.json https://raw.githubusercontent.com/wulabing/Xray_onekey/${github_branch}/config/xray_tls_ws_mix-rprx-direct.json
   modify_UUID
   modify_UUID_ws
   modify_port
@@ -618,8 +618,8 @@ menu() {
   echo -e "当前已安装版本：${shell_mode}"
   echo -e "—————————————— 安装向导 ——————————————"""
   echo -e "${Green}0.${Font}  升级 脚本"
-  echo -e "${Green}1.${Font}  安装 Xray (VLESS+TCP+XTLS+Nginx)"
-  echo -e "${Green}2.${Font}  安装 Xray (VLESS+TCP+TLS+Nginx with WebSocket 混合模式)"
+  echo -e "${Green}1.${Font}  安装 Xray (VLESS + TCP+ XTLS + Nginx)"
+  echo -e "${Green}2.${Font}  安装 Xray (VLESS + TCP+ TLS + Nginx WebSocket 混合模式)"
   echo -e "—————————————— 配置变更 ——————————————"
   echo -e "${Green}11.${Font} 变更 UUID"
   echo -e "${Green}12.${Font} 变更 TLS 最低适配版本"

@@ -14,8 +14,12 @@
 * 准备一个域名，并将 A 记录添加好；
 * 安装好 wget。
 
+### 支持配置方式
+VLESS + TCP + XTLS + Nginx
+
+VLESS + TCP + TLS 及 VLESS + TCP + TLS + Nginx + WebSocket 并存模式
+
 ### 安装/更新方式（Xray）
-VLESS + XTLS + Nginx + Web
 
 ```
 wget -N --no-check-certificate -q -O install.sh "https://raw.githubusercontent.com/wulabing/Xray_onekey/main/install.sh" && chmod +x install.sh && bash install.sh
