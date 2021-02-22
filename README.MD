@@ -15,7 +15,7 @@
 * 安装好 wget。
 
 ### 安装/更新方式（Xray）
-VLESS + XTLS + nginx + Web
+VLESS + XTLS + Nginx + Web
 
 ```
 wget -N --no-check-certificate -q -O install.sh "https://raw.githubusercontent.com/wulabing/Xray_onekey/main/install.sh" && chmod +x install.sh && bash install.sh

@@ -464,7 +464,7 @@ function vless_xtls-rprx-direct_information() {
   echo -e "${Red} 底层传输安全：${Font} xtls "
 }
 function basic_information() {
-  print_ok "VLESS+tcp+xtls+nginx 安装成功"
+  print_ok "VLESS+TCP+XTLS+Nginx 安装成功"
   vless_xtls-rprx-direct_information
   vless_xtls-rprx-direct_link
 }
@@ -513,7 +513,7 @@ menu() {
 
   echo -e "—————————————— 安装向导 ——————————————"""
   echo -e "${Green}0.${Font}  升级 脚本"
-  echo -e "${Green}1.${Font}  安装 Xray (VLESS+tcp+xtls+nginx)"
+  echo -e "${Green}1.${Font}  安装 Xray (VLESS+TCP+XTLS+Nginx)"
   echo -e "—————————————— 配置变更 ——————————————"
   echo -e "${Green}11.${Font} 变更 UUID"
   echo -e "${Green}12.${Font} 变更 TLS 最低适配版本"
