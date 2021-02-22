@@ -24,7 +24,7 @@ OK="${Green}[OK]${Font}"
 ERROR="${Red}[ERROR]${Font}"
 
 # 变量
-shell_version="1.0.13"
+shell_version="1.1.0"
 github_branch="xray"
 version_cmp="/tmp/version_cmp.tmp"
 xray_conf_dir="/usr/local/etc/xray"
@@ -228,7 +228,7 @@ function port_exist_check() {
   fi
 }
 function update_sh() {
-  ol_version=$(curl -L -s https://raw.githubusercontent.com/wulabing/Xray_onekey/${github_branch}/install.sh | grep "shell_version=" | head -1 | awk -F '=|"' '{print $3}')
+  ol_version=$(curl -L -s https://raw.githubusercontent.com/wulabing/Xray_onekey/main/install.sh | grep "shell_version=" | head -1 | awk -F '=|"' '{print $3}')
   echo "$ol_version" >$version_cmp
   echo "$shell_version" >>$version_cmp
   if [[ "$shell_version" != "$(sort -rV $version_cmp | head -1)" ]]; then
@@ -236,7 +236,7 @@ function update_sh() {
     read -r update_confirm
     case $update_confirm in
     [yY][eE][sS] | [yY])
-      wget -N --no-check-certificate https://raw.githubusercontent.com/wulabing/Xray_onekey/${github_branch}/install.sh
+      wget -N --no-check-certificate https://raw.githubusercontent.com/wulabing/Xray_onekey/main/install.sh
       print_ok "更新完成"
       exit 0
       ;;
