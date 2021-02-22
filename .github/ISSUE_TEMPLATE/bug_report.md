@@ -26,8 +26,7 @@ assignees: ''
 ------------------------------------------------------------------
 
 <!-- 
-请附上任何可以帮助我们解决这个问题的信息，如果我们收到的信息不足，我们将对这个 issue 加上 *Needs more information* 标记并在收到更多资讯之前关闭 issue。
-Make sure to add **all the information needed to understand the bug** so that someone can help. If the info is missing we'll add the 'Needs more information' label and close the issue until there is enough information.
+请附上任何可以帮助我们解决这个问题的信息。
 -->
 
 ### 服务运行情况
