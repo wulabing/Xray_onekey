@@ -24,8 +24,8 @@ OK="${Green}[OK]${Font}"
 ERROR="${Red}[ERROR]${Font}"
 
 # 变量
-shell_version="1.1.0"
-github_branch="xray"
+shell_version="1.1.2"
+github_branch="main"
 version_cmp="/tmp/version_cmp.tmp"
 xray_conf_dir="/usr/local/etc/xray"
 website_dir="/www/xray_web/"
@@ -70,7 +70,7 @@ function system_check() {
   if [[ "${ID}" == "centos" && ${VERSION_ID} -ge 7 ]]; then
     print_ok "当前系统为 Centos ${VERSION_ID} ${VERSION}"
     INS="yum install -y"
-    wget -N -P /etc/yum.repos.d/ https://raw.githubusercontent.com/wulabing/Xray_onekey/xray/basic/nginx.repo
+    wget -N -P /etc/yum.repos.d/ https://raw.githubusercontent.com/wulabing/Xray_onekey/${github_branch}/basic/nginx.repo
   elif [[ "${ID}" == "debian" && ${VERSION_ID} -ge 9 ]]; then
     print_ok "当前系统为 Debian ${VERSION_ID} ${VERSION}"
     INS="apt install -y"
@@ -168,7 +168,7 @@ function dependency_install() {
   ${INS} jq
 
   if ! command -v jq; then
-    wget -P /usr/bin https://raw.githubusercontent.com/wulabing/Xray_onekey/xray/binary/jq && chmod +x /usr/bin/jq
+    wget -P /usr/bin https://raw.githubusercontent.com/wulabing/Xray_onekey/${github_branch}/binary/jq && chmod +x /usr/bin/jq
     judge "安装 jq"
   fi
 }
@@ -228,7 +228,7 @@ function port_exist_check() {
   fi
 }
 function update_sh() {
-  ol_version=$(curl -L -s https://raw.githubusercontent.com/wulabing/Xray_onekey/main/install.sh | grep "shell_version=" | head -1 | awk -F '=|"' '{print $3}')
+  ol_version=$(curl -L -s https://raw.githubusercontent.com/wulabing/Xray_onekey/${github_branch}/install.sh | grep "shell_version=" | head -1 | awk -F '=|"' '{print $3}')
   echo "$ol_version" >$version_cmp
   echo "$shell_version" >>$version_cmp
   if [[ "$shell_version" != "$(sort -rV $version_cmp | head -1)" ]]; then
@@ -236,8 +236,9 @@ function update_sh() {
     read -r update_confirm
     case $update_confirm in
     [yY][eE][sS] | [yY])
-      wget -N --no-check-certificate https://raw.githubusercontent.com/wulabing/Xray_onekey/main/install.sh
+      wget -N --no-check-certificate https://raw.githubusercontent.com/wulabing/Xray_onekey/${github_branch}/install.sh
       print_ok "更新完成"
+      print_ok "您可以通过 bash $0 执行本程序"
       exit 0
       ;;
     *) ;;
@@ -245,6 +246,7 @@ function update_sh() {
     esac
   else
     print_ok "当前版本为最新版本"
+    print_ok "您可以通过 bash $0 执行本程序"
   fi
 }
 
@@ -271,7 +273,7 @@ function modify_tls_version() {
 
 function configure_nginx() {
   nginx_conf="/etc/nginx/conf.d/${domain}.conf"
-  cd /etc/nginx/conf.d/ && rm -f ${domain}.conf && wget -O ${domain}.conf https://raw.githubusercontent.com/wulabing/Xray_onekey/xray/config/web.conf
+  cd /etc/nginx/conf.d/ && rm -f ${domain}.conf && wget -O ${domain}.conf https://raw.githubusercontent.com/wulabing/Xray_onekey/${github_branch}/config/web.conf
   sed -i "/server_name/c \\\tserver_name ${domain};" ${nginx_conf}
   judge "Nginx config modify"
 
@@ -308,7 +310,7 @@ function modify_port() {
 }
 
 function configure_xray() {
-  cd /usr/local/etc/xray && rm -f config.json && wget -O config.json https://raw.githubusercontent.com/wulabing/Xray_onekey/xray/config/xray_xtls-rprx-direct.json
+  cd /usr/local/etc/xray && rm -f config.json && wget -O config.json https://raw.githubusercontent.com/wulabing/Xray_onekey/${github_branch}/config/xray_xtls-rprx-direct.json
   modify_UUID
   modify_port
   tls_type
@@ -462,7 +464,7 @@ function vless_xtls-rprx-direct_information() {
   echo -e "${Red} 底层传输安全：${Font} xtls "
 }
 function basic_information() {
-  print_ok "VLESS+tcp+xtls+nginx 安装成功"
+  print_ok "VLESS+TCP+XTLS+Nginx 安装成功"
   vless_xtls-rprx-direct_information
   vless_xtls-rprx-direct_link
 }
@@ -511,7 +513,7 @@ menu() {
 
   echo -e "—————————————— 安装向导 ——————————————"""
   echo -e "${Green}0.${Font}  升级 脚本"
-  echo -e "${Green}1.${Font}  安装 Xray (VLESS+tcp+xtls+nginx)"
+  echo -e "${Green}1.${Font}  安装 Xray (VLESS+TCP+XTLS+Nginx)"
   echo -e "—————————————— 配置变更 ——————————————"
   echo -e "${Green}11.${Font} 变更 UUID"
   echo -e "${Green}12.${Font} 变更 TLS 最低适配版本"
