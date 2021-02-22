@@ -24,7 +24,7 @@ OK="${Green}[OK]${Font}"
 ERROR="${Red}[ERROR]${Font}"
 
 # 变量
-shell_version="1.1.1"
+shell_version="1.1.2"
 github_branch="main"
 version_cmp="/tmp/version_cmp.tmp"
 xray_conf_dir="/usr/local/etc/xray"
@@ -238,6 +238,7 @@ function update_sh() {
     [yY][eE][sS] | [yY])
       wget -N --no-check-certificate https://raw.githubusercontent.com/wulabing/Xray_onekey/${github_branch}/install.sh
       print_ok "更新完成"
+      print_ok "您可以通过 bash $0 执行本程序"
       exit 0
       ;;
     *) ;;
@@ -245,6 +246,7 @@ function update_sh() {
     esac
   else
     print_ok "当前版本为最新版本"
+    print_ok "您可以通过 bash $0 执行本程序"
   fi
 }
 
