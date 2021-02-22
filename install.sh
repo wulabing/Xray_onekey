@@ -24,7 +24,7 @@ OK="${Green}[OK]${Font}"
 ERROR="${Red}[ERROR]${Font}"
 
 # 变量
-shell_version="1.1.2"
+shell_version="1.2.1"
 github_branch="main"
 version_cmp="/tmp/version_cmp.tmp"
 xray_conf_dir="/usr/local/etc/xray"
@@ -536,13 +536,13 @@ function ws_link() {
   print_ok "vless://$UUID@$DOMAIN:$PORT?security=tls#wulabing-$DOMAIN"
 
   print_ok "URL 链接（VLESS + WebSocket + TLS）"
-  print_ok "vless://$UUID@$DOMAIN:$PORT?type=ws&security=tls&path=%2f${WS_PATH_WITHOUT_SLASH}#wulabing-$DOMAIN"
+  print_ok "vless://$UUID@$DOMAIN:$PORT?type=ws&security=tls&path=%2f${WS_PATH_WITHOUT_SLASH}%2f#wulabing-$DOMAIN"
 
   print_ok "URL 二维码（VLESS + TCP + TLS）（请在浏览器中访问）"
   print_ok "https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=vless://$UUID@$DOMAIN:$PORT?security=tls%23wulabing-$DOMAIN"
 
   print_ok "URL 二维码（VLESS + WebSocket + TLS）（请在浏览器中访问）"
-  print_ok "https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=vless://$UUID@$DOMAIN:$PORT?type=ws%26security=tls%26path=%2f${WS_PATH_WITHOUT_SLASH}%23wulabing-$DOMAIN"
+  print_ok "https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=vless://$UUID@$DOMAIN:$PORT?type=ws%26security=tls%26path=%2f${WS_PATH_WITHOUT_SLASH}%2f%23wulabing-$DOMAIN"
 }
 
 function basic_information() {
@@ -606,7 +606,7 @@ function install_xray_ws() {
   generate_certificate
   ssl_judge_and_install
   restart_all
-  basic_information
+  basic_ws_information
 }
 menu() {
   update_sh
@@ -644,11 +644,14 @@ menu() {
   1)
     install_xray
     ;;
+  2)
+    install_xray_ws
+    ;;
   11)
     read -rp "请输入UUID:" UUID
     if [[ ${shell_mode} == "tcp" ]]; then
       modify_UUID
-    else
+    elif [[ ${shell_mode} == "ws" ]]; then
       modify_UUID
       modify_UUID_ws
     fi
@@ -664,9 +667,10 @@ menu() {
     ;;
   14)
     if [[ ${shell_mode} == "ws" ]]; then
-      read -rp "请输入路径(示例：/wulabing):" WS_PATH
+      read -rp "请输入路径(示例：/wulabing/ 要求两侧都包含/):" WS_PATH
       modify_fallback_ws
       modify_ws
+      restart_all
     else
       print_error "当前模式不是Websocket模式"
     fi
@@ -678,7 +682,15 @@ menu() {
     tail -f $xray_error_log
     ;;
   23)
-    [[ -f $xray_conf_dir/config.json ]] && basic_information || print_error "xray 配置文件不存在"
+    if [[ -f $xray_conf_dir/config.json ]]; then
+      if [[ ${shell_mode} == "tcp" ]]; then
+        basic_information
+      elif [[ ${shell_mode} == "ws" ]]; then
+        basic_ws_information
+      fi
+    else
+      print_error "xray 配置文件不存在"
+    fi
     ;;
   31)
     bbr_boost_sh
