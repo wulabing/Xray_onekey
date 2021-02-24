@@ -6,6 +6,11 @@
 
 > Thanks for non-commercial open source development authorization by JetBrains!
 
+## 导入链接规范
+https://github.com/XTLS/Xray-core/issues/91
+
+> 截止 2021-2-24 仅有 V2RayN 4.12+ 及 V2RayNG 1.5.8+ 支持链接及二维码导入
+
 ### Telegram 群组
 * Telegram 交流群：https://t.me/wulabing_v2ray 
 * Telegram 更新公告频道：https://t.me/wulabing_channel
