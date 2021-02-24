@@ -80,4 +80,4 @@ https://bandwagonhost.com/aff.php?aff=63939
 
 ## Stargazers over time
 
-[![Stargazers over time](https://starchart.cc/wulabing/V2Ray_ws-tls_bash_onekey.svg)](https://starchart.cc/wulabing/V2Ray_ws-tls_bash_onekey)
+[![Stargazers over time](https://starchart.cc/wulabing/Xray_onekey.svg)](https://starchart.cc/wulabing/Xray_onekey)
