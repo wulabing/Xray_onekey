@@ -36,8 +36,8 @@
       },
       "streamSettings": {
         "network": "tcp",
-        "security": "tls",
-        "tlsSettings": {
+        "security": "xtls",
+        "xtlsSettings": {
           "minVersion": "1.3",
           "certificates": [
             {
