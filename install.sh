@@ -24,7 +24,7 @@ OK="${Green}[OK]${Font}"
 ERROR="${Red}[ERROR]${Font}"
 
 # 变量
-shell_version="1.1.2"
+shell_version="1.2.3"
 github_branch="main"
 version_cmp="/tmp/version_cmp.tmp"
 xray_conf_dir="/usr/local/etc/xray"
@@ -34,9 +34,22 @@ xray_error_log="/var/log/xray/error.log"
 cert_dir="/usr/local/etc/xray"
 domain_tmp_dir="/usr/local/etc/xray"
 cert_group="nobody"
+random_num=$((RANDOM % 12 + 4))
 
 VERSION=$(echo "${VERSION}" | awk -F "[()]" '{print $2}')
+WS_PATH="/$(head -n 10 /dev/urandom | md5sum | head -c ${random_num})/"
 
+function shell_mode_check() {
+  if [ -f ${xray_conf_dir}/config.json ]; then
+    if [ "$(grep -c "wsSettings" ${xray_conf_dir}/config.json)" -ge 1 ]; then
+      shell_mode="ws"
+    else
+      shell_mode="tcp"
+    fi
+  else
+    shell_mode="None"
+  fi
+}
 function print_ok() {
   echo -e "${OK} ${Blue} $1 ${Font}"
 }
@@ -262,9 +275,26 @@ function modify_UUID() {
   [ -z "$UUID" ] && UUID=$(cat /proc/sys/kernel/random/uuid)
   cat ${xray_conf_dir}/config.json | jq 'setpath(["inbounds",0,"settings","clients",0,"id"];"'${UUID}'")' >${xray_conf_dir}/config_tmp.json
   xray_tmp_config_file_check_and_use
-  judge "Xray UUID 修改"
+  judge "Xray TCP UUID 修改"
 }
 
+function modify_UUID_ws() {
+  cat ${xray_conf_dir}/config.json | jq 'setpath(["inbounds",1,"settings","clients",0,"id"];"'${UUID}'")' >${xray_conf_dir}/config_tmp.json
+  xray_tmp_config_file_check_and_use
+  judge "Xray ws UUID 修改"
+}
+
+function modify_fallback_ws() {
+  cat ${xray_conf_dir}/config.json | jq 'setpath(["inbounds",0,"settings","fallbacks",2,"path"];"'${WS_PATH}'")' >${xray_conf_dir}/config_tmp.json
+  xray_tmp_config_file_check_and_use
+  judge "Xray fallback_ws 修改"
+}
+
+function modify_ws() {
+  cat ${xray_conf_dir}/config.json | jq 'setpath(["inbounds",1,"streamSettings","wsSettings","path"];"'${WS_PATH}'")' >${xray_conf_dir}/config_tmp.json
+  xray_tmp_config_file_check_and_use
+  judge "Xray ws 修改"
+}
 function modify_tls_version() {
   cat ${xray_conf_dir}/config.json | jq 'setpath(["inbounds",0,"streamSettings","xtlsSettings","minVersion"];"'$1'")' >${xray_conf_dir}/config_tmp.json
   xray_tmp_config_file_check_and_use
@@ -313,6 +343,16 @@ function configure_xray() {
   cd /usr/local/etc/xray && rm -f config.json && wget -O config.json https://raw.githubusercontent.com/wulabing/Xray_onekey/${github_branch}/config/xray_xtls-rprx-direct.json
   modify_UUID
   modify_port
+  tls_type
+}
+
+function configure_xray_ws() {
+  cd /usr/local/etc/xray && rm -f config.json && wget -O config.json https://raw.githubusercontent.com/wulabing/Xray_onekey/${github_branch}/config/xray_tls_ws_mix-rprx-direct.json
+  modify_UUID
+  modify_UUID_ws
+  modify_port
+  modify_fallback_ws
+  modify_ws
   tls_type
 }
 
@@ -420,6 +460,7 @@ function configure_web() {
   judge "站点伪装"
   rm -f web.tar.gz
 }
+
 function xray_uninstall() {
   curl -L https://github.com/XTLS/Xray-install/raw/main/install-release.sh | bash -s -- remove --purge
   systemctl stop nginx
@@ -427,6 +468,7 @@ function xray_uninstall() {
   print_ok "卸载完成"
   exit 0
 }
+
 function restart_all() {
   systemctl restart nginx
   judge "Nginx 启动"
@@ -440,11 +482,17 @@ function vless_xtls-rprx-direct_link() {
   FLOW=$(cat ${xray_conf_dir}/config.json | jq .inbounds[0].settings.clients[0].flow | tr -d '"')
   DOMAIN=$(cat ${domain_tmp_dir}/domain)
 
-  print_ok "URL 链接（V2RayN/V2RayNG）"
-  print_ok "vless://$UUID@$DOMAIN:$PORT?security=xtls&flow=$FLOW#wulabing-$DOMAIN"
+  print_ok "URL 链接（VLESS + TCP +  TLS）"
+  print_ok "vless://$UUID@$DOMAIN:$PORT?security=tls&flow=$FLOW#TLS_wulabing-$DOMAIN"
 
-  print_ok "URL 二维码（V2RayN/V2RayNG）（请在浏览器中访问）"
-  print_ok "https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=vless://$UUID@$DOMAIN:$PORT?security=xtls%26flow=$FLOW%23wulabing-$DOMAIN"
+  print_ok "URL 链接（VLESS + TCP +  XTLS）"
+  print_ok "vless://$UUID@$DOMAIN:$PORT?security=xtls&flow=$FLOW#XTLS_wulabing-$DOMAIN"
+
+  print_ok "URL 二维码（VLESS + TCP + XTLS）（请在浏览器中访问）"
+  print_ok "https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=vless://$UUID@$DOMAIN:$PORT?security=tls%26flow=$FLOW%23TLS_wulabing-$DOMAIN"
+
+  print_ok "URL 二维码（VLESS + TCP + XTLS）（请在浏览器中访问）"
+  print_ok "https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=vless://$UUID@$DOMAIN:$PORT?security=xtls%26flow=$FLOW%23XTLS_wulabing-$DOMAIN"
 }
 
 function vless_xtls-rprx-direct_information() {
@@ -461,12 +509,66 @@ function vless_xtls-rprx-direct_information() {
   echo -e "${Red} 加密方式（security）：${Font} none "
   echo -e "${Red} 传输协议（network）：${Font} tcp "
   echo -e "${Red} 伪装类型（type）：${Font} none "
-  echo -e "${Red} 底层传输安全：${Font} xtls "
+  echo -e "${Red} 底层传输安全：${Font} xtls 或 tls"
 }
+
+function ws_information() {
+  UUID=$(cat ${xray_conf_dir}/config.json | jq .inbounds[0].settings.clients[0].id | tr -d '"')
+  PORT=$(cat ${xray_conf_dir}/config.json | jq .inbounds[0].port)
+  FLOW=$(cat ${xray_conf_dir}/config.json | jq .inbounds[0].settings.clients[0].flow | tr -d '"')
+  WS_PATH=$(cat ${xray_conf_dir}/config.json | jq .inbounds[0].settings.fallbacks[2].path | tr -d '"')
+  DOMAIN=$(cat ${domain_tmp_dir}/domain)
+
+  echo -e "${Red} Xray 配置信息 ${Font}"
+  echo -e "${Red} 地址（address）:${Font}  $DOMAIN"
+  echo -e "${Red} 端口（port）：${Font}  $PORT"
+  echo -e "${Red} 用户 ID（UUID）：${Font} $UUID"
+  echo -e "${Red} 加密方式（security）：${Font} none "
+  echo -e "${Red} 传输协议（network）：${Font} ws "
+  echo -e "${Red} 伪装类型（type）：${Font} none "
+  echo -e "${Red} 路径（path）：${Font} $WS_PATH "
+  echo -e "${Red} 底层传输安全：${Font} tls "
+}
+
+function ws_link() {
+  UUID=$(cat ${xray_conf_dir}/config.json | jq .inbounds[0].settings.clients[0].id | tr -d '"')
+  PORT=$(cat ${xray_conf_dir}/config.json | jq .inbounds[0].port)
+  FLOW=$(cat ${xray_conf_dir}/config.json | jq .inbounds[0].settings.clients[0].flow | tr -d '"')
+  WS_PATH=$(cat ${xray_conf_dir}/config.json | jq .inbounds[0].settings.fallbacks[2].path | tr -d '"')
+  WS_PATH_WITHOUT_SLASH=$(echo $WS_PATH | tr -d '/')
+  DOMAIN=$(cat ${domain_tmp_dir}/domain)
+
+  print_ok "URL 链接（VLESS + TCP + TLS）"
+  print_ok "vless://$UUID@$DOMAIN:$PORT?security=tls#TLS_wulabing-$DOMAIN"
+
+  print_ok "URL 链接（VLESS + TCP + XTLS）"
+  print_ok "vless://$UUID@$DOMAIN:$PORT?security=xtls&flow=$FLOW#XTLS_wulabing-$DOMAIN"
+
+  print_ok "URL 链接（VLESS + WebSocket + TLS）"
+  print_ok "vless://$UUID@$DOMAIN:$PORT?type=ws&security=tls&path=%2f${WS_PATH_WITHOUT_SLASH}%2f#WS_TLS_wulabing-$DOMAIN"
+  print_ok "-------------------------------------------------"
+  print_ok "URL 二维码（VLESS + TCP + TLS）（请在浏览器中访问）"
+  print_ok "https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=vless://$UUID@$DOMAIN:$PORT?security=tls%23TLS_wulabing-$DOMAIN"
+
+  print_ok "URL 二维码（VLESS + TCP + XTLS）（请在浏览器中访问）"
+  print_ok "https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=vless://$UUID@$DOMAIN:$PORT?security=xtls%26flow=$FLOW%23XTLS_wulabing-$DOMAIN"
+
+  print_ok "URL 二维码（VLESS + WebSocket + TLS）（请在浏览器中访问）"
+  print_ok "https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=vless://$UUID@$DOMAIN:$PORT?type=ws%26security=tls%26path=%2f${WS_PATH_WITHOUT_SLASH}%2f%23WS_TLS_wulabing-$DOMAIN"
+}
+
 function basic_information() {
   print_ok "VLESS+TCP+XTLS+Nginx 安装成功"
   vless_xtls-rprx-direct_information
   vless_xtls-rprx-direct_link
+}
+
+function basic_ws_information() {
+  print_ok "VLESS+TCP+TLS+Nginx with WebSocket 混合模式 安装成功"
+  ws_information
+  print_ok "————————————————————————"
+  vless_xtls-rprx-direct_information
+  ws_link
 }
 
 function show_access_log() {
@@ -500,24 +602,43 @@ function install_xray() {
   configure_web
   generate_certificate
   ssl_judge_and_install
-  #  Xray_qr_config
   restart_all
   basic_information
 }
-
+function install_xray_ws() {
+  is_root
+  system_check
+  dependency_install
+  basic_optimization
+  domain_check
+  port_exist_check 80
+  xray_install
+  configure_xray_ws
+  nginx_install
+  configure_nginx
+  configure_web
+  generate_certificate
+  ssl_judge_and_install
+  restart_all
+  basic_ws_information
+}
 menu() {
   update_sh
+  shell_mode_check
   echo -e "\t Xray 安装管理脚本 ${Red}[${shell_version}]${Font}"
   echo -e "\t---authored by wulabing---"
   echo -e "\thttps://github.com/wulabing\n"
 
+  echo -e "当前已安装版本：${shell_mode}"
   echo -e "—————————————— 安装向导 ——————————————"""
   echo -e "${Green}0.${Font}  升级 脚本"
-  echo -e "${Green}1.${Font}  安装 Xray (VLESS+TCP+XTLS+Nginx)"
+  echo -e "${Green}1.${Font}  安装 Xray (VLESS + TCP + XTLS / TLS + Nginx)"
+  echo -e "${Green}2.${Font}  安装 Xray (VLESS + TCP + XTLS / TLS + Nginx 及 VLESS + TCP + TLS + Nginx + WebSocket 回落并存模式)"
   echo -e "—————————————— 配置变更 ——————————————"
   echo -e "${Green}11.${Font} 变更 UUID"
   echo -e "${Green}12.${Font} 变更 TLS 最低适配版本"
   echo -e "${Green}13.${Font} 变更 连接端口"
+  echo -e "${Green}14.${Font} 变更 WebSocket PATH"
   echo -e "—————————————— 查看信息 ——————————————"
   echo -e "${Green}21.${Font} 查看 实时访问日志"
   echo -e "${Green}22.${Font} 查看 实时错误日志"
@@ -537,9 +658,17 @@ menu() {
   1)
     install_xray
     ;;
+  2)
+    install_xray_ws
+    ;;
   11)
     read -rp "请输入UUID:" UUID
-    modify_UUID
+    if [[ ${shell_mode} == "tcp" ]]; then
+      modify_UUID
+    elif [[ ${shell_mode} == "ws" ]]; then
+      modify_UUID
+      modify_UUID_ws
+    fi
     restart_all
     ;;
   12)
@@ -550,6 +679,16 @@ menu() {
     modify_port
     restart_all
     ;;
+  14)
+    if [[ ${shell_mode} == "ws" ]]; then
+      read -rp "请输入路径(示例：/wulabing/ 要求两侧都包含/):" WS_PATH
+      modify_fallback_ws
+      modify_ws
+      restart_all
+    else
+      print_error "当前模式不是Websocket模式"
+    fi
+    ;;
   21)
     tail -f $xray_access_log
     ;;
@@ -557,7 +696,15 @@ menu() {
     tail -f $xray_error_log
     ;;
   23)
-    [[ -f $xray_conf_dir/config.json ]] && basic_information || print_error "xray 配置文件不存在"
+    if [[ -f $xray_conf_dir/config.json ]]; then
+      if [[ ${shell_mode} == "tcp" ]]; then
+        basic_information
+      elif [[ ${shell_mode} == "ws" ]]; then
+        basic_ws_information
+      fi
+    else
+      print_error "xray 配置文件不存在"
+    fi
     ;;
   31)
     bbr_boost_sh
