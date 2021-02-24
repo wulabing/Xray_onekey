@@ -24,7 +24,7 @@ OK="${Green}[OK]${Font}"
 ERROR="${Red}[ERROR]${Font}"
 
 # 变量
-shell_version="1.2.2"
+shell_version="1.2.3"
 github_branch="main"
 version_cmp="/tmp/version_cmp.tmp"
 xray_conf_dir="/usr/local/etc/xray"
@@ -482,11 +482,17 @@ function vless_xtls-rprx-direct_link() {
   FLOW=$(cat ${xray_conf_dir}/config.json | jq .inbounds[0].settings.clients[0].flow | tr -d '"')
   DOMAIN=$(cat ${domain_tmp_dir}/domain)
 
-  print_ok "URL 链接（V2RayN/V2RayNG）"
-  print_ok "vless://$UUID@$DOMAIN:$PORT?security=xtls&flow=$FLOW#wulabing-$DOMAIN"
+  print_ok "URL 链接（VLESS + TCP +  TLS）"
+  print_ok "vless://$UUID@$DOMAIN:$PORT?security=tls&flow=$FLOW#TLS_wulabing-$DOMAIN"
 
-  print_ok "URL 二维码（V2RayN/V2RayNG）（请在浏览器中访问）"
-  print_ok "https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=vless://$UUID@$DOMAIN:$PORT?security=xtls%26flow=$FLOW%23wulabing-$DOMAIN"
+  print_ok "URL 链接（VLESS + TCP +  XTLS）"
+  print_ok "vless://$UUID@$DOMAIN:$PORT?security=xtls&flow=$FLOW#XTLS_wulabing-$DOMAIN"
+
+  print_ok "URL 二维码（VLESS + TCP + XTLS）（请在浏览器中访问）"
+  print_ok "https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=vless://$UUID@$DOMAIN:$PORT?security=tls%26flow=$FLOW%23TLS_wulabing-$DOMAIN"
+
+  print_ok "URL 二维码（VLESS + TCP + XTLS）（请在浏览器中访问）"
+  print_ok "https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=vless://$UUID@$DOMAIN:$PORT?security=xtls%26flow=$FLOW%23XTLS_wulabing-$DOMAIN"
 }
 
 function vless_xtls-rprx-direct_information() {
@@ -503,7 +509,7 @@ function vless_xtls-rprx-direct_information() {
   echo -e "${Red} 加密方式（security）：${Font} none "
   echo -e "${Red} 传输协议（network）：${Font} tcp "
   echo -e "${Red} 伪装类型（type）：${Font} none "
-  echo -e "${Red} 底层传输安全：${Font} xtls "
+  echo -e "${Red} 底层传输安全：${Font} xtls 或 tls"
 }
 
 function ws_information() {
@@ -533,16 +539,22 @@ function ws_link() {
   DOMAIN=$(cat ${domain_tmp_dir}/domain)
 
   print_ok "URL 链接（VLESS + TCP + TLS）"
-  print_ok "vless://$UUID@$DOMAIN:$PORT?security=tls#wulabing-$DOMAIN"
+  print_ok "vless://$UUID@$DOMAIN:$PORT?security=tls#TLS_wulabing-$DOMAIN"
+
+  print_ok "URL 链接（VLESS + TCP + XTLS）"
+  print_ok "vless://$UUID@$DOMAIN:$PORT?security=xtls&flow=$FLOW#XTLS_wulabing-$DOMAIN"
 
   print_ok "URL 链接（VLESS + WebSocket + TLS）"
-  print_ok "vless://$UUID@$DOMAIN:$PORT?type=ws&security=tls&path=%2f${WS_PATH_WITHOUT_SLASH}%2f#wulabing-$DOMAIN"
-
+  print_ok "vless://$UUID@$DOMAIN:$PORT?type=ws&security=tls&path=%2f${WS_PATH_WITHOUT_SLASH}%2f#WS_TLS_wulabing-$DOMAIN"
+  print_ok "-------------------------------------------------"
   print_ok "URL 二维码（VLESS + TCP + TLS）（请在浏览器中访问）"
-  print_ok "https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=vless://$UUID@$DOMAIN:$PORT?security=tls%23wulabing-$DOMAIN"
+  print_ok "https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=vless://$UUID@$DOMAIN:$PORT?security=tls%23TLS_wulabing-$DOMAIN"
+
+  print_ok "URL 二维码（VLESS + TCP + XTLS）（请在浏览器中访问）"
+  print_ok "https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=vless://$UUID@$DOMAIN:$PORT?security=xtls%26flow=$FLOW%23XTLS_wulabing-$DOMAIN"
 
   print_ok "URL 二维码（VLESS + WebSocket + TLS）（请在浏览器中访问）"
-  print_ok "https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=vless://$UUID@$DOMAIN:$PORT?type=ws%26security=tls%26path=%2f${WS_PATH_WITHOUT_SLASH}%2f%23wulabing-$DOMAIN"
+  print_ok "https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=vless://$UUID@$DOMAIN:$PORT?type=ws%26security=tls%26path=%2f${WS_PATH_WITHOUT_SLASH}%2f%23WS_TLS_wulabing-$DOMAIN"
 }
 
 function basic_information() {
@@ -554,6 +566,8 @@ function basic_information() {
 function basic_ws_information() {
   print_ok "VLESS+TCP+TLS+Nginx with WebSocket 混合模式 安装成功"
   ws_information
+  print_ok "————————————————————————"
+  vless_xtls-rprx-direct_information
   ws_link
 }
 
@@ -618,8 +632,8 @@ menu() {
   echo -e "当前已安装版本：${shell_mode}"
   echo -e "—————————————— 安装向导 ——————————————"""
   echo -e "${Green}0.${Font}  升级 脚本"
-  echo -e "${Green}1.${Font}  安装 Xray (VLESS + TCP+ XTLS + Nginx)"
-  echo -e "${Green}2.${Font}  安装 Xray (VLESS + TCP+ TLS + Nginx WebSocket 混合模式)"
+  echo -e "${Green}1.${Font}  安装 Xray (VLESS + TCP+ TLS / XTLS + Nginx)"
+  echo -e "${Green}2.${Font}  安装 Xray (VLESS + TCP+ TLS / XTLS  + Nginx WebSocket 混合模式)"
   echo -e "—————————————— 配置变更 ——————————————"
   echo -e "${Green}11.${Font} 变更 UUID"
   echo -e "${Green}12.${Font} 变更 TLS 最低适配版本"

@@ -15,9 +15,9 @@
 * 安装好 wget。
 
 ### 支持配置方式
-VLESS + TCP + XTLS + Nginx
+VLESS + TCP + XTLS / TLS  + Nginx
 
-VLESS + TCP + TLS 及 VLESS + TCP + TLS + Nginx + WebSocket 并存模式
+VLESS + TCP + XTLS / TLS  + Nginx 及 VLESS + TCP + TLS + Nginx + WebSocket 回落并存模式
 
 ### 安装/更新方式（Xray）
 
