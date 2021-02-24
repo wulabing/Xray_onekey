@@ -21,9 +21,9 @@ https://github.com/XTLS/Xray-core/issues/91
 > 截止 2021-2-24 仅有 V2RayN 4.12+ 及 V2RayNG 1.5.8+ 支持链接及二维码导入
 
 ### 支持配置方式
-VLESS + TCP + XTLS / TLS  + Nginx
+* VLESS + TCP + XTLS / TLS + Nginx
 
-VLESS + TCP + XTLS / TLS  + Nginx 及 VLESS + TCP + TLS + Nginx + WebSocket 回落并存模式
+* VLESS + TCP + XTLS / TLS + Nginx 及 VLESS + TCP + TLS + Nginx + WebSocket 回落并存模式
 
 ### 安装/更新方式（Xray）
 
@@ -68,13 +68,9 @@ Nginx 目录： `/etc/nginx`
 
 ### 捐赠
 
-您可以使用我的 搬瓦工 AFF 购买 VPS
+您可以使用我的 搬瓦工 AFF 购买 VPS： https://bandwagonhost.com/aff.php?aff=63939
 
-https://bandwagonhost.com/aff.php?aff=63939
-
-支持通过 Telegram MugglePay 接受虚拟货币捐赠。
-
-发送 `/pay @wulabing xxx` 到 @MugglePayBot 即可，默认货币为 USDT。
+支持通过 Telegram MugglePay 接受虚拟货币捐赠：发送 `/pay @wulabing xxx` 到 [@MugglePayBot](https://t.me/MugglePayBot) 即可，默认货币为 USDT。
 
 如需要通过支付宝/微信捐赠，请在 Telegram 私聊 [@wulabing](https://t.me/wulabing)，感谢您的支持！
 
