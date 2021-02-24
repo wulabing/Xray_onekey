@@ -633,7 +633,7 @@ menu() {
   echo -e "—————————————— 安装向导 ——————————————"""
   echo -e "${Green}0.${Font}  升级 脚本"
   echo -e "${Green}1.${Font}  安装 Xray (VLESS + TCP+ TLS / XTLS + Nginx)"
-  echo -e "${Green}2.${Font}  安装 Xray (VLESS + TCP+ TLS / XTLS  + Nginx WebSocket 混合模式)"
+  echo -e "${Green}2.${Font}  安装 Xray (VLESS + TCP + XTLS / TLS  + Nginx 及 VLESS + TCP + TLS + Nginx + WebSocket 回落并存模式)"
   echo -e "—————————————— 配置变更 ——————————————"
   echo -e "${Green}11.${Font} 变更 UUID"
   echo -e "${Green}12.${Font} 变更 TLS 最低适配版本"
