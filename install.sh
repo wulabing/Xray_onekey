@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 #====================================================
-#	System Request:Debian 9+/Ubuntu 18.04+/Centos 7+
+#	System Request: Debian 9+/Ubuntu 18.04+/Centos 7+
 #	Author:	wulabing
 #	Dscription: Xray onekey Management
 #	email: admin@wulabing.com
@@ -193,14 +193,14 @@ function basic_optimization() {
   echo '* soft nofile 65536' >>/etc/security/limits.conf
   echo '* hard nofile 65536' >>/etc/security/limits.conf
 
-  # 关闭 Selinux
+  # 关闭 SELinux
   if [[ "${ID}" == "centos" ]]; then
     sed -i 's/^SELINUX=.*/SELINUX=disabled/' /etc/selinux/config
     setenforce 0
   fi
 }
 function domain_check() {
-  read -rp "请输入你的域名信息(eg: www.wulabing.com):" domain
+  read -rp "请输入你的域名信息（eg: www.wulabing.com）：" domain
   domain_ip=$(ping "${domain}" -c 1 | sed '1{s/[^(]*(//;s/).*//;q}')
   print_ok "正在获取 IP 地址信息，请耐心等待"
   local_ip=$(curl https://api-ipv4.ip.sb/ip)
@@ -231,7 +231,7 @@ function port_exist_check() {
     print_ok "$1 端口未被占用"
     sleep 1
   else
-    print_error "检测到 $1 端口被占用，以下为 $1 端口占用信息"
+    print_error "检测到 $1 端口被占用，以下为 $1 端口占用信息："
     lsof -i:"$1"
     print_error "5s 后将尝试自动 kill 占用进程"
     sleep 5
@@ -267,7 +267,7 @@ function xray_tmp_config_file_check_and_use() {
   if [[ -s ${xray_conf_dir}/config_tmp.json ]]; then
     mv -f ${xray_conf_dir}/config_tmp.json ${xray_conf_dir}/config.json
   else
-    print_error "xray 配置文件修改异常"
+    print_error "Xray 配置文件修改异常"
   fi
 }
 
@@ -281,7 +281,7 @@ function modify_UUID() {
 function modify_UUID_ws() {
   cat ${xray_conf_dir}/config.json | jq 'setpath(["inbounds",1,"settings","clients",0,"id"];"'${UUID}'")' >${xray_conf_dir}/config_tmp.json
   xray_tmp_config_file_check_and_use
-  judge "Xray ws UUID 修改"
+  judge "Xray WebSocket UUID 修改"
 }
 
 function modify_fallback_ws() {
@@ -293,7 +293,7 @@ function modify_fallback_ws() {
 function modify_ws() {
   cat ${xray_conf_dir}/config.json | jq 'setpath(["inbounds",1,"streamSettings","wsSettings","path"];"'${WS_PATH}'")' >${xray_conf_dir}/config_tmp.json
   xray_tmp_config_file_check_and_use
-  judge "Xray ws 修改"
+  judge "Xray WebSocket 修改"
 }
 function modify_tls_version() {
   cat ${xray_conf_dir}/config.json | jq 'setpath(["inbounds",0,"streamSettings","xtlsSettings","minVersion"];"'$1'")' >${xray_conf_dir}/config_tmp.json
@@ -305,15 +305,15 @@ function configure_nginx() {
   nginx_conf="/etc/nginx/conf.d/${domain}.conf"
   cd /etc/nginx/conf.d/ && rm -f ${domain}.conf && wget -O ${domain}.conf https://raw.githubusercontent.com/wulabing/Xray_onekey/${github_branch}/config/web.conf
   sed -i "/server_name/c \\\tserver_name ${domain};" ${nginx_conf}
-  judge "Nginx config modify"
+  judge "Nginx 配置 修改"
 
   systemctl restart nginx
 }
 
 function tls_type() {
   echo "请选择支持的 TLS 版本（默认：TLS1.3 only）:"
-  echo "1: TLS1.1, TLS1.2 and TLS1.3（兼容模式）"
-  echo "2: TLS1.2 and TLS1.3 (兼容模式)"
+  echo "1: TLS1.1, TLS1.2 and TLS1.3 （兼容模式）"
+  echo "2: TLS1.2 and TLS1.3 （兼容模式）"
   echo "3: TLS1.3 only"
   read -rp "请输入：" tls_version
   [[ -z ${tls_version} ]] && tls_version=3
@@ -413,7 +413,7 @@ function ssl_judge_and_install() {
     case $ssl_delete in
     [yY][eE][sS] | [yY])
       rm -rf /ssl/*
-      print_ok "已删除"
+      print_ok "证书文件已删除"
       ;;
     *) ;;
 
@@ -572,11 +572,11 @@ function basic_ws_information() {
 }
 
 function show_access_log() {
-  [ -f ${xray_access_log} ] && tail -f ${xray_access_log} || echo -e "${RedBG}log文件不存在${Font}"
+  [ -f ${xray_access_log} ] && tail -f ${xray_access_log} || echo -e "${RedBG}log 文件不存在${Font}"
 }
 
 function show_error_log() {
-  [ -f ${xray_error_log} ] && tail -f ${xray_error_log} || echo -e "${RedBG}log文件不存在${Font}"
+  [ -f ${xray_error_log} ] && tail -f ${xray_error_log} || echo -e "${RedBG}log 文件不存在${Font}"
 }
 
 function bbr_boost_sh() {
@@ -638,7 +638,7 @@ menu() {
   echo -e "${Green}11.${Font} 变更 UUID"
   echo -e "${Green}12.${Font} 变更 TLS 最低适配版本"
   echo -e "${Green}13.${Font} 变更 连接端口"
-  echo -e "${Green}14.${Font} 变更 WebSocket PATH"
+  echo -e "${Green}14.${Font} 变更 WebSocket PATH （路径）"
   echo -e "—————————————— 查看信息 ——————————————"
   echo -e "${Green}21.${Font} 查看 实时访问日志"
   echo -e "${Green}22.${Font} 查看 实时错误日志"
@@ -662,7 +662,7 @@ menu() {
     install_xray_ws
     ;;
   11)
-    read -rp "请输入UUID:" UUID
+    read -rp "请输入UUID：" UUID
     if [[ ${shell_mode} == "tcp" ]]; then
       modify_UUID
     elif [[ ${shell_mode} == "ws" ]]; then
@@ -681,12 +681,12 @@ menu() {
     ;;
   14)
     if [[ ${shell_mode} == "ws" ]]; then
-      read -rp "请输入路径(示例：/wulabing/ 要求两侧都包含/):" WS_PATH
+      read -rp "请输入路径（示例：/wulabing/ 要求两侧都包含/）：" WS_PATH
       modify_fallback_ws
       modify_ws
       restart_all
     else
-      print_error "当前模式不是Websocket模式"
+      print_error "当前模式不是 WebSocket 模式"
     fi
     ;;
   21)
@@ -703,7 +703,7 @@ menu() {
         basic_ws_information
       fi
     else
-      print_error "xray 配置文件不存在"
+      print_error "Xray 配置文件不存在"
     fi
     ;;
   31)
