@@ -483,8 +483,8 @@ function vless_xtls-rprx-direct_link() {
 
   print_ok "URL 链接（VLESS + TCP +  XTLS）"
   print_ok "vless://$UUID@$DOMAIN:$PORT?security=xtls&flow=$FLOW#XTLS_wulabing-$DOMAIN"
-
-  print_ok "URL 二维码（VLESS + TCP + XTLS）（请在浏览器中访问）"
+  print_ok "-------------------------------------------------"
+  print_ok "URL 二维码（VLESS + TCP + TLS）（请在浏览器中访问）"
   print_ok "https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=vless://$UUID@$DOMAIN:$PORT?security=tls%26flow=$FLOW%23TLS_wulabing-$DOMAIN"
 
   print_ok "URL 二维码（VLESS + TCP + XTLS）（请在浏览器中访问）"
