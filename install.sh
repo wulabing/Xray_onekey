@@ -27,7 +27,7 @@ OK="${Green}[OK]${Font}"
 ERROR="${Red}[ERROR]${Font}"
 
 # 变量
-shell_version="1.2.4"
+shell_version="1.2.5"
 github_branch="main"
 xray_conf_dir="/usr/local/etc/xray"
 website_dir="/www/xray_web/"
@@ -642,7 +642,7 @@ menu() {
   #    echo -e "${Green}23.${Font}  查看 V2Ray 配置信息"
   echo -e "—————————————— 其他选项 ——————————————"
   echo -e "${Green}31.${Font} 安装 4 合 1 BBR、锐速安装脚本"
-  echo -e "${Green}32.${Font} 安装 MTproxy（支持 TLS 混淆）"
+  echo -e "${Yellow}32.${Font} 安装 MTproxy(不推荐使用,请相关用户关闭或卸载)"
   echo -e "${Green}33.${Font} 卸载 Xray"
   echo -e "${Green}34.${Font} 更新 Xray-core"
   echo -e "${Green}40.${Font} 退出"
