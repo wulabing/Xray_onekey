@@ -27,7 +27,7 @@ OK="${Green}[OK]${Font}"
 ERROR="${Red}[ERROR]${Font}"
 
 # 变量
-shell_version="1.2.5"
+shell_version="1.2.6"
 github_branch="main"
 xray_conf_dir="/usr/local/etc/xray"
 website_dir="/www/xray_web/"
@@ -439,9 +439,10 @@ function ssl_judge_and_install() {
 }
 
 function generate_certificate() {
-  openssl genrsa -out $cert_dir/self_signed_key.pem 2048
-  openssl req -new -x509 -days 3650 -key $cert_dir/self_signed_key.pem -out $cert_dir/self_signed_cert.pem -subj "/CN=$local_ip"
-  [[ ! -f "$cert_dir/self_signed_cert.pem" || ! -f "$cert_dir/self_signed_key.pem" ]] && print_error "生成自签名证书失败"
+  signedcert=$(xray tls cert -domain="$local_ip" -name="$local_ip" -org="$local_ip" -expire=87600h)
+  echo $signedcert | jq '.certificate[]' | sed 's/\"//g' | tee $cert_dir/self_signed_cert.pem
+  echo $signedcert | jq '.key[]' | sed 's/\"//g' > $cert_dir/self_signed_key.pem
+  openssl x509 -in $cert_dir/self_signed_cert.pem -noout || print_error "生成自签名证书失败"
   print_ok "生成自签名证书成功"
   chown nobody.$cert_group $cert_dir/self_signed_cert.pem
   chown nobody.$cert_group $cert_dir/self_signed_key.pem
@@ -645,6 +646,7 @@ menu() {
   echo -e "${Yellow}32.${Font} 安装 MTproxy(不推荐使用,请相关用户关闭或卸载)"
   echo -e "${Green}33.${Font} 卸载 Xray"
   echo -e "${Green}34.${Font} 更新 Xray-core"
+  echo -e "${Green}35.${Font} 安装 Xray-core 测试版(Pre)"
   echo -e "${Green}40.${Font} 退出"
   read -rp "请输入数字：" menu_num
   case $menu_num in
@@ -712,7 +714,11 @@ menu() {
     xray_uninstall
     ;;
   34)
-    curl -L https://github.com/XTLS/Xray-install/raw/main/install-release.sh | bash -s -- install
+    bash -c "$(curl -L https://github.com/XTLS/Xray-install/raw/main/install-release.sh)" - install
+    restart_all
+    ;;
+  35)
+    bash -c "$(curl -L https://github.com/XTLS/Xray-install/raw/main/install-release.sh)" - install --beta
     restart_all
     ;;
   40)
