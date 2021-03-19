@@ -542,7 +542,7 @@ function ws_link() {
   print_ok "vless://$UUID@$DOMAIN:$PORT?security=xtls&flow=$FLOW#XTLS_wulabing-$DOMAIN"
 
   print_ok "URL 链接（VLESS + WebSocket + TLS）"
-  print_ok "vless://$UUID@$DOMAIN:$PORT?type=ws&security=tls&path=%2f${WS_PATH_WITHOUT_SLASH}%2f#WS_TLS_wulabing-$DOMAIN"
+  print_ok "vless://$UUID@$DOMAIN:$PORT?type=ws&security=tls&path=%2f${WS_PATH_WITHOUT_SLASH}%3Fed%3D2048%2f#WS_TLS_wulabing-$DOMAIN"
   print_ok "-------------------------------------------------"
   print_ok "URL 二维码（VLESS + TCP + TLS）（请在浏览器中访问）"
   print_ok "https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=vless://$UUID@$DOMAIN:$PORT?security=tls%23TLS_wulabing-$DOMAIN"
