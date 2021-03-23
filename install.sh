@@ -27,7 +27,7 @@ OK="${Green}[OK]${Font}"
 ERROR="${Red}[ERROR]${Font}"
 
 # 变量
-shell_version="1.2.6"
+shell_version="1.2.7"
 github_branch="main"
 xray_conf_dir="/usr/local/etc/xray"
 website_dir="/www/xray_web/"
@@ -205,7 +205,7 @@ function domain_check() {
   read -rp "请输入你的域名信息(eg: www.wulabing.com):" domain
   domain_ip=$(ping "${domain}" -c 1 | sed '1{s/[^(]*(//;s/).*//;q}')
   print_ok "正在获取 IP 地址信息，请耐心等待"
-  local_ip=$(curl https://api-ipv4.ip.sb/ip)
+  local_ip=$(curl -4 ip.sb)
   echo -e "域名通过 DNS 解析的 IP 地址：${domain_ip}"
   echo -e "本机公网 IP 地址： ${local_ip}"
   sleep 2
