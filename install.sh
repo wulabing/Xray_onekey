@@ -27,7 +27,7 @@ OK="${Green}[OK]${Font}"
 ERROR="${Red}[ERROR]${Font}"
 
 # 变量
-shell_version="1.2.7"
+shell_version="1.2.8"
 github_branch="main"
 xray_conf_dir="/usr/local/etc/xray"
 website_dir="/www/xray_web/"
@@ -451,8 +451,7 @@ function generate_certificate() {
 function configure_web() {
   rm -rf /www/xray_web
   mkdir -p /www/xray_web
-  # 该处保留引用源
-  wget -O web.tar.gz https://github.com/jiuqi9997/Xray-yes/raw/main/web.tar.gz
+  wget -O web.tar.gz https://raw.githubusercontent.com/wulabing/Xray_onekey/main/basic/web.tar.gz
   tar xzf web.tar.gz -C /www/xray_web
   judge "站点伪装"
   rm -f web.tar.gz
