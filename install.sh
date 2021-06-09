@@ -27,7 +27,7 @@ OK="${Green}[OK]${Font}"
 ERROR="${Red}[ERROR]${Font}"
 
 # 变量
-shell_version="1.2.9"
+shell_version="1.2.10"
 github_branch="main"
 xray_conf_dir="/usr/local/etc/xray"
 website_dir="/www/xray_web/"
@@ -303,8 +303,11 @@ function modify_tls_version() {
 
 function configure_nginx() {
   nginx_conf="/etc/nginx/conf.d/${domain}.conf"
+  nginx_conf_2="/etc/nginx/conf.d/${domain}_2.conf"
   cd /etc/nginx/conf.d/ && rm -f ${domain}.conf && wget -O ${domain}.conf https://raw.githubusercontent.com/wulabing/Xray_onekey/${github_branch}/config/web.conf
+  cd /etc/nginx/conf.d/ && rm -f ${domain}_2.conf && wget -O ${domain}_2.conf https://raw.githubusercontent.com/wulabing/Xray_onekey/${github_branch}/config/web2.conf
   sed -i "/server_name/c \\\tserver_name ${domain};" ${nginx_conf}
+  sed -i "/server_name/c \\\tserver_name ${domain};" ${nginx_conf_2}
   judge "Nginx config modify"
 
   systemctl restart nginx
@@ -381,7 +384,7 @@ function ssl_install() {
 
 function acme() {
 
-  sed -i "27s/^/#/" "$nginx_conf"
+  sed -i "6s/^/#/" "$nginx_conf"
 
   # 启动 Nginx Xray 并使用 Nginx 配合 acme 进行证书签发
   systemctl restart nginx
@@ -400,7 +403,7 @@ function acme() {
     exit 1
   fi
 
-  sed -i "27s/#//" "$nginx_conf"
+  sed -i "6s/#//" "$nginx_conf"
 }
 
 function ssl_judge_and_install() {
