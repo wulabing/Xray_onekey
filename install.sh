@@ -27,7 +27,7 @@ OK="${Green}[OK]${Font}"
 ERROR="${Red}[ERROR]${Font}"
 
 # 变量
-shell_version="1.2.8"
+shell_version="1.2.9"
 github_branch="main"
 xray_conf_dir="/usr/local/etc/xray"
 website_dir="/www/xray_web/"
@@ -175,9 +175,9 @@ function dependency_install() {
   #  judge "编译工具包 安装"
 
   if [[ "${ID}" == "centos" ]]; then
-    ${INS} pcre pcre-devel zlib-devel epel-release openssl openssl-devel
+    ${INS} pcre pcre-devel zlib-devel epel-release openssl openssl-devel iputils
   else
-    ${INS} libpcre3 libpcre3-dev zlib1g-dev openssl libssl-dev
+    ${INS} libpcre3 libpcre3-dev zlib1g-dev openssl libssl-dev iputils-ping
   fi
 
   ${INS} jq
@@ -381,7 +381,7 @@ function ssl_install() {
 
 function acme() {
 
-  sed -i "6s/^/#/" "$nginx_conf"
+  sed -i "27s/^/#/" "$nginx_conf"
 
   # 启动 Nginx Xray 并使用 Nginx 配合 acme 进行证书签发
   systemctl restart nginx
@@ -400,7 +400,7 @@ function acme() {
     exit 1
   fi
 
-  sed -i "6s/#//" "$nginx_conf"
+  sed -i "27s/#//" "$nginx_conf"
 }
 
 function ssl_judge_and_install() {
@@ -646,6 +646,7 @@ menu() {
   echo -e "${Green}33.${Font} 卸载 Xray"
   echo -e "${Green}34.${Font} 更新 Xray-core"
   echo -e "${Green}35.${Font} 安装 Xray-core 测试版(Pre)"
+  echo -e "${Green}36.${Font} 手动更新SSL证书"
   echo -e "${Green}40.${Font} 退出"
   read -rp "请输入数字：" menu_num
   case $menu_num in
@@ -718,6 +719,10 @@ menu() {
     ;;
   35)
     bash -c "$(curl -L https://github.com/XTLS/Xray-install/raw/main/install-release.sh)" - install --beta
+    restart_all
+    ;;
+  36)
+    acme.sh --cron
     restart_all
     ;;
   40)
