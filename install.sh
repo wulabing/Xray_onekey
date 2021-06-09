@@ -27,7 +27,7 @@ OK="${Green}[OK]${Font}"
 ERROR="${Red}[ERROR]${Font}"
 
 # 变量
-shell_version="1.2.10"
+shell_version="1.2.11"
 github_branch="main"
 xray_conf_dir="/usr/local/etc/xray"
 website_dir="/www/xray_web/"
@@ -725,7 +725,7 @@ menu() {
     restart_all
     ;;
   36)
-    acme.sh --cron
+    "/root/.acme.sh"/acme.sh --cron --home "/root/.acme.sh"
     restart_all
     ;;
   40)
