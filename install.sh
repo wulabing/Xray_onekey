@@ -382,7 +382,8 @@ function ssl_install() {
 function acme() {
 
   sed -i "6s/^/#/" "$nginx_conf"
-  sed -i "6a\\troot $website_dir;" "$nginx_conf"
+  sed -i "6a\\\troot $website_dir;" "$nginx_conf"
+  systemctl restart nginx
 
   if "$HOME"/.acme.sh/acme.sh --issue -d "${domain}" --webroot "$website_dir" -k ec-256 --force; then
     print_ok "SSL 证书生成成功"
