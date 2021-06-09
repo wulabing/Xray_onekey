@@ -27,7 +27,7 @@ OK="${Green}[OK]${Font}"
 ERROR="${Red}[ERROR]${Font}"
 
 # 变量
-shell_version="1.2.11"
+shell_version="1.2.12"
 github_branch="main"
 xray_conf_dir="/usr/local/etc/xray"
 website_dir="/www/xray_web/"
@@ -303,11 +303,8 @@ function modify_tls_version() {
 
 function configure_nginx() {
   nginx_conf="/etc/nginx/conf.d/${domain}.conf"
-  nginx_conf_2="/etc/nginx/conf.d/${domain}_2.conf"
   cd /etc/nginx/conf.d/ && rm -f ${domain}.conf && wget -O ${domain}.conf https://raw.githubusercontent.com/wulabing/Xray_onekey/${github_branch}/config/web.conf
-  cd /etc/nginx/conf.d/ && rm -f ${domain}_2.conf && wget -O ${domain}_2.conf https://raw.githubusercontent.com/wulabing/Xray_onekey/${github_branch}/config/web2.conf
-  sed -i "/server_name/c \\\tserver_name ${domain};" ${nginx_conf}
-  sed -i "/server_name/c \\\tserver_name ${domain};" ${nginx_conf_2}
+  sed -i "s/xxx/${domain}/g" ${nginx_conf}
   judge "Nginx config modify"
 
   systemctl restart nginx
@@ -385,12 +382,9 @@ function ssl_install() {
 function acme() {
 
   sed -i "6s/^/#/" "$nginx_conf"
+  sed -i "6a\\troot $website_dir;" "$nginx_conf"
 
-  # 启动 Nginx Xray 并使用 Nginx 配合 acme 进行证书签发
-  systemctl restart nginx
-  systemctl restart xray
-
-  if "$HOME"/.acme.sh/acme.sh --issue -d "${domain}" --nginx -k ec-256 --force; then
+  if "$HOME"/.acme.sh/acme.sh --issue -d "${domain}" --webroot "$website_dir" -k ec-256 --force; then
     print_ok "SSL 证书生成成功"
     sleep 2
     if "$HOME"/.acme.sh/acme.sh --installcert -d "${domain}" --fullchainpath /ssl/xray.crt --keypath /ssl/xray.key --reloadcmd "systemctl restart xray" --ecc --force; then
@@ -403,6 +397,7 @@ function acme() {
     exit 1
   fi
 
+  sed -i "7d" "$nginx_conf"
   sed -i "6s/#//" "$nginx_conf"
 }
 
