@@ -27,7 +27,7 @@ OK="${Green}[OK]${Font}"
 ERROR="${Red}[ERROR]${Font}"
 
 # 变量
-shell_version="1.2.16"
+shell_version="1.2.17"
 github_branch="main"
 xray_conf_dir="/usr/local/etc/xray"
 website_dir="/www/xray_web/"
@@ -458,7 +458,7 @@ function configure_web() {
 function xray_uninstall() {
   curl -L https://github.com/XTLS/Xray-install/raw/main/install-release.sh | bash -s -- remove --purge
   rm -rf $website_dir
-  print_ok "是否卸载nginx"
+  print_ok "是否卸载nginx [Y/N]?"
   read -r uninstall_nginx
   case $uninstall_nginx in
   [yY][eE][sS] | [yY])
@@ -471,7 +471,7 @@ function xray_uninstall() {
       ;;
   *) ;;
   esac
-  print_ok "是否卸载acme.sh"
+  print_ok "是否卸载acme.sh [Y/N]?"
   read -r uninstall_acme
   case $uninstall_acme in
   [yY][eE][sS] | [yY])
