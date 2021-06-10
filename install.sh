@@ -27,7 +27,7 @@ OK="${Green}[OK]${Font}"
 ERROR="${Red}[ERROR]${Font}"
 
 # 变量
-shell_version="1.2.14"
+shell_version="1.2.15"
 github_branch="main"
 xray_conf_dir="/usr/local/etc/xray"
 website_dir="/www/xray_web/"
@@ -255,7 +255,6 @@ function update_sh() {
       exit 0
       ;;
     *) ;;
-
     esac
   else
     print_ok "当前版本为最新版本"
@@ -459,12 +458,27 @@ function configure_web() {
 function xray_uninstall() {
   curl -L https://github.com/XTLS/Xray-install/raw/main/install-release.sh | bash -s -- remove --purge
   rm -rf $website_dir
-  if [[ "${ID}" == "centos" ]]; then
-    yum remove nginx -y
-    rm -rf /etc/nginx
-  else
-    apt purge nginx -y
-  fi
+  read -rp "是否卸载nginx" uninstall_nginx
+  case $uninstall_nginx in
+  [yY][eE][sS] | [yY])
+      if [[ "${ID}" == "centos" ]]; then
+        yum remove nginx -y
+        rm -rf /etc/nginx
+      else
+        apt purge nginx -y
+      fi
+      ;;
+  *) ;;
+  esac
+  read -rp "是否卸载acme.sh" uninstall_acme
+  case $uninstall_acme in
+  [yY][eE][sS] | [yY])
+      /root/.acme.sh/acme.sh --uninstall
+      rm -rf /root/.acme.sh
+      rm -rf /ssl/
+      ;;
+  *) ;;
+  esac
   print_ok "卸载完成"
   exit 0
 }
@@ -715,6 +729,7 @@ menu() {
     mtproxy_sh
     ;;
   33)
+    source '/etc/os-release'
     xray_uninstall
     ;;
   34)
