@@ -27,7 +27,7 @@ OK="${Green}[OK]${Font}"
 ERROR="${Red}[ERROR]${Font}"
 
 # 变量
-shell_version="1.2.15"
+shell_version="1.2.16"
 github_branch="main"
 xray_conf_dir="/usr/local/etc/xray"
 website_dir="/www/xray_web/"
@@ -405,8 +405,8 @@ function ssl_judge_and_install() {
 
   mkdir -p /ssl
   if [[ -f "/ssl/xray.key" || -f "/ssl/xray.crt" ]]; then
-    echo "/ssl 目录下证书文件已存在"
-    print_ok "是否删除 [Y/N]?"
+    print_ok "/ssl 目录下证书文件已存在"
+    print_ok "是否删除 /ssl 目录下的证书文件 [Y/N]?"
     read -r ssl_delete
     case $ssl_delete in
     [yY][eE][sS] | [yY])
