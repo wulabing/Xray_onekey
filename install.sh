@@ -458,7 +458,8 @@ function configure_web() {
 function xray_uninstall() {
   curl -L https://github.com/XTLS/Xray-install/raw/main/install-release.sh | bash -s -- remove --purge
   rm -rf $website_dir
-  read -rp "是否卸载nginx" uninstall_nginx
+  print_ok "是否卸载nginx"
+  read -r uninstall_nginx
   case $uninstall_nginx in
   [yY][eE][sS] | [yY])
       if [[ "${ID}" == "centos" ]]; then
@@ -470,7 +471,8 @@ function xray_uninstall() {
       ;;
   *) ;;
   esac
-  read -rp "是否卸载acme.sh" uninstall_acme
+  print_ok "是否卸载acme.sh"
+  read -r uninstall_acme
   case $uninstall_acme in
   [yY][eE][sS] | [yY])
       /root/.acme.sh/acme.sh --uninstall
