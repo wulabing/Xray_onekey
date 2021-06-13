@@ -27,7 +27,7 @@ OK="${Green}[OK]${Font}"
 ERROR="${Red}[ERROR]${Font}"
 
 # 变量
-shell_version="1.2.17"
+shell_version="1.3.0"
 github_branch="main"
 xray_conf_dir="/usr/local/etc/xray"
 website_dir="/www/xray_web/"
@@ -383,6 +383,15 @@ function acme() {
   sed -i "6s/^/#/" "$nginx_conf"
   sed -i "6a\\\troot $website_dir;" "$nginx_conf"
   systemctl restart nginx
+
+  if "$HOME"/.acme.sh/acme.sh --register-account -m test@example.com; then
+    print_ok "acme 账号注册成功"
+    sleep 1
+  else
+    print_error "acme 账号注册失败"
+    exit 1
+  fi
+
 
   if "$HOME"/.acme.sh/acme.sh --issue -d "${domain}" --webroot "$website_dir" -k ec-256 --force; then
     print_ok "SSL 证书生成成功"
