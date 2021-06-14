@@ -27,7 +27,7 @@ OK="${Green}[OK]${Font}"
 ERROR="${Red}[ERROR]${Font}"
 
 # 变量
-shell_version="1.3.1"
+shell_version="1.3.2"
 github_branch="main"
 xray_conf_dir="/usr/local/etc/xray"
 website_dir="/www/xray_web/"
@@ -374,7 +374,8 @@ function ssl_install() {
   #  fi
   #  judge "安装 SSL 证书生成脚本依赖"
 
-  curl https://get.acme.sh | sh -s email=my@example.com
+  read -rp "请输入用于注册域名的邮箱:" domain_email
+  curl https://get.acme.sh | sh -s email=$domain_email
   judge "安装 SSL 证书生成脚本"
 }
 
