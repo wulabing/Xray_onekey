@@ -448,6 +448,7 @@ function generate_certificate() {
     print_ok "生成自签名证书成功"
   else
     print_error "生成自签名证书失败"
+    exit 1
   fi
 
   chown nobody.$cert_group $cert_dir/self_signed_cert.pem
