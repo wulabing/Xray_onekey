@@ -27,7 +27,7 @@ OK="${Green}[OK]${Font}"
 ERROR="${Red}[ERROR]${Font}"
 
 # 变量
-shell_version="1.3.2"
+shell_version="1.3.3"
 github_branch="main"
 xray_conf_dir="/usr/local/etc/xray"
 website_dir="/www/xray_web/"
@@ -186,6 +186,9 @@ function dependency_install() {
     wget -P /usr/bin https://raw.githubusercontent.com/wulabing/Xray_onekey/${github_branch}/binary/jq && chmod +x /usr/bin/jq
     judge "安装 jq"
   fi
+
+  # 防止部分系统xray的默认bin目录缺失
+  mkdir /usr/local/bin >/dev/null 2>&1
 }
 
 function basic_optimization() {
@@ -374,7 +377,7 @@ function ssl_install() {
   #  fi
   #  judge "安装 SSL 证书生成脚本依赖"
 
-  read -rp "请输入用于注册域名的邮箱:" domain_email
+  read -rp "请输入用于注册域名的邮箱(eg:xxx@gmail.com):" domain_email
   curl https://get.acme.sh | sh -s email=$domain_email
   judge "安装 SSL 证书生成脚本"
 }
@@ -441,8 +444,12 @@ function generate_certificate() {
   signedcert=$(xray tls cert -domain="$local_ip" -name="$local_ip" -org="$local_ip" -expire=87600h)
   echo $signedcert | jq '.certificate[]' | sed 's/\"//g' | tee $cert_dir/self_signed_cert.pem
   echo $signedcert | jq '.key[]' | sed 's/\"//g' > $cert_dir/self_signed_key.pem
-  openssl x509 -in $cert_dir/self_signed_cert.pem -noout || print_error "生成自签名证书失败"
-  print_ok "生成自签名证书成功"
+  if openssl x509 -in $cert_dir/self_signed_cert.pem -noout;then
+    print_ok "生成自签名证书成功"
+  else
+    print_error "生成自签名证书失败"
+  fi
+
   chown nobody.$cert_group $cert_dir/self_signed_cert.pem
   chown nobody.$cert_group $cert_dir/self_signed_key.pem
 }
