@@ -34,7 +34,7 @@ wget -N --no-check-certificate -q -O install.sh "https://raw.githubusercontent.c
 ### 注意事项
 * 如果你不了解脚本中各项设置的具体含义，除域名外，请使用脚本提供的默认值；
 * 使用本脚本需要你拥有 Linux 基础及使用经验，了解计算机网络部分知识，计算机基础操作；
-* 目前支持 Debian 9+ / Ubuntu 18.04+ / Centos7+；
+* 目前支持 Debian 9+ / Ubuntu 18.04+ / Centos7+ / Oracle Linux 7+；
 * 群主仅提供极其有限的支持，如有问题可以询问群友。
 
 ### 鸣谢

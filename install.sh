@@ -27,7 +27,7 @@ OK="${Green}[OK]${Font}"
 ERROR="${Red}[ERROR]${Font}"
 
 # 变量
-shell_version="1.3.3"
+shell_version="1.3.4"
 github_branch="main"
 xray_conf_dir="/usr/local/etc/xray"
 website_dir="/www/xray_web/"
@@ -86,6 +86,10 @@ function system_check() {
     print_ok "当前系统为 Centos ${VERSION_ID} ${VERSION}"
     INS="yum install -y"
     wget -N -P /etc/yum.repos.d/ https://raw.githubusercontent.com/wulabing/Xray_onekey/${github_branch}/basic/nginx.repo
+  elif [[ "${ID}" == "ol" ]]; then
+    print_ok "当前系统为 Oracle Linux ${VERSION_ID} ${VERSION}"
+    INS="yum install -y"
+    wget -N -P /etc/yum.repos.d/ https://raw.githubusercontent.com/wulabing/Xray_onekey/${github_branch}/basic/nginx.repo
   elif [[ "${ID}" == "debian" && ${VERSION_ID} -ge 9 ]]; then
     print_ok "当前系统为 Debian ${VERSION_ID} ${VERSION}"
     INS="apt install -y"
@@ -139,14 +143,14 @@ function dependency_install() {
   ${INS} wget lsof tar
   judge "安装 wget lsof tar"
 
-  if [[ "${ID}" == "centos" ]]; then
+  if [[ "${ID}" == "centos" || "${ID}" == "ol" ]]; then
     ${INS} crontabs
   else
     ${INS} cron
   fi
   judge "安装 crontab"
 
-  if [[ "${ID}" == "centos" ]]; then
+  if [[ "${ID}" == "centos" || "${ID}" == "ol" ]]; then
     touch /var/spool/cron/root && chmod 600 /var/spool/cron/root
     systemctl start crond && systemctl enable crond
   else
@@ -167,7 +171,7 @@ function dependency_install() {
   judge "安装/升级 systemd"
 
   # Nginx 后置 无需编译 不再需要
-  #  if [[ "${ID}" == "centos" ]]; then
+  #  if [[ "${ID}" == "centos" ||  "${ID}" == "ol" ]]; then
   #    yum -y groupinstall "Development tools"
   #  else
   #    ${INS} build-essential
@@ -176,6 +180,11 @@ function dependency_install() {
 
   if [[ "${ID}" == "centos" ]]; then
     ${INS} pcre pcre-devel zlib-devel epel-release openssl openssl-devel iputils
+  elif [[ "${ID}" == "ol" ]]; then
+    ${INS} pcre pcre-devel zlib-devel openssl openssl-devel iputils
+    # Oracle Linux 不同日期版本的 VERSION_ID 比较乱 直接暴力处理
+    yum-config-manager --enable ol7_developer_EPEL >/dev/null 2>&1
+    yum-config-manager --enable ol8_developer_EPEL >/dev/null 2>&1
   else
     ${INS} libpcre3 libpcre3-dev zlib1g-dev openssl libssl-dev iputils-ping
   fi
@@ -199,7 +208,7 @@ function basic_optimization() {
   echo '* hard nofile 65536' >>/etc/security/limits.conf
 
   # 关闭 Selinux
-  if [[ "${ID}" == "centos" ]]; then
+  if [[ "${ID}" == "centos" || "${ID}" == "ol" ]]; then
     sed -i 's/^SELINUX=.*/SELINUX=disabled/' /etc/selinux/config
     setenforce 0
   fi
@@ -370,19 +379,20 @@ function xray_install() {
 
 function ssl_install() {
   #  使用 Nginx 配合签发 无需安装相关依赖
-  #  if [[ "${ID}" == "centos" ]]; then
+  #  if [[ "${ID}" == "centos" ||  "${ID}" == "ol" ]]; then
   #    ${INS} socat nc
   #  else
   #    ${INS} socat netcat
   #  fi
   #  judge "安装 SSL 证书生成脚本依赖"
 
-  read -rp "请输入用于注册域名的邮箱(eg:xxx@gmail.com):" domain_email
+  read -rp "请输入用于注册域名证书的邮箱(eg:xxx@gmail.com 可按照邮箱格式随意填写):" domain_email
   curl https://get.acme.sh | sh -s email=$domain_email
   judge "安装 SSL 证书生成脚本"
 }
 
 function acme() {
+  "$HOME"/.acme.sh/acme.sh --set-default-ca --server letsencrypt
 
   sed -i "6s/^/#/" "$nginx_conf"
   sed -i "6a\\\troot $website_dir;" "$nginx_conf"
@@ -407,7 +417,7 @@ function acme() {
 
 function ssl_judge_and_install() {
 
-  mkdir -p /ssl
+  mkdir -p /ssl >/dev/null 2>&1
   if [[ -f "/ssl/xray.key" || -f "/ssl/xray.crt" ]]; then
     print_ok "/ssl 目录下证书文件已存在"
     print_ok "是否删除 /ssl 目录下的证书文件 [Y/N]?"
@@ -443,8 +453,8 @@ function ssl_judge_and_install() {
 function generate_certificate() {
   signedcert=$(xray tls cert -domain="$local_ip" -name="$local_ip" -org="$local_ip" -expire=87600h)
   echo $signedcert | jq '.certificate[]' | sed 's/\"//g' | tee $cert_dir/self_signed_cert.pem
-  echo $signedcert | jq '.key[]' | sed 's/\"//g' > $cert_dir/self_signed_key.pem
-  if openssl x509 -in $cert_dir/self_signed_cert.pem -noout;then
+  echo $signedcert | jq '.key[]' | sed 's/\"//g' >$cert_dir/self_signed_key.pem
+  if openssl x509 -in $cert_dir/self_signed_cert.pem -noout; then
     print_ok "生成自签名证书成功"
   else
     print_error "生成自签名证书失败"
@@ -471,23 +481,23 @@ function xray_uninstall() {
   read -r uninstall_nginx
   case $uninstall_nginx in
   [yY][eE][sS] | [yY])
-      if [[ "${ID}" == "centos" ]]; then
-        yum remove nginx -y
-        rm -rf /etc/nginx
-      else
-        apt purge nginx -y
-      fi
-      ;;
+    if [[ "${ID}" == "centos" || "${ID}" == "ol" ]]; then
+      yum remove nginx -y
+      rm -rf /etc/nginx
+    else
+      apt purge nginx -y
+    fi
+    ;;
   *) ;;
   esac
   print_ok "是否卸载acme.sh [Y/N]?"
   read -r uninstall_acme
   case $uninstall_acme in
   [yY][eE][sS] | [yY])
-      /root/.acme.sh/acme.sh --uninstall
-      rm -rf /root/.acme.sh
-      rm -rf /ssl/
-      ;;
+    /root/.acme.sh/acme.sh --uninstall
+    rm -rf /root/.acme.sh
+    rm -rf /ssl/
+    ;;
   *) ;;
   esac
   print_ok "卸载完成"
