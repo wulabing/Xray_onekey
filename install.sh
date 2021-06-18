@@ -179,14 +179,14 @@ function dependency_install() {
   #  judge "编译工具包 安装"
 
   if [[ "${ID}" == "centos" ]]; then
-    ${INS} pcre pcre-devel zlib-devel epel-release openssl openssl-devel iputils
+    ${INS} pcre pcre-devel zlib-devel epel-release openssl openssl-devel
   elif [[ "${ID}" == "ol" ]]; then
-    ${INS} pcre pcre-devel zlib-devel openssl openssl-devel iputils
+    ${INS} pcre pcre-devel zlib-devel openssl openssl-devel
     # Oracle Linux 不同日期版本的 VERSION_ID 比较乱 直接暴力处理
     yum-config-manager --enable ol7_developer_EPEL >/dev/null 2>&1
     yum-config-manager --enable ol8_developer_EPEL >/dev/null 2>&1
   else
-    ${INS} libpcre3 libpcre3-dev zlib1g-dev openssl libssl-dev iputils-ping
+    ${INS} libpcre3 libpcre3-dev zlib1g-dev openssl libssl-dev
   fi
 
   ${INS} jq
@@ -217,7 +217,7 @@ function domain_check() {
   read -rp "请输入你的域名信息(eg: www.wulabing.com):" domain
   domain_ip=$(ping "${domain}" -c 1 | sed '1{s/[^(]*(//;s/).*//;q}')
   print_ok "正在获取 IP 地址信息，请耐心等待"
-  local_ip=$(curl -4 ip.sb)
+  local_ip=$(curl -4L api64.ipify.org)
   echo -e "域名通过 DNS 解析的 IP 地址：${domain_ip}"
   echo -e "本机公网 IP 地址： ${local_ip}"
   sleep 2
@@ -306,11 +306,6 @@ function modify_ws() {
   xray_tmp_config_file_check_and_use
   judge "Xray ws 修改"
 }
-function modify_tls_version() {
-  cat ${xray_conf_dir}/config.json | jq 'setpath(["inbounds",0,"streamSettings","xtlsSettings","minVersion"];"'$1'")' >${xray_conf_dir}/config_tmp.json
-  xray_tmp_config_file_check_and_use
-  judge "Xray TLS_version 修改"
-}
 
 function configure_nginx() {
   nginx_conf="/etc/nginx/conf.d/${domain}.conf"
@@ -319,22 +314,6 @@ function configure_nginx() {
   judge "Nginx config modify"
 
   systemctl restart nginx
-}
-
-function tls_type() {
-  echo "请选择支持的 TLS 版本（默认：TLS1.3 only）:"
-  echo "1: TLS1.1, TLS1.2 and TLS1.3（兼容模式）"
-  echo "2: TLS1.2 and TLS1.3 (兼容模式)"
-  echo "3: TLS1.3 only"
-  read -rp "请输入：" tls_version
-  [[ -z ${tls_version} ]] && tls_version=3
-  if [[ $tls_version == 3 ]]; then
-    modify_tls_version "1.3"
-  elif [[ $tls_version == 2 ]]; then
-    modify_tls_version "1.2"
-  else
-    modify_tls_version "1.1"
-  fi
 }
 
 function modify_port() {
@@ -354,7 +333,6 @@ function configure_xray() {
   cd /usr/local/etc/xray && rm -f config.json && wget -O config.json https://raw.githubusercontent.com/wulabing/Xray_onekey/${github_branch}/config/xray_xtls-rprx-direct.json
   modify_UUID
   modify_port
-  tls_type
 }
 
 function configure_xray_ws() {
@@ -364,7 +342,6 @@ function configure_xray_ws() {
   modify_port
   modify_fallback_ws
   modify_ws
-  tls_type
 }
 
 function xray_install() {
@@ -386,8 +363,7 @@ function ssl_install() {
   #  fi
   #  judge "安装 SSL 证书生成脚本依赖"
 
-  read -rp "请输入用于注册域名证书的邮箱(eg:xxx@gmail.com 可按照邮箱格式随意填写):" domain_email
-  curl https://get.acme.sh | sh -s email=$domain_email
+  curl -L get.acme.sh | bash
   judge "安装 SSL 证书生成脚本"
 }
 
@@ -454,13 +430,8 @@ function generate_certificate() {
   signedcert=$(xray tls cert -domain="$local_ip" -name="$local_ip" -org="$local_ip" -expire=87600h)
   echo $signedcert | jq '.certificate[]' | sed 's/\"//g' | tee $cert_dir/self_signed_cert.pem
   echo $signedcert | jq '.key[]' | sed 's/\"//g' >$cert_dir/self_signed_key.pem
-  if openssl x509 -in $cert_dir/self_signed_cert.pem -noout; then
-    print_ok "生成自签名证书成功"
-  else
-    print_error "生成自签名证书失败"
-    exit 1
-  fi
-
+  openssl x509 -in $cert_dir/self_signed_cert.pem -noout || 'print_error "生成自签名证书失败" && exit 1'
+  print_ok "生成自签名证书成功"
   chown nobody.$cert_group $cert_dir/self_signed_cert.pem
   chown nobody.$cert_group $cert_dir/self_signed_key.pem
 }
@@ -671,7 +642,6 @@ menu() {
   echo -e "${Green}2.${Font}  安装 Xray (VLESS + TCP + XTLS / TLS + Nginx 及 VLESS + TCP + TLS + Nginx + WebSocket 回落并存模式)"
   echo -e "—————————————— 配置变更 ——————————————"
   echo -e "${Green}11.${Font} 变更 UUID"
-  echo -e "${Green}12.${Font} 变更 TLS 最低适配版本"
   echo -e "${Green}13.${Font} 变更 连接端口"
   echo -e "${Green}14.${Font} 变更 WebSocket PATH"
   echo -e "—————————————— 查看信息 ——————————————"
@@ -706,10 +676,6 @@ menu() {
       modify_UUID
       modify_UUID_ws
     fi
-    restart_all
-    ;;
-  12)
-    tls_type
     restart_all
     ;;
   13)

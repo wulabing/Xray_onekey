@@ -38,7 +38,7 @@
         "network": "tcp",
         "security": "xtls",
         "xtlsSettings": {
-          "minVersion": "1.3",
+          "minVersion": "1.2",
           "certificates": [
             {
               "certificateFile": "/usr/local/etc/xray/self_signed_cert.pem",
