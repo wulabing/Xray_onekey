@@ -98,7 +98,7 @@ function system_check() {
     $INS lsb-release gnupg2
 
     echo "deb http://nginx.org/packages/debian $(lsb_release -cs) nginx" >/etc/apt/sources.list.d/nginx.list
-    curl -fsSL https://nginx.org/keys/nginx_signing.key | sudo apt-key add -
+    curl -fsSL https://nginx.org/keys/nginx_signing.key | apt-key add -
 
     apt update
   elif [[ "${ID}" == "ubuntu" && $(echo "${VERSION_ID}" | cut -d '.' -f1) -ge 18 ]]; then
@@ -109,7 +109,7 @@ function system_check() {
     $INS lsb-release gnupg2
 
     echo "deb http://nginx.org/packages/ubuntu $(lsb_release -cs) nginx" >/etc/apt/sources.list.d/nginx.list
-    curl -fsSL https://nginx.org/keys/nginx_signing.key | sudo apt-key add -
+    curl -fsSL https://nginx.org/keys/nginx_signing.key | apt-key add -
     apt update
   else
     print_error "当前系统为 ${ID} ${VERSION_ID} 不在支持的系统列表内"
@@ -140,8 +140,8 @@ function nginx_install() {
   fi
 }
 function dependency_install() {
-  ${INS} wget lsof tar
-  judge "安装 wget lsof tar"
+  ${INS} lsof tar
+  judge "安装 lsof tar"
 
   if [[ "${ID}" == "centos" || "${ID}" == "ol" ]]; then
     ${INS} crontabs
@@ -182,7 +182,7 @@ function dependency_install() {
     ${INS} pcre pcre-devel zlib-devel epel-release openssl openssl-devel
   elif [[ "${ID}" == "ol" ]]; then
     ${INS} pcre pcre-devel zlib-devel openssl openssl-devel
-    # Oracle Linux 不同日期版本的 VERSION_ID 比较乱 直接暴力处理
+    # Oracle Linux 不同日期版本的 VERSION_ID 比较乱 直接暴力处理。如出现问题或有更好的方案，请提交 Issue。
     yum-config-manager --enable ol7_developer_EPEL >/dev/null 2>&1
     yum-config-manager --enable ol8_developer_EPEL >/dev/null 2>&1
   else
@@ -207,7 +207,7 @@ function basic_optimization() {
   echo '* soft nofile 65536' >>/etc/security/limits.conf
   echo '* hard nofile 65536' >>/etc/security/limits.conf
 
-  # 关闭 Selinux
+  # RedHat 系发行版关闭 SELinux
   if [[ "${ID}" == "centos" || "${ID}" == "ol" ]]; then
     sed -i 's/^SELINUX=.*/SELINUX=disabled/' /etc/selinux/config
     setenforce 0
@@ -311,7 +311,7 @@ function configure_nginx() {
   nginx_conf="/etc/nginx/conf.d/${domain}.conf"
   cd /etc/nginx/conf.d/ && rm -f ${domain}.conf && wget -O ${domain}.conf https://raw.githubusercontent.com/wulabing/Xray_onekey/${github_branch}/config/web.conf
   sed -i "s/xxx/${domain}/g" ${nginx_conf}
-  judge "Nginx config modify"
+  judge "Nginx 配置 修改"
 
   systemctl restart nginx
 }
@@ -413,7 +413,7 @@ function ssl_judge_and_install() {
   elif [[ -f "$HOME/.acme.sh/${domain}_ecc/${domain}.key" && -f "$HOME/.acme.sh/${domain}_ecc/${domain}.cer" ]]; then
     echo "证书文件已存在"
     "$HOME"/.acme.sh/acme.sh --installcert -d "${domain}" --fullchainpath /ssl/xray.crt --keypath /ssl/xray.key --ecc
-    judge "证书应用"
+    judge "证书启用"
   else
     mkdir /ssl
     cp -a $cert_dir/self_signed_cert.pem /ssl/xray.crt
@@ -465,7 +465,7 @@ function xray_uninstall() {
   read -r uninstall_acme
   case $uninstall_acme in
   [yY][eE][sS] | [yY])
-    /root/.acme.sh/acme.sh --uninstall
+    "$HOME"/.acme.sh/acme.sh --uninstall
     rm -rf /root/.acme.sh
     rm -rf /ssl/
     ;;
@@ -488,16 +488,16 @@ function vless_xtls-rprx-direct_link() {
   FLOW=$(cat ${xray_conf_dir}/config.json | jq .inbounds[0].settings.clients[0].flow | tr -d '"')
   DOMAIN=$(cat ${domain_tmp_dir}/domain)
 
-  print_ok "URL 链接（VLESS + TCP +  TLS）"
+  print_ok "URL 链接 (VLESS + TCP + TLS)"
   print_ok "vless://$UUID@$DOMAIN:$PORT?security=tls&flow=$FLOW#TLS_wulabing-$DOMAIN"
 
-  print_ok "URL 链接（VLESS + TCP +  XTLS）"
+  print_ok "URL 链接 (VLESS + TCP + XTLS)"
   print_ok "vless://$UUID@$DOMAIN:$PORT?security=xtls&flow=$FLOW#XTLS_wulabing-$DOMAIN"
   print_ok "-------------------------------------------------"
-  print_ok "URL 二维码（VLESS + TCP + TLS）（请在浏览器中访问）"
+  print_ok "URL 二维码 (VLESS + TCP + TLS) （请在浏览器中访问）"
   print_ok "https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=vless://$UUID@$DOMAIN:$PORT?security=tls%26flow=$FLOW%23TLS_wulabing-$DOMAIN"
 
-  print_ok "URL 二维码（VLESS + TCP + XTLS）（请在浏览器中访问）"
+  print_ok "URL 二维码 (VLESS + TCP + XTLS) （请在浏览器中访问）"
   print_ok "https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=vless://$UUID@$DOMAIN:$PORT?security=xtls%26flow=$FLOW%23XTLS_wulabing-$DOMAIN"
 }
 
@@ -544,22 +544,22 @@ function ws_link() {
   WS_PATH_WITHOUT_SLASH=$(echo $WS_PATH | tr -d '/')
   DOMAIN=$(cat ${domain_tmp_dir}/domain)
 
-  print_ok "URL 链接（VLESS + TCP + TLS）"
+  print_ok "URL 链接 (VLESS + TCP + TLS)"
   print_ok "vless://$UUID@$DOMAIN:$PORT?security=tls#TLS_wulabing-$DOMAIN"
 
-  print_ok "URL 链接（VLESS + TCP + XTLS）"
+  print_ok "URL 链接 (VLESS + TCP + XTLS)"
   print_ok "vless://$UUID@$DOMAIN:$PORT?security=xtls&flow=$FLOW#XTLS_wulabing-$DOMAIN"
 
-  print_ok "URL 链接（VLESS + WebSocket + TLS）"
+  print_ok "URL 链接 (VLESS + WebSocket + TLS)"
   print_ok "vless://$UUID@$DOMAIN:$PORT?type=ws&security=tls&path=%2f${WS_PATH_WITHOUT_SLASH}%2f#WS_TLS_wulabing-$DOMAIN"
   print_ok "-------------------------------------------------"
-  print_ok "URL 二维码（VLESS + TCP + TLS）（请在浏览器中访问）"
+  print_ok "URL 二维码 (VLESS + TCP + TLS) （请在浏览器中访问）"
   print_ok "https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=vless://$UUID@$DOMAIN:$PORT?security=tls%23TLS_wulabing-$DOMAIN"
 
-  print_ok "URL 二维码（VLESS + TCP + XTLS）（请在浏览器中访问）"
+  print_ok "URL 二维码 (VLESS + TCP + XTLS) （请在浏览器中访问）"
   print_ok "https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=vless://$UUID@$DOMAIN:$PORT?security=xtls%26flow=$FLOW%23XTLS_wulabing-$DOMAIN"
 
-  print_ok "URL 二维码（VLESS + WebSocket + TLS）（请在浏览器中访问）"
+  print_ok "URL 二维码 (VLESS + WebSocket + TLS) （请在浏览器中访问）"
   print_ok "https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=vless://$UUID@$DOMAIN:$PORT?type=ws%26security=tls%26path=%2f${WS_PATH_WITHOUT_SLASH}%2f%23WS_TLS_wulabing-$DOMAIN"
 }
 
@@ -578,11 +578,11 @@ function basic_ws_information() {
 }
 
 function show_access_log() {
-  [ -f ${xray_access_log} ] && tail -f ${xray_access_log} || echo -e "${RedBG}log文件不存在${Font}"
+  [ -f ${xray_access_log} ] && tail -f ${xray_access_log} || echo -e "${RedBG}log 文件不存在${Font}"
 }
 
 function show_error_log() {
-  [ -f ${xray_error_log} ] && tail -f ${xray_error_log} || echo -e "${RedBG}log文件不存在${Font}"
+  [ -f ${xray_error_log} ] && tail -f ${xray_error_log} || echo -e "${RedBG}log 文件不存在${Font}"
 }
 
 function bbr_boost_sh() {
@@ -651,11 +651,11 @@ menu() {
   #    echo -e "${Green}23.${Font}  查看 V2Ray 配置信息"
   echo -e "—————————————— 其他选项 ——————————————"
   echo -e "${Green}31.${Font} 安装 4 合 1 BBR、锐速安装脚本"
-  echo -e "${Yellow}32.${Font} 安装 MTproxy(不推荐使用,请相关用户关闭或卸载)"
+  echo -e "${Yellow}32.${Font} 安装 MTproxy （不推荐使用,请相关用户关闭或卸载）"
   echo -e "${Green}33.${Font} 卸载 Xray"
   echo -e "${Green}34.${Font} 更新 Xray-core"
-  echo -e "${Green}35.${Font} 安装 Xray-core 测试版(Pre)"
-  echo -e "${Green}36.${Font} 手动更新SSL证书"
+  echo -e "${Green}35.${Font} 安装 Xray-core 测试版 (Pre)"
+  echo -e "${Green}36.${Font} 手动更新 SSL 证书"
   echo -e "${Green}40.${Font} 退出"
   read -rp "请输入数字：" menu_num
   case $menu_num in
@@ -669,7 +669,7 @@ menu() {
     install_xray_ws
     ;;
   11)
-    read -rp "请输入UUID:" UUID
+    read -rp "请输入 UUID:" UUID
     if [[ ${shell_mode} == "tcp" ]]; then
       modify_UUID
     elif [[ ${shell_mode} == "ws" ]]; then
@@ -684,12 +684,12 @@ menu() {
     ;;
   14)
     if [[ ${shell_mode} == "ws" ]]; then
-      read -rp "请输入路径(示例：/wulabing/ 要求两侧都包含/):" WS_PATH
+      read -rp "请输入路径(示例：/wulabing/ 要求两侧都包含 /):" WS_PATH
       modify_fallback_ws
       modify_ws
       restart_all
     else
-      print_error "当前模式不是Websocket模式"
+      print_error "当前模式不是 Websocket 模式"
     fi
     ;;
   21)
