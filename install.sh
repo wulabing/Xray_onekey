@@ -27,7 +27,7 @@ OK="${Green}[OK]${Font}"
 ERROR="${Red}[ERROR]${Font}"
 
 # 变量
-shell_version="0.1.4"
+shell_version="0.1.5"
 github_branch="nginx_forward"
 xray_conf_dir="/usr/local/etc/xray"
 website_dir="/www/xray_web/"
@@ -36,7 +36,6 @@ xray_error_log="/var/log/xray/error.log"
 cert_dir="/usr/local/etc/xray"
 domain_tmp_dir="/usr/local/etc/xray"
 nginx_conf_dir="/etc/nginx/conf/conf.d"
-nginx_conf="${nginx_conf_dir}/v2ray.conf"
 compatible_nginx_conf="no"
 
 cert_group="nobody"
@@ -495,29 +494,14 @@ function restart_all() {
   judge "Xray 启动"
 }
 
-function vless_xtls-rprx-direct_information() {
-  UUID=$(cat ${xray_conf_dir}/config.json | jq .inbounds[0].settings.clients[0].id | tr -d '"')
-  PORT=$(cat ${xray_conf_dir}/config.json | jq .inbounds[0].port)
-  FLOW=$(cat ${xray_conf_dir}/config.json | jq .inbounds[0].settings.clients[0].flow | tr -d '"')
-  DOMAIN=$(cat ${domain_tmp_dir}/domain)
-
-  echo -e "${Red} Xray 配置信息 ${Font}"
-  echo -e "${Red} 地址（address）:${Font}  $DOMAIN"
-  echo -e "${Red} 端口（port）：${Font}  $PORT"
-  echo -e "${Red} 用户 ID（UUID）：${Font} $UUID"
-  echo -e "${Red} 流控（flow）：${Font} $FLOW"
-  echo -e "${Red} 加密方式（security）：${Font} none "
-  echo -e "${Red} 传输协议（network）：${Font} tcp "
-  echo -e "${Red} 伪装类型（type）：${Font} none "
-  echo -e "${Red} 底层传输安全：${Font} xtls 或 tls"
-}
 
 function ws_information() {
-  UUID=$(cat ${xray_conf_dir}/config.json | jq .inbounds[0].settings.clients[0].id | tr -d '"')
-  PORT=$(cat ${xray_conf_dir}/config.json | jq .inbounds[0].port)
-  FLOW=$(cat ${xray_conf_dir}/config.json | jq .inbounds[0].settings.clients[0].flow | tr -d '"')
-  WS_PATH=$(cat ${xray_conf_dir}/config.json | jq .inbounds[0].settings.fallbacks[2].path | tr -d '"')
   DOMAIN=$(cat ${domain_tmp_dir}/domain)
+  UUID=$(cat ${xray_conf_dir}/config.json | jq .inbounds[0].settings.clients[0].id | tr -d '"')
+  PORT=$(cat "/etc/nginx/conf.d/${DOMAIN}.conf" | grep 'ssl http2' | awk -F ' ' '{print $2}' )
+  FLOW=$(cat ${xray_conf_dir}/config.json | jq .inbounds[0].settings.clients[0].flow | tr -d '"')
+  WS_PATH=$(cat ${xray_conf_dir}/config.json | jq .inbounds[0].streamSettings.wsSettings.path | tr -d '"')
+
 
   echo -e "${Red} Xray 配置信息 ${Font}"
   echo -e "${Red} 地址（address）:${Font}  $DOMAIN"
@@ -531,12 +515,12 @@ function ws_information() {
 }
 
 function ws_link() {
-  UUID=$(cat ${xray_conf_dir}/config.json | jq .inbounds[0].settings.clients[0].id | tr -d '"')
-  PORT=$(cat ${xray_conf_dir}/config.json | jq .inbounds[0].port)
-  FLOW=$(cat ${xray_conf_dir}/config.json | jq .inbounds[0].settings.clients[0].flow | tr -d '"')
-  WS_PATH=$(cat ${xray_conf_dir}/config.json | jq .inbounds[0].settings.fallbacks[2].path | tr -d '"')
-  WS_PATH_WITHOUT_SLASH=$(echo $WS_PATH | tr -d '/')
   DOMAIN=$(cat ${domain_tmp_dir}/domain)
+  UUID=$(cat ${xray_conf_dir}/config.json | jq .inbounds[0].settings.clients[0].id | tr -d '"')
+  PORT=$(cat "/etc/nginx/conf.d/${DOMAIN}.conf" | grep 'ssl http2' | awk -F ' ' '{print $2}' )
+  FLOW=$(cat ${xray_conf_dir}/config.json | jq .inbounds[0].settings.clients[0].flow | tr -d '"')
+  WS_PATH=$(cat ${xray_conf_dir}/config.json | jq .inbounds[0].streamSettings.wsSettings.path | tr -d '"')
+  WS_PATH_WITHOUT_SLASH=$(echo $WS_PATH | tr -d '/')
 
   print_ok "URL 链接（VLESS + WebSocket + TLS）"
   print_ok "vless://$UUID@$DOMAIN:$PORT?type=ws&security=tls&path=%2f${WS_PATH_WITHOUT_SLASH}%2f#WS_TLS_wulabing-$DOMAIN"
@@ -585,6 +569,7 @@ function install_xray_ws() {
   restart_all
   basic_ws_information
 }
+
 menu() {
   update_sh
   shell_mode_check
@@ -627,6 +612,8 @@ menu() {
     restart_all
     ;;
   13)
+    DOMAIN=$(cat ${domain_tmp_dir}/domain)
+    nginx_conf="/etc/nginx/conf.d/${DOMAIN}.conf"
     modify_port
     restart_all
     ;;
