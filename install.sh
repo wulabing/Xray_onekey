@@ -27,7 +27,7 @@ OK="${Green}[OK]${Font}"
 ERROR="${Red}[ERROR]${Font}"
 
 # 变量
-shell_version="1.3.4"
+shell_version="1.3.5"
 github_branch="main"
 xray_conf_dir="/usr/local/etc/xray"
 website_dir="/www/xray_web/"
@@ -454,7 +454,6 @@ function xray_uninstall() {
   [yY][eE][sS] | [yY])
     if [[ "${ID}" == "centos" || "${ID}" == "ol" ]]; then
       yum remove nginx -y
-      rm -rf /etc/nginx
     else
       apt purge nginx -y
     fi
