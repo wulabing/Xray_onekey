@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 #====================================================
-#	System Request:Debian 9+/Ubuntu 18.04+/Centos 7+
+#	System Request:Debian 10+/Ubuntu 20.04+/Centos 8+
 #	Author:	wulabing
 #	Dscription: Xray onekey Management
 #	email: admin@wulabing.com
@@ -27,14 +27,18 @@ OK="${Green}[OK]${Font}"
 ERROR="${Red}[ERROR]${Font}"
 
 # 变量
-shell_version="1.3.4"
-github_branch="main"
+shell_version="0.1.0"
+github_branch="nginx_forward"
 xray_conf_dir="/usr/local/etc/xray"
 website_dir="/www/xray_web/"
 xray_access_log="/var/log/xray/access.log"
 xray_error_log="/var/log/xray/error.log"
 cert_dir="/usr/local/etc/xray"
 domain_tmp_dir="/usr/local/etc/xray"
+nginx_conf_dir="/etc/nginx/conf/conf.d"
+nginx_conf="${nginx_conf_dir}/v2ray.conf"
+compatible_nginx_conf="no"
+
 cert_group="nobody"
 random_num=$((RANDOM % 12 + 4))
 
@@ -45,8 +49,6 @@ function shell_mode_check() {
   if [ -f ${xray_conf_dir}/config.json ]; then
     if [ "$(grep -c "wsSettings" ${xray_conf_dir}/config.json)" -ge 1 ]; then
       shell_mode="ws"
-    else
-      shell_mode="tcp"
     fi
   else
     shell_mode="None"
@@ -83,12 +85,18 @@ function system_check() {
   source '/etc/os-release'
 
   if [[ "${ID}" == "centos" && ${VERSION_ID} -ge 7 ]]; then
+    if [[ ${VERSION_ID} -ge 8 ]]; then
+      compatible_nginx_conf="no"
+    else
+      compatible_nginx_conf="yes"
+    fi
     print_ok "当前系统为 Centos ${VERSION_ID} ${VERSION}"
     INS="yum install -y"
     wget -N -P /etc/yum.repos.d/ https://raw.githubusercontent.com/wulabing/Xray_onekey/${github_branch}/basic/nginx.repo
   elif [[ "${ID}" == "ol" ]]; then
     print_ok "当前系统为 Oracle Linux ${VERSION_ID} ${VERSION}"
     INS="yum install -y"
+    compatible_nginx_conf="yes"
     wget -N -P /etc/yum.repos.d/ https://raw.githubusercontent.com/wulabing/Xray_onekey/${github_branch}/basic/nginx.repo
   elif [[ "${ID}" == "debian" && ${VERSION_ID} -ge 9 ]]; then
     print_ok "当前系统为 Debian ${VERSION_ID} ${VERSION}"
@@ -137,6 +145,8 @@ function nginx_install() {
     judge "Nginx 安装"
   else
     print_ok "Nginx 已存在"
+    # 防止部分异常
+    ${INS} nginx
   fi
 }
 function dependency_install() {
@@ -289,31 +299,21 @@ function modify_UUID() {
   judge "Xray TCP UUID 修改"
 }
 
-function modify_UUID_ws() {
-  cat ${xray_conf_dir}/config.json | jq 'setpath(["inbounds",1,"settings","clients",0,"id"];"'${UUID}'")' >${xray_conf_dir}/config_tmp.json
-  xray_tmp_config_file_check_and_use
-  judge "Xray ws UUID 修改"
-}
-
-function modify_fallback_ws() {
-  cat ${xray_conf_dir}/config.json | jq 'setpath(["inbounds",0,"settings","fallbacks",2,"path"];"'${WS_PATH}'")' >${xray_conf_dir}/config_tmp.json
-  xray_tmp_config_file_check_and_use
-  judge "Xray fallback_ws 修改"
-}
-
 function modify_ws() {
-  cat ${xray_conf_dir}/config.json | jq 'setpath(["inbounds",1,"streamSettings","wsSettings","path"];"'${WS_PATH}'")' >${xray_conf_dir}/config_tmp.json
+  cat ${xray_conf_dir}/config.json | jq 'setpath(["inbounds",0,"streamSettings","wsSettings","path"];"'${WS_PATH}'")' >${xray_conf_dir}/config_tmp.json
   xray_tmp_config_file_check_and_use
   judge "Xray ws 修改"
 }
 
-function configure_nginx() {
-  nginx_conf="/etc/nginx/conf.d/${domain}.conf"
-  cd /etc/nginx/conf.d/ && rm -f ${domain}.conf && wget -O ${domain}.conf https://raw.githubusercontent.com/wulabing/Xray_onekey/${github_branch}/config/web.conf
-  sed -i "s/xxx/${domain}/g" ${nginx_conf}
-  judge "Nginx config modify"
+function modify_nginx_port() {
+  sed -i "/ssl http2;$/c \\\tlisten ${PORT} ssl http2;" ${nginx_conf}
+  sed -i "3c \\\tlisten [::]:${PORT} http2;" ${nginx_conf}
+  judge "Xray port 修改"
+}
 
-  systemctl restart nginx
+function modify_nginx_other() {
+  sed -i "/location/c \\\tlocation ${WS_PATH}" ${nginx_conf}
+  sed -i "/proxy_pass/c \\\tproxy_pass http://127.0.0.1:${PORT};" ${nginx_conf}
 }
 
 function modify_port() {
@@ -324,24 +324,37 @@ function modify_port() {
     exit 1
   fi
   port_exist_check $PORT
-  cat ${xray_conf_dir}/config.json | jq 'setpath(["inbounds",0,"port"];'${PORT}')' >${xray_conf_dir}/config_tmp.json
-  xray_tmp_config_file_check_and_use
-  judge "Xray 端口 修改"
+  modify_nginx_port
 }
 
-function configure_xray() {
-  cd /usr/local/etc/xray && rm -f config.json && wget -O config.json https://raw.githubusercontent.com/wulabing/Xray_onekey/${github_branch}/config/xray_xtls-rprx-direct.json
-  modify_UUID
+function configure_nginx() {
+  nginx_conf="/etc/nginx/conf.d/${domain}.conf"
+  cd /etc/nginx/conf.d/ && rm -f ${domain}.conf
+  if [[ $compatible_nginx_conf == "yes" ]]; then
+    wget -O ${domain}.conf https://raw.githubusercontent.com/wulabing/Xray_onekey/${github_branch}/config/web_compatible.conf
+  elif [[ $compatible_nginx_conf == "no" ]]; then
+    wget -O ${domain}.conf https://raw.githubusercontent.com/wulabing/Xray_onekey/${github_branch}/config/web.conf
+  fi
+  sed -i "s/xxx/${domain}/g" ${nginx_conf}
   modify_port
+  modify_nginx_other
+  systemctl restart nginx
+}
+
+
+function modify_inbound_port() {
+  inbound_port=$((RANDOM + 10000))
+  cat ${xray_conf_dir}/config.json | jq 'setpath(["inbounds",0,"port"];'${inbound_port}')' >${xray_conf_dir}/config_tmp.json
+  xray_tmp_config_file_check_and_use
+  sed -i "9c \    \"port\":${inbound_port}," ${xray_conf_dir}/config.json
+  judge "Xray inbound_port 修改"
 }
 
 function configure_xray_ws() {
-  cd /usr/local/etc/xray && rm -f config.json && wget -O config.json https://raw.githubusercontent.com/wulabing/Xray_onekey/${github_branch}/config/xray_tls_ws_mix-rprx-direct.json
+  cd /usr/local/etc/xray && rm -f config.json && wget -O config.json https://raw.githubusercontent.com/wulabing/Xray_onekey/${github_branch}/config/xray_tls_ws.json
   modify_UUID
-  modify_UUID_ws
-  modify_port
-  modify_fallback_ws
   modify_ws
+  modify_inbound_port
 }
 
 function xray_install() {
@@ -482,25 +495,6 @@ function restart_all() {
   judge "Xray 启动"
 }
 
-function vless_xtls-rprx-direct_link() {
-  UUID=$(cat ${xray_conf_dir}/config.json | jq .inbounds[0].settings.clients[0].id | tr -d '"')
-  PORT=$(cat ${xray_conf_dir}/config.json | jq .inbounds[0].port)
-  FLOW=$(cat ${xray_conf_dir}/config.json | jq .inbounds[0].settings.clients[0].flow | tr -d '"')
-  DOMAIN=$(cat ${domain_tmp_dir}/domain)
-
-  print_ok "URL 链接（VLESS + TCP +  TLS）"
-  print_ok "vless://$UUID@$DOMAIN:$PORT?security=tls&flow=$FLOW#TLS_wulabing-$DOMAIN"
-
-  print_ok "URL 链接（VLESS + TCP +  XTLS）"
-  print_ok "vless://$UUID@$DOMAIN:$PORT?security=xtls&flow=$FLOW#XTLS_wulabing-$DOMAIN"
-  print_ok "-------------------------------------------------"
-  print_ok "URL 二维码（VLESS + TCP + TLS）（请在浏览器中访问）"
-  print_ok "https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=vless://$UUID@$DOMAIN:$PORT?security=tls%26flow=$FLOW%23TLS_wulabing-$DOMAIN"
-
-  print_ok "URL 二维码（VLESS + TCP + XTLS）（请在浏览器中访问）"
-  print_ok "https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=vless://$UUID@$DOMAIN:$PORT?security=xtls%26flow=$FLOW%23XTLS_wulabing-$DOMAIN"
-}
-
 function vless_xtls-rprx-direct_information() {
   UUID=$(cat ${xray_conf_dir}/config.json | jq .inbounds[0].settings.clients[0].id | tr -d '"')
   PORT=$(cat ${xray_conf_dir}/config.json | jq .inbounds[0].port)
@@ -594,23 +588,6 @@ function mtproxy_sh() {
   wget -N --no-check-certificate "https://github.com/wulabing/mtp/raw/master/mtproxy.sh" && chmod +x mtproxy.sh && bash mtproxy.sh
 }
 
-function install_xray() {
-  is_root
-  system_check
-  dependency_install
-  basic_optimization
-  domain_check
-  port_exist_check 80
-  xray_install
-  configure_xray
-  nginx_install
-  configure_nginx
-  configure_web
-  generate_certificate
-  ssl_judge_and_install
-  restart_all
-  basic_information
-}
 function install_xray_ws() {
   is_root
   system_check
@@ -623,7 +600,6 @@ function install_xray_ws() {
   nginx_install
   configure_nginx
   configure_web
-  generate_certificate
   ssl_judge_and_install
   restart_all
   basic_ws_information
@@ -670,12 +646,7 @@ menu() {
     ;;
   11)
     read -rp "请输入UUID:" UUID
-    if [[ ${shell_mode} == "tcp" ]]; then
-      modify_UUID
-    elif [[ ${shell_mode} == "ws" ]]; then
-      modify_UUID
-      modify_UUID_ws
-    fi
+    modify_UUID
     restart_all
     ;;
   13)
@@ -683,14 +654,9 @@ menu() {
     restart_all
     ;;
   14)
-    if [[ ${shell_mode} == "ws" ]]; then
-      read -rp "请输入路径(示例：/wulabing/ 要求两侧都包含/):" WS_PATH
-      modify_fallback_ws
-      modify_ws
-      restart_all
-    else
-      print_error "当前模式不是Websocket模式"
-    fi
+    read -rp "请输入路径(示例：/wulabing/ 要求两侧都包含/):" WS_PATH
+    modify_ws
+    restart_all
     ;;
   21)
     tail -f $xray_access_log
@@ -700,11 +666,7 @@ menu() {
     ;;
   23)
     if [[ -f $xray_conf_dir/config.json ]]; then
-      if [[ ${shell_mode} == "tcp" ]]; then
-        basic_information
-      elif [[ ${shell_mode} == "ws" ]]; then
-        basic_ws_information
-      fi
+      basic_ws_information
     else
       print_error "xray 配置文件不存在"
     fi
