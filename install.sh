@@ -27,7 +27,7 @@ OK="${Green}[OK]${Font}"
 ERROR="${Red}[ERROR]${Font}"
 
 # 变量
-shell_version="0.1.0"
+shell_version="0.1.1"
 github_branch="nginx_forward"
 xray_conf_dir="/usr/local/etc/xray"
 website_dir="/www/xray_web/"
@@ -313,7 +313,7 @@ function modify_nginx_port() {
 
 function modify_nginx_other() {
   sed -i "/location/c \\\tlocation ${WS_PATH}" ${nginx_conf}
-  sed -i "/proxy_pass/c \\\tproxy_pass http://127.0.0.1:${PORT};" ${nginx_conf}
+  sed -i "/proxy_pass/c \\\tproxy_pass http://127.0.0.1:${inbound_port};" ${nginx_conf}
 }
 
 function modify_port() {
@@ -325,6 +325,13 @@ function modify_port() {
   fi
   port_exist_check $PORT
   modify_nginx_port
+}
+
+function configure_nginx_temp(){
+  nginx_conf="/etc/nginx/conf.d/${domain}.conf"
+  cd /etc/nginx/conf.d/ && rm -f ${domain}.conf
+  wget -O ${domain}.conf https://raw.githubusercontent.com/wulabing/Xray_onekey/${github_branch}/config/web_temp.conf
+  sed -i "s/xxx/${domain}/g" ${nginx_conf}
 }
 
 function configure_nginx() {
@@ -383,8 +390,6 @@ function ssl_install() {
 function acme() {
   "$HOME"/.acme.sh/acme.sh --set-default-ca --server letsencrypt
 
-  sed -i "6s/^/#/" "$nginx_conf"
-  sed -i "6a\\\troot $website_dir;" "$nginx_conf"
   systemctl restart nginx
 
   if "$HOME"/.acme.sh/acme.sh --issue -d "${domain}" --webroot "$website_dir" -k ec-256 --force; then
@@ -400,8 +405,6 @@ function acme() {
     exit 1
   fi
 
-  sed -i "7d" "$nginx_conf"
-  sed -i "6s/#//" "$nginx_conf"
 }
 
 function ssl_judge_and_install() {
@@ -429,8 +432,6 @@ function ssl_judge_and_install() {
     judge "证书应用"
   else
     mkdir /ssl
-    cp -a $cert_dir/self_signed_cert.pem /ssl/xray.crt
-    cp -a $cert_dir/self_signed_key.pem /ssl/xray.key
     ssl_install
     acme
   fi
@@ -467,7 +468,6 @@ function xray_uninstall() {
   [yY][eE][sS] | [yY])
     if [[ "${ID}" == "centos" || "${ID}" == "ol" ]]; then
       yum remove nginx -y
-      rm -rf /etc/nginx
     else
       apt purge nginx -y
     fi
@@ -598,9 +598,10 @@ function install_xray_ws() {
   xray_install
   configure_xray_ws
   nginx_install
-  configure_nginx
+  configure_nginx_temp
   configure_web
   ssl_judge_and_install
+  configure_nginx
   restart_all
   basic_ws_information
 }
@@ -614,8 +615,7 @@ menu() {
   echo -e "当前已安装版本：${shell_mode}"
   echo -e "—————————————— 安装向导 ——————————————"""
   echo -e "${Green}0.${Font}  升级 脚本"
-  echo -e "${Green}1.${Font}  安装 Xray (VLESS + TCP + XTLS / TLS + Nginx)"
-  echo -e "${Green}2.${Font}  安装 Xray (VLESS + TCP + XTLS / TLS + Nginx 及 VLESS + TCP + TLS + Nginx + WebSocket 回落并存模式)"
+  echo -e "${Green}1.${Font}  安装 Xray (VLESS + TCP + TLS + Nginx + WebSocket)"
   echo -e "—————————————— 配置变更 ——————————————"
   echo -e "${Green}11.${Font} 变更 UUID"
   echo -e "${Green}13.${Font} 变更 连接端口"
@@ -639,9 +639,6 @@ menu() {
     update_sh
     ;;
   1)
-    install_xray
-    ;;
-  2)
     install_xray_ws
     ;;
   11)
