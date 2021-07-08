@@ -27,7 +27,7 @@ OK="${Green}[OK]${Font}"
 ERROR="${Red}[ERROR]${Font}"
 
 # 变量
-shell_version="0.1.6"
+shell_version="0.1.7"
 github_branch="nginx_forward"
 xray_conf_dir="/usr/local/etc/xray"
 website_dir="/www/xray_web/"
@@ -157,6 +157,8 @@ function nginx_install() {
     # 防止部分异常
     ${INS} nginx
   fi
+  # 遗留问题处理
+  mkdir -p /etc/nginx/conf.d >/dev/null 2>&1
 }
 function dependency_install() {
   ${INS} wget lsof tar
