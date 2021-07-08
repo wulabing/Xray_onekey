@@ -27,7 +27,7 @@ OK="${Green}[OK]${Font}"
 ERROR="${Red}[ERROR]${Font}"
 
 # 变量
-shell_version="0.1.5"
+shell_version="0.1.6"
 github_branch="nginx_forward"
 xray_conf_dir="/usr/local/etc/xray"
 website_dir="/www/xray_web/"
@@ -98,6 +98,11 @@ function system_check() {
     compatible_nginx_conf="yes"
     wget -N -P /etc/yum.repos.d/ https://raw.githubusercontent.com/wulabing/Xray_onekey/${github_branch}/basic/nginx.repo
   elif [[ "${ID}" == "debian" && ${VERSION_ID} -ge 9 ]]; then
+    if [[ ${VERSION_ID} -ge 10 ]]; then
+      compatible_nginx_conf="no"
+    else
+      compatible_nginx_conf="yes"
+    fi
     print_ok "当前系统为 Debian ${VERSION_ID} ${VERSION}"
     INS="apt install -y"
     # 清除可能的遗留问题
@@ -110,6 +115,11 @@ function system_check() {
     apt update
   elif [[ "${ID}" == "ubuntu" && $(echo "${VERSION_ID}" | cut -d '.' -f1) -ge 18 ]]; then
     print_ok "当前系统为 Ubuntu ${VERSION_ID} ${UBUNTU_CODENAME}"
+    if [[ ${VERSION_ID} -ge 20 ]]; then
+      compatible_nginx_conf="no"
+    else
+      compatible_nginx_conf="yes"
+    fi
     INS="apt install -y"
     # 清除可能的遗留问题
     rm -f /etc/apt/sources.list.d/nginx.list
@@ -310,10 +320,17 @@ function modify_nginx_port() {
   judge "Xray port 修改"
 }
 
-function modify_nginx_other() {
+function modify_nginx_ws(){
   sed -i "/location/c \\\tlocation ${WS_PATH}" ${nginx_conf}
+  judge "Nginx ws 修改"
+}
+
+function modify_nginx_other() {
+  modify_nginx_ws
   sed -i "/proxy_pass/c \\\tproxy_pass http://127.0.0.1:${inbound_port};" ${nginx_conf}
 }
+
+
 
 function modify_port() {
   read -rp "请输入端口号(默认：443)：" PORT
@@ -352,7 +369,6 @@ function modify_inbound_port() {
   inbound_port=$((RANDOM + 10000))
   cat ${xray_conf_dir}/config.json | jq 'setpath(["inbounds",0,"port"];'${inbound_port}')' >${xray_conf_dir}/config_tmp.json
   xray_tmp_config_file_check_and_use
-  sed -i "9c \    \"port\":${inbound_port}," ${xray_conf_dir}/config.json
   judge "Xray inbound_port 修改"
 }
 
@@ -618,8 +634,11 @@ menu() {
     restart_all
     ;;
   14)
+    DOMAIN=$(cat ${domain_tmp_dir}/domain)
+    nginx_conf="/etc/nginx/conf.d/${DOMAIN}.conf"
     read -rp "请输入路径(示例：/wulabing/ 要求两侧都包含/):" WS_PATH
     modify_ws
+    modify_nginx_ws
     restart_all
     ;;
   21)
