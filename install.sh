@@ -27,7 +27,7 @@ OK="${Green}[OK]${Font}"
 ERROR="${Red}[ERROR]${Font}"
 
 # 变量
-shell_version="0.1.2"
+shell_version="0.1.4"
 github_branch="nginx_forward"
 xray_conf_dir="/usr/local/etc/xray"
 website_dir="/www/xray_web/"
@@ -392,10 +392,10 @@ function acme() {
 
   systemctl restart nginx
 
-  if "$HOME"/.acme.sh/acme.sh --issue -d "${domain}" -k ec-256 --nginx --force; then
+  if "$HOME"/.acme.sh/acme.sh --issue -d "${domain}" -k ec-256 --webroot "$website_dir" --force; then
     print_ok "SSL 证书生成成功"
     sleep 2
-    if "$HOME"/.acme.sh/acme.sh --installcert -d "${domain}" --fullchainpath /ssl/xray.crt --keypath /ssl/xray.key --reloadcmd "systemctl restart xray" --ecc --force; then
+    if "$HOME"/.acme.sh/acme.sh --installcert -d "${domain}" --fullchainpath /ssl/xray.crt --keypath /ssl/xray.key --reloadcmd "systemctl restart xray" --reloadcmd "systemctl restart nginx" --ecc --force; then
       print_ok "SSL 证书配置成功"
       sleep 2
     fi
@@ -538,36 +538,16 @@ function ws_link() {
   WS_PATH_WITHOUT_SLASH=$(echo $WS_PATH | tr -d '/')
   DOMAIN=$(cat ${domain_tmp_dir}/domain)
 
-  print_ok "URL 链接（VLESS + TCP + TLS）"
-  print_ok "vless://$UUID@$DOMAIN:$PORT?security=tls#TLS_wulabing-$DOMAIN"
-
-  print_ok "URL 链接（VLESS + TCP + XTLS）"
-  print_ok "vless://$UUID@$DOMAIN:$PORT?security=xtls&flow=$FLOW#XTLS_wulabing-$DOMAIN"
-
   print_ok "URL 链接（VLESS + WebSocket + TLS）"
   print_ok "vless://$UUID@$DOMAIN:$PORT?type=ws&security=tls&path=%2f${WS_PATH_WITHOUT_SLASH}%2f#WS_TLS_wulabing-$DOMAIN"
-  print_ok "-------------------------------------------------"
-  print_ok "URL 二维码（VLESS + TCP + TLS）（请在浏览器中访问）"
-  print_ok "https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=vless://$UUID@$DOMAIN:$PORT?security=tls%23TLS_wulabing-$DOMAIN"
-
-  print_ok "URL 二维码（VLESS + TCP + XTLS）（请在浏览器中访问）"
-  print_ok "https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=vless://$UUID@$DOMAIN:$PORT?security=xtls%26flow=$FLOW%23XTLS_wulabing-$DOMAIN"
-
   print_ok "URL 二维码（VLESS + WebSocket + TLS）（请在浏览器中访问）"
   print_ok "https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=vless://$UUID@$DOMAIN:$PORT?type=ws%26security=tls%26path=%2f${WS_PATH_WITHOUT_SLASH}%2f%23WS_TLS_wulabing-$DOMAIN"
 }
 
-function basic_information() {
-  print_ok "VLESS+TCP+XTLS+Nginx 安装成功"
-  vless_xtls-rprx-direct_information
-  vless_xtls-rprx-direct_link
-}
-
 function basic_ws_information() {
-  print_ok "VLESS+TCP+TLS+Nginx with WebSocket 混合模式 安装成功"
+  print_ok "VLESS + TCP + TLS + Nginx + WebSocket 安装成功"
   ws_information
   print_ok "————————————————————————"
-  vless_xtls-rprx-direct_information
   ws_link
 }
 
