@@ -27,7 +27,7 @@ OK="${Green}[OK]${Font}"
 ERROR="${Red}[ERROR]${Font}"
 
 # 变量
-shell_version="0.1.7"
+shell_version="0.1.8"
 github_branch="nginx_forward"
 xray_conf_dir="/usr/local/etc/xray"
 website_dir="/www/xray_web/"
