@@ -321,7 +321,7 @@ function configure_nginx() {
 
 function modify_port() {
   read -rp "请输入端口号(默认：443)：" PORT
-  [ -z "$PORT" ] && PORT="443"
+  [ -z "$PORT" ] && PORT="2083"
   if [[ $PORT -le 0 ]] || [[ $PORT -gt 65535 ]]; then
     print_error "请输入 0-65535 之间的值"
     exit 1
