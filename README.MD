@@ -13,12 +13,12 @@
 
 ### 准备工作
 * 准备一个域名，并将 A 记录添加好；
-* 安装好 wget。
+* 安装好 `wget`。
 
 ### 导入链接规范
 https://github.com/XTLS/Xray-core/issues/91
 
-> 截止 2021-2-24 仅有 V2RayN 4.12+ 及 V2RayNG 1.5.8+ 支持链接及二维码导入
+> 截至 2021-2-24 仅有 V2RayN 4.12+ 及 V2RayNG 1.5.8+ 支持链接及二维码导入，其他客户端请手动填入配置信息。
 
 
 ### 安装/更新方式（Nginx 前置）
@@ -57,7 +57,7 @@ wget -N --no-check-certificate -q -O install.sh "https://raw.githubusercontent.c
 * 本脚本中 锐速 4 合 1 脚本原项目引用 https://www.94ish.me/1635.html 在此感谢；
 * 本脚本中 锐速 4 合 1 脚本修改版项目引用 https://github.com/ylx2016/Linux-NetSpeed 在此感谢 ylx2016；
 * 本脚本中 配置文件及部分逻辑参考 https://github.com/jiuqi9997/xray-yes 在此感谢 玖柒；
-* 本脚本中 二维码 API 部分参考 https://github.com/mack-a/v2ray-agent  在此感谢 mack-a；
+* 本脚本中 二维码 API 部分参考 https://github.com/mack-a/v2ray-agent  在此感谢 mack-a。
 
 ### 启动方式
 
@@ -85,7 +85,11 @@ Nginx 目录： `/etc/nginx`
 
 https://bandwagonhost.com/aff.php?aff=63939
 
-您可以使用我的 justmysocks AFF 购买搬瓦工提供的代理
+您可以使用我的 JustMySocks AFF 购买搬瓦工提供的代理
 
 https://justmysocks.net/members/aff.php?aff=17621
+
+## Stargazers over time
+
+[![Stargazers over time](https://starchart.cc/wulabing/Xray_onekey.svg)](https://starchart.cc/wulabing/Xray_onekey)
 
