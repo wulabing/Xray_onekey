@@ -20,16 +20,29 @@ https://github.com/XTLS/Xray-core/issues/91
 
 > 截至 2021-2-24 仅有 V2RayN 4.12+ 及 V2RayNG 1.5.8+ 支持链接及二维码导入，其他客户端请手动填入配置信息。
 
-### 支持配置方式
+
+### 安装/更新方式（Nginx 前置）
+
+支持配置方式
+
+VLESS + TCP + TLS + Nginx + WebSocket
+
+```
+wget -N --no-check-certificate -q -O install.sh "https://raw.githubusercontent.com/wulabing/Xray_onekey/nginx_forward/install.sh" && chmod +x install.sh && bash install.sh
+```
+
+### 安装/更新方式（Xray 前置）
+
+支持配置方式
+
 VLESS + TCP + XTLS / TLS  + Nginx
 
 VLESS + TCP + XTLS / TLS  + Nginx 及 VLESS + TCP + TLS + Nginx + WebSocket 回落并存模式
 
-### 安装/更新方式（Xray）
-
 ```
 wget -N --no-check-certificate -q -O install.sh "https://raw.githubusercontent.com/wulabing/Xray_onekey/main/install.sh" && chmod +x install.sh && bash install.sh
 ```
+
 
 ### 注意事项
 * 如果你不了解脚本中各项设置的具体含义，除域名外，请使用脚本提供的默认值；
@@ -76,14 +89,7 @@ https://bandwagonhost.com/aff.php?aff=63939
 
 https://justmysocks.net/members/aff.php?aff=17621
 
-通过 Telegram 使用 MugglePay 进行虚拟货币捐赠。
-
-发送 `/pay @wulabing xxx` 到 @MugglePayBot 即可，默认货币为 USDT。
-
-通过 zfaka 进行 支付宝/微信捐赠
-
-https://zfaka.wulabing.com
-
 ## Stargazers over time
 
 [![Stargazers over time](https://starchart.cc/wulabing/Xray_onekey.svg)](https://starchart.cc/wulabing/Xray_onekey)
+
