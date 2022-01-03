@@ -27,7 +27,7 @@ OK="${Green}[OK]${Font}"
 ERROR="${Red}[ERROR]${Font}"
 
 # 变量
-shell_version="1.3.7"
+shell_version="1.3.8"
 github_branch="main"
 xray_conf_dir="/usr/local/etc/xray"
 website_dir="/www/xray_web/"
@@ -367,7 +367,7 @@ function ssl_install() {
   #  fi
   #  judge "安装 SSL 证书生成脚本依赖"
 
-  curl -L get.acme.sh | bash
+  curl -L https://get.acme.sh | bash
   judge "安装 SSL 证书生成脚本"
 }
 
