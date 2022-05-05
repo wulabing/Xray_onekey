@@ -29,7 +29,7 @@ OK="${Green}[OK]${Font}"
 Error="${Red}[错误]${Font}"
 
 # 版本
-shell_version="1.1.5.0"
+shell_version="1.1.5.7"
 shell_mode="None"
 github_branch="master"
 version_cmp="/tmp/version_cmp.tmp"
@@ -40,7 +40,8 @@ nginx_conf="${nginx_conf_dir}/v2ray.conf"
 nginx_dir="/etc/nginx"
 web_dir="/home/wwwroot"
 nginx_openssl_src="/usr/local/src"
-v2ray_bin_dir="/usr/bin/v2ray"
+v2ray_bin_dir_old="/usr/bin/v2ray"
+v2ray_bin_dir="/usr/local/bin"
 v2ray_info_file="$HOME/v2ray_info.inf"
 v2ray_qr_config_file="/usr/local/vmess_qr.json"
 nginx_systemd_file="/etc/systemd/system/nginx.service"
@@ -82,6 +83,10 @@ check_system() {
     elif [[ "${ID}" == "ubuntu" && $(echo "${VERSION_ID}" | cut -d '.' -f1) -ge 16 ]]; then
         echo -e "${OK} ${GreenBG} 当前系统为 Ubuntu ${VERSION_ID} ${UBUNTU_CODENAME} ${Font}"
         INS="apt"
+        rm /var/lib/dpkg/lock
+        dpkg --configure -a
+        rm /var/lib/apt/lists/lock
+        rm /var/cache/apt/archives/lock
         $INS update
     else
         echo -e "${Error} ${RedBG} 当前系统为 ${ID} ${VERSION_ID} 不在支持的系统列表内，安装中断 ${Font}"
@@ -380,6 +385,7 @@ nginx_install() {
 
     ./configure --prefix="${nginx_dir}" \
         --with-http_ssl_module \
+        --with-http_sub_module \
         --with-http_gzip_static_module \
         --with-http_stub_status_module \
         --with-pcre \
@@ -425,7 +431,7 @@ domain_check() {
     read -rp "请输入你的域名信息(eg:www.wulabing.com):" domain
     domain_ip=$(ping "${domain}" -c 1 | sed '1{s/[^(]*(//;s/).*//;q}')
     echo -e "${OK} ${GreenBG} 正在获取 公网ip 信息，请耐心等待 ${Font}"
-    local_ip=$(curl -4 ip.sb)
+    local_ip=$(curl https://api-ipv4.ip.sb/ip)
     echo -e "域名dns解析IP：${domain_ip}"
     echo -e "本机IP: ${local_ip}"
     sleep 2
@@ -544,6 +550,7 @@ nginx_conf_add() {
         location /ray/
         {
         proxy_redirect off;
+        proxy_read_timeout 1200s;
         proxy_pass http://127.0.0.1:10000;
         proxy_http_version 1.1;
         proxy_set_header X-Real-IP \$remote_addr;
@@ -572,6 +579,7 @@ EOF
 
 start_process_systemd() {
     systemctl daemon-reload
+    chown -R root.root /var/log/v2ray/
     if [[ "$shell_mode" != "h2" ]]; then
         systemctl restart nginx
         judge "Nginx 启动"
@@ -818,6 +826,7 @@ uninstall_all() {
     [[ -f $nginx_systemd_file ]] && rm -f $nginx_systemd_file
     [[ -f $v2ray_systemd_file ]] && rm -f $v2ray_systemd_file
     [[ -d $v2ray_bin_dir ]] && rm -rf $v2ray_bin_dir
+    [[ -d $v2ray_bin_dir_old ]] && rm -rf $v2ray_bin_dir_old
     if [[ -d $nginx_dir ]]; then
         echo -e "${OK} ${Green} 是否卸载 Nginx [Y/N]? ${Font}"
         read -r uninstall_nginx
@@ -841,7 +850,7 @@ delete_tls_key_and_crt() {
     echo -e "${OK} ${GreenBG} 已清空证书遗留文件 ${Font}"
 }
 judge_mode() {
-    if [ -f $v2ray_bin_dir/v2ray ]; then
+    if [ -f $v2ray_bin_dir/v2ray ] || [ -f $v2ray_bin_dir_old/v2ray ]; then
         if grep -q "ws" $v2ray_qr_config_file; then
             shell_mode="ws"
         elif grep -q "h2" $v2ray_qr_config_file; then
