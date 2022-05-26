@@ -85,7 +85,10 @@ function system_check() {
   if [[ "${ID}" == "centos" && ${VERSION_ID} -ge 7 ]]; then
     print_ok "当前系统为 Centos ${VERSION_ID} ${VERSION}"
     INS="yum install -y"
+    ${INS} wget
     wget -N -P /etc/yum.repos.d/ https://raw.githubusercontents.com/wulabing/Xray_onekey/${github_branch}/basic/nginx.repo
+
+
   elif [[ "${ID}" == "ol" ]]; then
     print_ok "当前系统为 Oracle Linux ${VERSION_ID} ${VERSION}"
     INS="yum install -y"
@@ -395,7 +398,7 @@ function acme() {
   sed -i "6a\\\troot $website_dir;" "$nginx_conf"
   systemctl restart nginx
 
-  if "$HOME"/.acme.sh/acme.sh --issue -d "${domain}" --webroot "$website_dir" -k ec-256 --force; then
+  if "$HOME"/.acme.sh/acme.sh --issue --insecure -d "${domain}" --webroot "$website_dir" -k ec-256 --force; then
     print_ok "SSL 证书生成成功"
     sleep 2
     if "$HOME"/.acme.sh/acme.sh --installcert -d "${domain}" --fullchainpath /ssl/xray.crt --keypath /ssl/xray.key --reloadcmd "systemctl restart xray" --ecc --force; then
