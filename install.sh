@@ -456,7 +456,11 @@ function ssl_judge_and_install() {
 }
 
 function generate_certificate() {
-  signedcert=$(xray tls cert -domain="$local_ip" -name="$local_ip" -org="$local_ip" -expire=87600h)
+  if [[ -z ${local_ipv4} && -n ${local_ipv6} ]]; then
+    signedcert=$(xray tls cert -domain="$local_ipv6" -name="$local_ipv6" -org="$local_ipv6" -expire=87600h)
+  else
+    signedcert=$(xray tls cert -domain="$local_ipv4" -name="$local_ipv4" -org="$local_ipv4" -expire=87600h)
+  fi
   echo $signedcert | jq '.certificate[]' | sed 's/\"//g' | tee $cert_dir/self_signed_cert.pem
   echo $signedcert | jq '.key[]' | sed 's/\"//g' >$cert_dir/self_signed_key.pem
   openssl x509 -in $cert_dir/self_signed_cert.pem -noout || print_error "生成自签名证书失败" && exit 1
