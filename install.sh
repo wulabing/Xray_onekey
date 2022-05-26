@@ -405,14 +405,18 @@ function acme() {
     if "$HOME"/.acme.sh/acme.sh --installcert -d "${domain}" --fullchainpath /ssl/xray.crt --keypath /ssl/xray.key --reloadcmd "systemctl restart xray" --ecc --force; then
       print_ok "SSL 证书配置成功"
       sleep 2
-      wg-quick up wgcf >/dev/null 2>&1
-      judge "已启动 wgcf-warp"
+      if [[ -n $(type -P wgcf) && -n $(type -P wg-quick) ]]; then
+        wg-quick up wgcf >/dev/null 2>&1
+        judge "已启动 wgcf-warp"
+      fi
     fi
   else
     print_error "SSL 证书生成失败"
     rm -rf "$HOME/.acme.sh/${domain}_ecc"
-    wg-quick up wgcf >/dev/null 2>&1
-    judge "已启动 wgcf-warp"
+    if [[ -n $(type -P wgcf) && -n $(type -P wg-quick) ]]; then
+      wg-quick up wgcf >/dev/null 2>&1
+      judge "已启动 wgcf-warp"
+    fi
     exit 1
   fi
 
