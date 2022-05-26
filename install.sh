@@ -229,13 +229,14 @@ function domain_check() {
   if [[ ${wgcfv4_status} =~ "on"|"plus" ]] || [[ ${wgcfv6_status} =~ "on"|"plus" ]]; then
     # 关闭wgcf-warp，以防误判VPS IP情况
     wg-quick down wgcf >/dev/null 2>&1
+    judge "已关闭wgcf-warp，以防误判VPS IP情况"
   fi
   local_ipv4=$(curl -s4m8 https://ip.gs)
   local_ipv6=$(curl -s6m8 https://ip.gs)
   if [[ -z ${local_ipv4} && -n ${local_ipv6} ]]; then
     # 纯IPv6 VPS，自动添加DNS64服务器以备acme.sh申请证书使用
     echo -e nameserver 2a01:4f8:c2c:123f::1 > /etc/resolv.conf
-    judge "添加DNS64服务器"
+    judge "识别为IPv6 Only的VPS，自动添加 DNS64 服务器"
   fi
   echo -e "域名通过 DNS 解析的 IP 地址：${domain_ip}"
   echo -e "本机公网 IPv4 地址： ${local_ipv4}"
