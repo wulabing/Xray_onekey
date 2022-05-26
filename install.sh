@@ -232,6 +232,7 @@ function domain_check() {
   if [[ -z ${local_ipv4} && -n ${local_ipv6} ]]; then
     # 纯IPv6 VPS，自动添加DNS64服务器以备acme.sh申请证书使用
     echo -e nameserver 2a01:4f8:c2c:123f::1 > /etc/resolv.conf
+    judge "添加DNS64服务器"
     # 设置acme.sh申请证书模式
     acme_mode=1
   else
