@@ -229,13 +229,14 @@ function domain_check() {
   if [[ ${wgcfv4_status} =~ "on"|"plus" ]] || [[ ${wgcfv6_status} =~ "on"|"plus" ]]; then
     # 关闭wgcf-warp，以防误判VPS IP情况
     wg-quick down wgcf >/dev/null 2>&1
+    judge "已关闭 wgcf-warp"
   fi
   local_ipv4=$(curl -s4m8 https://ip.gs)
   local_ipv6=$(curl -s6m8 https://ip.gs)
   if [[ -z ${local_ipv4} && -n ${local_ipv6} ]]; then
     # 纯IPv6 VPS，自动添加DNS64服务器以备acme.sh申请证书使用
     echo -e nameserver 2a01:4f8:c2c:123f::1 > /etc/resolv.conf
-    judge "添加DNS64服务器"
+    judge "识别为 IPv6 Only 的 VPS，自动添加 DNS64 服务器"
   fi
   echo -e "域名通过 DNS 解析的 IP 地址：${domain_ip}"
   echo -e "本机公网 IPv4 地址： ${local_ipv4}"
@@ -404,12 +405,18 @@ function acme() {
     if "$HOME"/.acme.sh/acme.sh --installcert -d "${domain}" --fullchainpath /ssl/xray.crt --keypath /ssl/xray.key --reloadcmd "systemctl restart xray" --ecc --force; then
       print_ok "SSL 证书配置成功"
       sleep 2
-      wg-quick up wgcf >/dev/null 2>&1
+      if [[ -n $(type -P wgcf) && -n $(type -P wg-quick) ]]; then
+        wg-quick up wgcf >/dev/null 2>&1
+        judge "已启动 wgcf-warp"
+      fi
     fi
   else
     print_error "SSL 证书生成失败"
     rm -rf "$HOME/.acme.sh/${domain}_ecc"
-    wg-quick up wgcf >/dev/null 2>&1
+    if [[ -n $(type -P wgcf) && -n $(type -P wg-quick) ]]; then
+      wg-quick up wgcf >/dev/null 2>&1
+      judge "已启动 wgcf-warp"
+    fi
     exit 1
   fi
 
@@ -453,7 +460,11 @@ function ssl_judge_and_install() {
 }
 
 function generate_certificate() {
-  signedcert=$(xray tls cert -domain="$local_ip" -name="$local_ip" -org="$local_ip" -expire=87600h)
+  if [[ -z ${local_ipv4} && -n ${local_ipv6} ]]; then
+    signedcert=$(xray tls cert -domain="$local_ipv6" -name="$local_ipv6" -org="$local_ipv6" -expire=87600h)
+  else
+    signedcert=$(xray tls cert -domain="$local_ipv4" -name="$local_ipv4" -org="$local_ipv4" -expire=87600h)
+  fi
   echo $signedcert | jq '.certificate[]' | sed 's/\"//g' | tee $cert_dir/self_signed_cert.pem
   echo $signedcert | jq '.key[]' | sed 's/\"//g' >$cert_dir/self_signed_key.pem
   openssl x509 -in $cert_dir/self_signed_cert.pem -noout || print_error "生成自签名证书失败" && exit 1
