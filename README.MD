@@ -6,7 +6,7 @@
 
 > Thanks for non-commercial open source development authorization by JetBrains!
 
-### 由于 xlts 存在被阻断的可能性，建议使用 Nginx 前置版本
+### 由于 xtls 存在被阻断的可能性，建议使用 Nginx 前置版本
 
 ### Telegram 群组
 * Telegram 交流群：https://t.me/wulabing_v2ray 
