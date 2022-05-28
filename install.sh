@@ -27,7 +27,7 @@ OK="${Green}[OK]${Font}"
 ERROR="${Red}[ERROR]${Font}"
 
 # 变量
-shell_version="1.3.8"
+shell_version="1.3.9"
 github_branch="main"
 xray_conf_dir="/usr/local/etc/xray"
 website_dir="/www/xray_web/"
@@ -98,21 +98,33 @@ function system_check() {
     INS="apt install -y"
     # 清除可能的遗留问题
     rm -f /etc/apt/sources.list.d/nginx.list
-    $INS lsb-release gnupg2 ca-certificates
-
-    echo "deb http://nginx.org/packages/debian $(lsb_release -cs) nginx" >/etc/apt/sources.list.d/nginx.list
-    curl -fsSL https://nginx.org/keys/nginx_signing.key | apt-key add -
+    # nginx 安装预处理
+    $INS curl gnupg2 ca-certificates lsb-release debian-archive-keyring
+    curl https://nginx.org/keys/nginx_signing.key | gpg --dearmor \
+    | tee /usr/share/keyrings/nginx-archive-keyring.gpg >/dev/null
+    echo "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] \
+    http://nginx.org/packages/debian `lsb_release -cs` nginx" \
+    | tee /etc/apt/sources.list.d/nginx.list
+    echo -e "Package: *\nPin: origin nginx.org\nPin: release o=nginx\nPin-Priority: 900\n" \
+    | tee /etc/apt/preferences.d/99nginx
 
     apt update
+
   elif [[ "${ID}" == "ubuntu" && $(echo "${VERSION_ID}" | cut -d '.' -f1) -ge 18 ]]; then
     print_ok "当前系统为 Ubuntu ${VERSION_ID} ${UBUNTU_CODENAME}"
     INS="apt install -y"
     # 清除可能的遗留问题
     rm -f /etc/apt/sources.list.d/nginx.list
-    $INS lsb-release gnupg2
+    # nginx 安装预处理
+    $INS curl gnupg2 ca-certificates lsb-release ubuntu-keyring
+    curl https://nginx.org/keys/nginx_signing.key | gpg --dearmor \
+    | tee /usr/share/keyrings/nginx-archive-keyring.gpg >/dev/null
+    echo "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] \
+    http://nginx.org/packages/ubuntu `lsb_release -cs` nginx" \
+    | tee /etc/apt/sources.list.d/nginx.list
+    echo -e "Package: *\nPin: origin nginx.org\nPin: release o=nginx\nPin-Priority: 900\n" \
+    | tee /etc/apt/preferences.d/99nginx
 
-    echo "deb http://nginx.org/packages/ubuntu $(lsb_release -cs) nginx" >/etc/apt/sources.list.d/nginx.list
-    curl -fsSL https://nginx.org/keys/nginx_signing.key | apt-key add -
     apt update
   else
     print_error "当前系统为 ${ID} ${VERSION_ID} 不在支持的系统列表内"
@@ -467,7 +479,7 @@ function generate_certificate() {
   fi
   echo $signedcert | jq '.certificate[]' | sed 's/\"//g' | tee $cert_dir/self_signed_cert.pem
   echo $signedcert | jq '.key[]' | sed 's/\"//g' >$cert_dir/self_signed_key.pem
-  openssl x509 -in $cert_dir/self_signed_cert.pem -noout || print_error "生成自签名证书失败" && exit 1
+  openssl x509 -in $cert_dir/self_signed_cert.pem -noout || (print_error "生成自签名证书失败" && exit 1)
   print_ok "生成自签名证书成功"
   chown nobody.$cert_group $cert_dir/self_signed_cert.pem
   chown nobody.$cert_group $cert_dir/self_signed_key.pem
@@ -476,10 +488,12 @@ function generate_certificate() {
 function configure_web() {
   rm -rf /www/xray_web
   mkdir -p /www/xray_web
-  wget -O web.tar.gz https://raw.githubusercontents.com/wulabing/Xray_onekey/main/basic/web.tar.gz
-  tar xzf web.tar.gz -C /www/xray_web
-  judge "站点伪装"
-  rm -f web.tar.gz
+#  不在进行页面伪装 访问首页默认403 Forbidden
+
+#  wget -O web.tar.gz https://raw.githubusercontents.com/wulabing/Xray_onekey/main/basic/web.tar.gz
+#  tar xzf web.tar.gz -C /www/xray_web
+#  judge "站点伪装"
+#  rm -f web.tar.gz
 }
 
 function xray_uninstall() {
