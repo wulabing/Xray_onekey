@@ -1,0 +1,31 @@
+version: "3.9"
+services:
+  shadowsocks:
+    image: shadowsocks/shadowsocks-libev:latest
+    expose:
+      - 8388
+      - 8388/udp
+    environment:
+      - METHOD=chacha20-ietf-poly1305
+      - PASSWORD=96166477-95b6-41a1-92c5-e33bce9694b0
+    restart: always
+    networks:
+      - backend
+  openresty:
+    image: openresty/openresty:latest
+    ports:
+      - "80:80"
+      - "443:443"
+      - "7777:7777"
+      - "7777:7777/udp"
+    volumes:
+      - /usr/local/src/ss/nginx.conf:/etc/openresty/nginx.conf
+      - /usr/local/src/ss/allow.list:/etc/openresty/allow.list
+      - /usr/local/src/ss/auth:/etc/openresty/auth
+    restart: always
+    networks:
+      - backend
+    depends_on:
+      - shadowsocks
+networks:
+  backend:
