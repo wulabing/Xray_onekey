@@ -19,9 +19,9 @@ services:
       - "7777:7777"
       - "7777:7777/udp"
     volumes:
-      - /usr/local/src/ss/nginx.conf:/etc/openresty/nginx.conf
-      - /usr/local/src/ss/allow.list:/etc/openresty/allow.list
-      - /usr/local/src/ss/auth:/etc/openresty/auth
+      - ./nginx.conf:/etc/openresty/nginx.conf
+      - ./allow.list:/etc/openresty/allow.list
+      - ./auth:/etc/openresty/auth
     restart: always
     networks:
       - backend
