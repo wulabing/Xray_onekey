@@ -1,5 +1,15 @@
 version: "3.9"
 services:
+  ipv6nat:
+    image: robbertkl/ipv6nat
+    container_name: ipv6nat
+    restart: unless-stopped
+    network_mode: host
+    privileged: true
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /lib/modules:/lib/modules:ro
+
   shadowsocks:
     image: shadowsocks/shadowsocks-libev:latest
     expose:
@@ -8,9 +18,16 @@ services:
     environment:
       - METHOD=chacha20-ietf-poly1305
       - PASSWORD=96166477-95b6-41a1-92c5-e33bce9694b0
+#      - SERVER_ADDR=0.0.0.0
+#      - SERVER_ADDR=::0  # no use for listen ipv6 (may be no env actually but in doc)
+      - DNS_ADDRS=2001:4860:4860::8888,2001:4860:4860::8844,8.8.8.8,1.1.1.1
+      - ARGS= -s ::0
     restart: always
     networks:
       - backend
+    depends_on:
+      - ipv6nat
+
   openresty:
     image: openresty/openresty:latest
     ports:
@@ -26,6 +43,13 @@ services:
     networks:
       - backend
     depends_on:
+      - ipv6nat
       - shadowsocks
 networks:
   backend:
+    enable_ipv6: true
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: fd00:cafe:face::/48
