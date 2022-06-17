@@ -1,27 +1,26 @@
-version: "3.9"
 services:
   shadowsocks:
-    image: shadowsocks/shadowsocks-libev:latest
+    image: vndroid/shadowsocks-libev:alpine
     expose:
-      - 8388
+      - 8388/tcp
       - 8388/udp
     environment:
-      - METHOD=chacha20-ietf-poly1305
-      - PASSWORD=96166477-95b6-41a1-92c5-e33bce9694b0
+      - METHOD=aes-256-gcm
+      - PASSWORD=9MLSpPmNt
     restart: always
     networks:
       - backend
   openresty:
-    image: openresty/openresty:latest
+    image: openresty/openresty:alpine
     ports:
       - "80:80"
       - "443:443"
-      - "7777:7777"
-      - "7777:7777/udp"
+      - "18388:18388/tcp"
+      - "18388:18388/udp"
     volumes:
-      - ./nginx.conf:/etc/openresty/nginx.conf
+      - ./nginx.conf:/usr/local/openresty/nginx/conf/nginx.conf
       - ./allow.list:/etc/openresty/allow.list
-      - ./auth:/etc/openresty/auth
+      - ./htpasswd:/etc/openresty/.htpasswd
     restart: always
     networks:
       - backend
