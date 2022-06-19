@@ -17,11 +17,10 @@ services:
       - 8388/udp
     environment:
       - METHOD=chacha20-ietf-poly1305
-      - PASSWORD=96166477-95b6-41a1-92c5-e33bce9694b0
-#      - SERVER_ADDR=0.0.0.0
-#      - SERVER_ADDR=::0  # no use for listen ipv6 (may be no env actually but in doc)
-      - DNS_ADDRS=2001:4860:4860::8888,2001:4860:4860::8844,8.8.8.8,1.1.1.1
-      - ARGS= -s ::0
+      - PASSWORD="replace with your password,Better to replace with UUID"
+      - DNS_ADDRS=8.8.8.8,1.1.1.1 # for ipv4
+#      - DNS_ADDRS=2001:4860:4860::8888,2001:4860:4860::8844     # for ipv6
+#      - ARGS= -s ::0   #for ipv6
     restart: always
     networks:
       - backend
@@ -45,6 +44,7 @@ services:
     depends_on:
       - ipv6nat
       - shadowsocks
+
 networks:
   backend:
     enable_ipv6: true
