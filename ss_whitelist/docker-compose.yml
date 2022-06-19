@@ -17,7 +17,7 @@ services:
       - 8388/udp
     environment:
       - METHOD=chacha20-ietf-poly1305
-      - PASSWORD="replace with your password,Better to replace with UUID"
+      - PASSWORD=replace with your password,Better to replace with UUID,no quote!!
       - DNS_ADDRS=8.8.8.8,1.1.1.1 # for ipv4
 #      - DNS_ADDRS=2001:4860:4860::8888,2001:4860:4860::8844     # for ipv6
 #      - ARGS= -s ::0   #for ipv6
