@@ -11,7 +11,7 @@ services:
       - /lib/modules:/lib/modules:ro
 
   shadowsocks:
-    image: vndroid/shadowsocks-libev:alpine
+    image: shadowsocks/shadowsocks-libev:edge
     expose:
       - 8388
       - 8388/udp
