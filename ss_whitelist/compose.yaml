@@ -1,4 +1,3 @@
-version: "3.9"
 services:
   ipv6nat:
     image: robbertkl/ipv6nat
