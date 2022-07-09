@@ -27,7 +27,7 @@ OK="${Green}[OK]${Font}"
 ERROR="${Red}[ERROR]${Font}"
 
 # 变量
-shell_version="1.3.10"
+shell_version="1.3.11"
 github_branch="main"
 xray_conf_dir="/usr/local/etc/xray"
 website_dir="/www/xray_web/"
@@ -498,12 +498,17 @@ function generate_certificate() {
 function configure_web() {
   rm -rf /www/xray_web
   mkdir -p /www/xray_web
-#  不在进行页面伪装 访问首页默认403 Forbidden
-
-#  wget -O web.tar.gz https://raw.githubusercontent.com/wulabing/Xray_onekey/main/basic/web.tar.gz
-#  tar xzf web.tar.gz -C /www/xray_web
-#  judge "站点伪装"
-#  rm -f web.tar.gz
+  prink_ok "是否配置伪装网页？[Y/N]"
+  read -r webpage
+  case $webpage in
+  [yY][eE][sS] | [yY])
+    wget -O web.tar.gz https://raw.githubusercontent.com/wulabing/Xray_onekey/main/basic/web.tar.gz
+    tar xzf web.tar.gz -C /www/xray_web
+    judge "站点伪装"
+    rm -f web.tar.gz
+    ;;
+  *) ;;
+  esac
 }
 
 function xray_uninstall() {
