@@ -498,7 +498,7 @@ function generate_certificate() {
 function configure_web() {
   rm -rf /www/xray_web
   mkdir -p /www/xray_web
-  prink_ok "是否配置伪装网页？[Y/N]"
+  print_ok "是否配置伪装网页？[Y/N]"
   read -r webpage
   case $webpage in
   [yY][eE][sS] | [yY])
