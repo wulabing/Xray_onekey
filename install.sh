@@ -27,7 +27,7 @@ OK="${Green}[OK]${Font}"
 ERROR="${Red}[ERROR]${Font}"
 
 # 变量
-shell_version="0.2.1"
+shell_version="0.2.2"
 github_branch="nginx_forward"
 xray_conf_dir="/usr/local/etc/xray"
 website_dir="/www/xray_web/"
@@ -522,10 +522,17 @@ function generate_certificate() {
 function configure_web() {
   rm -rf /www/xray_web
   mkdir -p /www/xray_web
-#  wget -O web.tar.gz https://raw.githubusercontent.com/wulabing/Xray_onekey/main/basic/web.tar.gz
-#  tar xzf web.tar.gz -C /www/xray_web
-#  judge "站点伪装"
-#  rm -f web.tar.gz
+  prink_ok "是否配置伪装网页？[Y/N]
+  read -r webpage
+  case $webpage in
+  [yY][eE][sS] | [yY])
+    wget -O web.tar.gz https://raw.githubusercontent.com/wulabing/Xray_onekey/main/basic/web.tar.gz
+    tar xzf web.tar.gz -C /www/xray_web
+    judge "站点伪装"
+    rm -f web.tar.gz
+    ;;
+  *) ;;
+  case
 }
 
 function xray_uninstall() {
