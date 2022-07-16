@@ -33,3 +33,4 @@
 * 访问 IP/auth (eg: http://1.1.1.1/auth) 输入鉴权信息，添加当前 IP 地址进入白名单
 * 访问 /purge 清空白名单信息
 * 务必将 allow.list 的权限设置为 666 及以上
+* 适配 ARM 架构机器，可以在 Oracle ARM 上使用

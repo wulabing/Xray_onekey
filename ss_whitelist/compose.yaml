@@ -27,15 +27,15 @@ services:
       - ipv6nat
 
   openresty:
-    image: openresty/openresty:latest
+    image: openresty/openresty:alpine
     ports:
       - "80:80"
       - "443:443"
       - "7777:7777"
       - "7777:7777/udp"
     volumes:
-      - ./nginx.conf:/etc/openresty/nginx.conf
-      - ./allow.list:/etc/openresty/allow.list
+      - ./nginx.conf:/usr/local/openresty/nginx/conf/nginx.conf
+      - ./allow.list:/usr/local/openresty/nginx/conf/allow.list
       - ./auth:/etc/openresty/auth
     restart: always
     networks:
