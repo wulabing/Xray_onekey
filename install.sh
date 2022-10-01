@@ -347,7 +347,7 @@ function modify_ws() {
 
 function modify_nginx_port() {
   sed -i "/ssl http2;$/c \\\tlisten ${PORT} ssl http2;" ${nginx_conf}
-  sed -i "3c \\\tlisten [::]:${PORT} http2;" ${nginx_conf}
+  sed -i "3c \\\tlisten [::]:${PORT} ssl http2;" ${nginx_conf}
   judge "Xray port 修改"
 }
 
