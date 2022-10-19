@@ -594,7 +594,7 @@ function ws_information() {
 function ws_link() {
   DOMAIN=$(cat ${domain_tmp_dir}/domain)
   UUID=$(cat ${xray_conf_dir}/config.json | jq .inbounds[0].settings.clients[0].id | tr -d '"')
-  PORT=$(cat "/etc/nginx/conf.d/${DOMAIN}.conf" | grep 'ssl http2' | awk -F ' ' '{print $2}' )
+  PORT=$(cat "/etc/nginx/conf.d/${DOMAIN}.conf" | grep -m 1 'ssl http2' | awk -F ' ' '{print $2}' )
   FLOW=$(cat ${xray_conf_dir}/config.json | jq .inbounds[0].settings.clients[0].flow | tr -d '"')
   WS_PATH=$(cat ${xray_conf_dir}/config.json | jq .inbounds[0].streamSettings.wsSettings.path | tr -d '"')
   WS_PATH_WITHOUT_SLASH=$(echo $WS_PATH | tr -d '/')
