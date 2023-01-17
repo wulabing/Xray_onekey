@@ -1,30 +1,31 @@
 
-## Xray 基于 Nginx 的 VLESS + XTLS 一键安装脚本 <img src="https://raw.githubusercontent.com/wulabing/Xray_onekey/main/image/project_xray.jpg" alt="Project_Xray" width="122" height="30" align="bottom" />
+## Xray Nginx-based VLESS + XTLS one-click installation script <img src="https://raw.githubusercontent.com/wulabing/Xray_onekey/main/image/project_xray.jpg" alt="Project_Xray" width="122" height="30" align="bottom" />
 
 
-> 感谢 JetBrains 提供的非商业开源软件开发授权！
+> Thanks to JetBrains for the non-commercial open source software development license!
 
 > Thanks for non-commercial open source development authorization by JetBrains!
 
-### 由于 xtls 存在被阻断的可能性，建议使用 Nginx 前置版本
+### Due to the possibility of xtls being blocked, it is recommended to use the Nginx pre-version
 
-### Telegram 群组
-* Telegram 交流群：https://t.me/wulabing_v2ray 
-* Telegram 更新公告频道：https://t.me/wulabing_channel
+### Telegram Group
+* Telegram communication group: https://t.me/wulabing_v2ray 
+* Telegram update announcement channel:https://t.me/wulabing_channel
 
-### 准备工作
-* 准备一个域名，并将 A 记录添加好；
-* 安装好 `wget`。
+### Preparation
+* Prepare a domain name and add the A record;
+* Installed wget.
 
-### 导入链接规范
+### import link specification
 https://github.com/XTLS/Xray-core/issues/91
 
-> 截至 2021-2-24 仅有 V2RayN 4.12+ 及 V2RayNG 1.5.8+ 支持链接及二维码导入，其他客户端请手动填入配置信息。
+> As of 2021-2-24, only V2RayN 4.12+ and V2RayNG 1.5.8+ support link and QR code import. For other clients, please fill in the configuration information manually.
 
 
-### 安装/更新方式（Nginx 前置）
+### Installation/update method (Nginx front)
 
-支持配置方式
+Support configuration
+
 
 - VLESS + TCP + TLS + Nginx + WebSocket
 
@@ -32,9 +33,9 @@ https://github.com/XTLS/Xray-core/issues/91
 wget -N --no-check-certificate -q -O install.sh "https://raw.githubusercontent.com/wulabing/Xray_onekey/nginx_forward/install.sh" && chmod +x install.sh && bash install.sh
 ```
 
-### 安装/更新方式（Xray 前置）
+### Installation/update method (Xray front)
 
-支持配置方式
+Support configuration
 
 - VLESS + TCP + XTLS / TLS  + Nginx
 
@@ -45,11 +46,11 @@ wget -N --no-check-certificate -q -O install.sh "https://raw.githubusercontent.c
 ```
 
 
-### 注意事项
-* 如果你不了解脚本中各项设置的具体含义，除域名外，请使用脚本提供的默认值；
-* 使用本脚本需要你拥有 Linux 基础及使用经验，了解计算机网络部分知识，计算机基础操作；
-* 目前支持 Debian 9+ / Ubuntu 18.04+ / Centos7+ / Oracle Linux 7+；
-* 群主仅提供极其有限的支持，如有问题可以询问群友。
+### Precautions
+* If you don't understand the specific meaning of each setting in the script, except the domain name, please use the default value provided by the script;
+* To use this script, you need to have Linux foundation and experience, some knowledge of computer networks, and basic computer operations;
+* Currently supports Debian 9+ / Ubuntu 18.04+ / Centos7+ / Oracle Linux 7+;
+* The group owner only provides extremely limited support, if you have any questions, you can ask the group members.
 
 ### 鸣谢
 
