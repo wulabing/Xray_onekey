@@ -2,17 +2,19 @@
 ## اسکریپت نصب VLESS + XTLS مبتنی بر Xray Nginx با یک کلیک <img src="https://raw.githubusercontent.com/wulabing/Xray_onekey/main/image/project_xray.jpg" alt="Project_Xray" width="122" height="30" align="bottom" />
 
 
-> Thanks to JetBrains for the non-commercial open source software development license!
+> با تشکر از JetBrains برای مجوز توسعه نرم افزار منبع باز غیر تجاری!
 
-> Thanks for non-commercial open source development authorization by JetBrains!
 
-### Due to the possibility of xtls being blocked, it is recommended to use the Nginx pre-version
+>از مجوز توسعه منبع باز غیر تجاری توسط JetBrains سپاسگزاریم!
 
-### Telegram Group
-* Telegram communication group: https://t.me/wulabing_v2ray 
-* Telegram update announcement channel:https://t.me/wulabing_channel
+### با توجه به احتمال مسدود شدن xtls، پیشنهاد می شود از نسخه پیشین Nginx استفاده کنید
 
-### Preparation
+
+### گروه تلگرام
+* گروه ارتباطی تلگرام: https://t.me/wulabing_v2ray 
+* کانال اطلاعیه آپدیت تلگرام:https://t.me/wulabing_channel
+
+### آماده سازی
 * Prepare a domain name and add the A record;
 * Installed wget.
 
