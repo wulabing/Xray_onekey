@@ -7,7 +7,7 @@
 
 >از مجوز توسعه منبع باز غیر تجاری توسط JetBrains سپاسگزاریم!
 
-### با توجه به احتمال مسدود شدن xtls، پیشنهاد می شود از نسخه پیشین Nginx استفاده کنید
+### با توجه به احتمال مسدود شدن xtls، پیشنهاد می شود از نسخه پیشین Nginx استفاده کنید 
 
 
 ### گروه تلگرام
@@ -62,7 +62,7 @@ wget -N --no-check-certificate -q -O install.sh "https://raw.githubusercontent.c
 * 本脚本中 配置文件及部分逻辑参考 https://github.com/jiuqi9997/xray-yes 在此感谢 玖柒；
 * 本脚本中 二维码 API 部分参考 https://github.com/mack-a/v2ray-agent  在此感谢 mack-a。
 
-### روش آغازکردن
+### روش شروع و توقف سرویس
 
 start Xray：`systemctl start xray`
 
@@ -72,7 +72,7 @@ start Nginx：`systemctl start nginx`
 
 stop Nginx：`systemctl stop nginx`
 
-### قسمت های مرتبط
+### قسمت های که پروژه استفاده می کند
 
 Web دایرکتوری：`/www/xray_web`
 
