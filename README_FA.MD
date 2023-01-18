@@ -84,19 +84,19 @@ certs： `/ssl/xray.key`（私钥）和 `/ssl/xray.crt`（证书公钥）
 
 ### حمایت کردن
 
-برای خرید vps
+با خرید vps
 
 https://bandwagonhost.com/aff.php?aff=63939
 
-خرید پروکسی
+با خرید پروکسی
 
 https://justmysocks.net/members/aff.php?aff=17621
 
-برای خرید vps
+با خرید vps
 
 https://www.dmit.io/aff.php?aff=3957
 
-ایجاد حساب در vultr
+با ایجاد حساب در vultr
 
 https://www.vultr.com/?ref=6881279
 
