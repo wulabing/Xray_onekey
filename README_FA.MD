@@ -15,9 +15,9 @@
 * کانال اطلاعیه آپدیت تلگرام:https://t.me/wulabing_channel
 
 ### آماده سازی
-* یک نام دامنه آماده کنید و رکورد A را اضافه کنید.
+* یک نام دامنه آماده کنید و رکورد A را اضافه کنید
 
-* نصب کردن wget.
+* نصب کردن wget
 
 ### مشخصات لینک وارد کردن
 https://github.com/XTLS/Xray-core/issues/91
@@ -85,18 +85,23 @@ certs： `/ssl/xray.key`（私钥）和 `/ssl/xray.crt`（证书公钥）
 ### حمایت کردن
 
 برای خرید vps
+
 https://bandwagonhost.com/aff.php?aff=63939
 
 خرید پروکسی
+
 https://justmysocks.net/members/aff.php?aff=17621
 
 برای خرید vps
+
 https://www.dmit.io/aff.php?aff=3957
 
 ایجاد حساب در vultr
+
 https://www.vultr.com/?ref=6881279
 
 حمایت با رمزارز
+
 TRC20:TFannfnajNGYsMTuVDcXfZXXPbcaxAEffa
 
 
