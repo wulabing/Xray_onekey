@@ -1,5 +1,5 @@
 
-## Xray Nginx-based VLESS + XTLS one-click installation script <img src="https://raw.githubusercontent.com/wulabing/Xray_onekey/main/image/project_xray.jpg" alt="Project_Xray" width="122" height="30" align="bottom" />
+## اسکریپت نصب VLESS + XTLS مبتنی بر Xray Nginx با یک کلیک <img src="https://raw.githubusercontent.com/wulabing/Xray_onekey/main/image/project_xray.jpg" alt="Project_Xray" width="122" height="30" align="bottom" />
 
 
 > Thanks to JetBrains for the non-commercial open source software development license!
