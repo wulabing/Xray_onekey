@@ -1,5 +1,5 @@
 
-## اسکریپت نصب VLESS + XTLS مبتنی بر Xray Nginx با یک کلیک <img src="https://raw.githubusercontent.com/wulabing/Xray_onekey/main/image/project_xray.jpg" alt="Project_Xray" width="122" height="30" align="bottom" />
+## اسکریپت نصب Xray مبتنی بر Nginx برای ساختار VLESS + XTLS با یک کلیک <img src="https://raw.githubusercontent.com/wulabing/Xray_onekey/main/image/project_xray.jpg" alt="Project_Xray" width="122" height="30" align="bottom" />
 
 
 > با تشکر از JetBrains برای مجوز توسعه نرم افزار منبع باز غیر تجاری!
@@ -15,19 +15,19 @@
 * کانال اطلاعیه آپدیت تلگرام:https://t.me/wulabing_channel
 
 ### آماده سازی
-* Prepare a domain name and add the A record;
-* Installed wget.
+* یک نام دامنه آماده کنید و رکورد A را اضافه کنید.
 
-### import link specification
+* نصب کردن wget.
+
+### مشخصات لینک وارد کردن
 https://github.com/XTLS/Xray-core/issues/91
 
 > As of 2021-2-24, only V2RayN 4.12+ and V2RayNG 1.5.8+ support link and QR code import. For other clients, please fill in the configuration information manually.
 
 
-### Installation/update method (Nginx front)
+### روش نصب و بروزرسانی (Nginx front)
 
-Support configuration
-
+پیکربندی قابل پشتیبان
 
 - VLESS + TCP + TLS + Nginx + WebSocket
 
@@ -35,10 +35,9 @@ Support configuration
 wget -N --no-check-certificate -q -O install.sh "https://raw.githubusercontent.com/wulabing/Xray_onekey/nginx_forward/install.sh" && chmod +x install.sh && bash install.sh
 ```
 
-### Installation/update method (Xray front)
+### روش نصب و بروزرسانی (Xray front)
 
-Support configuration
-
+پیکربندی قابل پشتیبانی
 - VLESS + TCP + XTLS / TLS  + Nginx
 
 - VLESS + TCP + XTLS / TLS  + Nginx 及 VLESS + TCP + TLS + Nginx + WebSocket 回落并存模式
@@ -48,13 +47,13 @@ wget -N --no-check-certificate -q -O install.sh "https://raw.githubusercontent.c
 ```
 
 
-### Precautions
-* If you don't understand the specific meaning of each setting in the script, except the domain name, please use the default value provided by the script;
-* To use this script, you need to have Linux foundation and experience, some knowledge of computer networks, and basic computer operations;
-* Currently supports Debian 9+ / Ubuntu 18.04+ / Centos7+ / Oracle Linux 7+;
-* The group owner only provides extremely limited support, if you have any questions, you can ask the group members.
+### موارد احتیاط
+* اگر معنای خاص هر یک از تنظیمات در اسکریپت را نمی‌دانید، به جز نام دامنه، لطفاً از مقدار پیش‌فرض ارائه شده توسط اسکریپت استفاده کنید.
+* برای استفاده از این اسکریپت، باید پایه و تجربه لینوکس، مقداری دانش در مورد شبکه های کامپیوتری و عملیات اولیه کامپیوتر داشته باشید.
+* در حال حاضر از Debian 9+ / Ubuntu 18.04+ / Centos7+ / Oracle Linux 7+ پشتیبانی می کند.
+* مالک گروه فقط پشتیبانی بسیار محدودی را ارائه می دهد، اگر سؤالی دارید، می توانید از اعضای گروه بپرسید.
 
-### 鸣谢
+### با تشکر
 
 * 本脚本中 README Project_Xray 项目图片由 Blitzcrank Telegram:@Blitz_crank 提供 在此感谢Blitzcrank
 * 本脚本中 MTProxyTLS 基于 https://github.com/sunpma/mtp 二次修改 在此感谢 sunpma；
@@ -63,45 +62,41 @@ wget -N --no-check-certificate -q -O install.sh "https://raw.githubusercontent.c
 * 本脚本中 配置文件及部分逻辑参考 https://github.com/jiuqi9997/xray-yes 在此感谢 玖柒；
 * 本脚本中 二维码 API 部分参考 https://github.com/mack-a/v2ray-agent  在此感谢 mack-a。
 
-### 启动方式
+### روش آغازکردن
 
-启动 Xray：`systemctl start xray`
+start Xray：`systemctl start xray`
 
-停止 Xray：`systemctl stop xray`
+stop Xray：`systemctl stop xray`
 
-启动 Nginx：`systemctl start nginx`
+start Nginx：`systemctl start nginx`
 
-停止 Nginx：`systemctl stop nginx`
+stop Nginx：`systemctl stop nginx`
 
-### 相关目录
+### قسمت های مرتبط
 
-Web 目录：`/www/xray_web`
+Web دایرکتوری：`/www/xray_web`
 
-Xray 服务端配置：`/usr/local/etc/xray/config.json`
+Xray پیکربندی سرور：`/usr/local/etc/xray/config.json`
 
-Nginx 目录： `/etc/nginx`
+Nginx دایرکتوری： `/etc/nginx`
 
-证书文件： `/ssl/xray.key`（私钥）和 `/ssl/xray.crt`（证书公钥）
+certs： `/ssl/xray.key`（私钥）和 `/ssl/xray.crt`（证书公钥）
 
-### 捐赠
+### حمایت کردن
 
-您可以使用我的 搬瓦工 AFF 购买 VPS
-
+برای خرید vps
 https://bandwagonhost.com/aff.php?aff=63939
 
-您可以使用我的 JustMySocks AFF 购买搬瓦工提供的代理
-
+خرید پروکسی
 https://justmysocks.net/members/aff.php?aff=17621
 
-您可以使用我的 DMIT AFF 购买 VPS
-
+برای خرید vps
 https://www.dmit.io/aff.php?aff=3957
 
-您可以使用我的 Vultr AFF 创建新的 Vultr 账号并使用
-
+ایجاد حساب در vultr
 https://www.vultr.com/?ref=6881279
 
-您可以通过 USDT 支持我，感谢您的支持
+حمایت با رمزارز
 TRC20:TFannfnajNGYsMTuVDcXfZXXPbcaxAEffa
 
 
