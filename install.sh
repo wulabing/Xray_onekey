@@ -366,13 +366,13 @@ function modify_port() {
 }
 
 function configure_xray() {
-  cd /usr/local/etc/xray && rm -f config.json && wget -O config.json https://raw.githubusercontent.com/wulabing/Xray_onekey/${github_branch}/config/xray_xtls-rprx-direct.json
+  cd /usr/local/etc/xray && rm -f config.json && wget -O config.json https://raw.githubusercontent.com/wulabing/Xray_onekey/${github_branch}/config/xray_xtls-rprx-vision.json
   modify_UUID
   modify_port
 }
 
 function configure_xray_ws() {
-  cd /usr/local/etc/xray && rm -f config.json && wget -O config.json https://raw.githubusercontent.com/wulabing/Xray_onekey/${github_branch}/config/xray_tls_ws_mix-rprx-direct.json
+  cd /usr/local/etc/xray && rm -f config.json && wget -O config.json https://raw.githubusercontent.com/wulabing/Xray_onekey/${github_branch}/config/xray_tls_ws_mix-rprx-vision.json
   modify_UUID
   modify_UUID_ws
   modify_port
@@ -547,7 +547,7 @@ function restart_all() {
   judge "Xray 启动"
 }
 
-function vless_xtls-rprx-direct_link() {
+function vless_xtls-rprx-vision_link() {
   UUID=$(cat ${xray_conf_dir}/config.json | jq .inbounds[0].settings.clients[0].id | tr -d '"')
   PORT=$(cat ${xray_conf_dir}/config.json | jq .inbounds[0].port)
   FLOW=$(cat ${xray_conf_dir}/config.json | jq .inbounds[0].settings.clients[0].flow | tr -d '"')
@@ -566,7 +566,7 @@ function vless_xtls-rprx-direct_link() {
   print_ok "https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=vless://$UUID@$DOMAIN:$PORT?security=xtls%26flow=$FLOW%23XTLS_wulabing-$DOMAIN"
 }
 
-function vless_xtls-rprx-direct_information() {
+function vless_xtls-rprx-vision_information() {
   UUID=$(cat ${xray_conf_dir}/config.json | jq .inbounds[0].settings.clients[0].id | tr -d '"')
   PORT=$(cat ${xray_conf_dir}/config.json | jq .inbounds[0].port)
   FLOW=$(cat ${xray_conf_dir}/config.json | jq .inbounds[0].settings.clients[0].flow | tr -d '"')
@@ -630,15 +630,15 @@ function ws_link() {
 
 function basic_information() {
   print_ok "VLESS+TCP+XTLS+Nginx 安装成功"
-  vless_xtls-rprx-direct_information
-  vless_xtls-rprx-direct_link
+  vless_xtls-rprx-vision_information
+  vless_xtls-rprx-vision_link
 }
 
 function basic_ws_information() {
   print_ok "VLESS+TCP+TLS+Nginx with WebSocket 混合模式 安装成功"
   ws_information
   print_ok "————————————————————————"
-  vless_xtls-rprx-direct_information
+  vless_xtls-rprx-vision_information
   ws_link
 }
 

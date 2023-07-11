@@ -12,7 +12,7 @@
         "clients": [
           {
             "id": "xx",
-            "flow": "xtls-rprx-direct"
+            "flow": "xtls-rprx-vision"
           }
         ],
         "decryption": "none",
@@ -25,6 +25,11 @@
           {
             "dest": 60001,
             "alpn": "h2",
+            "xver": 1
+          },
+          {
+            "dest": 60002,
+            "path": "/wulabing",
             "xver": 1
           }
         ]
@@ -53,8 +58,29 @@
           "tls"
         ]
       }
-    }
-  ],
+    },
+    {
+      "port": 60002,
+      "listen": "127.0.0.1",
+      "protocol": "vless",
+      "settings": {
+          "clients": [
+              {
+                  "id": "xx"
+              }
+          ],
+          "decryption": "none"
+      },
+      "streamSettings": {
+          "network": "ws",
+          "security": "none",
+          "wsSettings": {
+              "acceptProxyProtocol": true,
+              "path": "xx"
+          }
+      }
+  }
+],
   "outbounds": [
     {
       "protocol": "freedom"
