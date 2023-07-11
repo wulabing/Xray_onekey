@@ -120,7 +120,7 @@ function system_check() {
     apt update
   elif [[ "${ID}" == "ubuntu" && $(echo "${VERSION_ID}" | cut -d '.' -f1) -ge 18 ]]; then
     print_ok "当前系统为 Ubuntu ${VERSION_ID} ${UBUNTU_CODENAME}"
-    if [[ ${VERSION_ID} -ge 20 ]]; then
+    if [[ $(echo "${VERSION_ID}" | cut -d '.' -f1) -ge 20 ]]; then
       compatible_nginx_conf="no"
     else
       compatible_nginx_conf="yes"
