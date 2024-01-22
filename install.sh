@@ -172,7 +172,7 @@ function nginx_install() {
   mkdir -p /etc/nginx/conf.d >/dev/null 2>&1
 }
 function dependency_install() {
-  ${INS} wget lsof tar
+  ${INS} wget lsof tar bind9-dnsutils
   judge "安装 wget lsof tar"
 
   if [[ "${ID}" == "centos" || "${ID}" == "ol" ]]; then
@@ -248,7 +248,8 @@ function basic_optimization() {
 
 function domain_check() {
   read -rp "请输入你的域名信息(eg: www.wulabing.com):" domain
-  domain_ip=$(curl -sm8 ipget.net/?ip="${domain}")
+  domain_ipv4="$(dig +short "${domain}" a)"
+  domain_ipv6="$(dig +short "${domain}" aaaa)"
   print_ok "正在获取 IP 地址信息，请耐心等待"
   wgcfv4_status=$(curl -s4m8 https://www.cloudflare.com/cdn-cgi/trace -k | grep warp | cut -d= -f2)
   wgcfv6_status=$(curl -s6m8 https://www.cloudflare.com/cdn-cgi/trace -k | grep warp | cut -d= -f2)
@@ -268,10 +269,10 @@ function domain_check() {
   echo -e "本机公网 IPv4 地址： ${local_ipv4}"
   echo -e "本机公网 IPv6 地址： ${local_ipv6}"
   sleep 2
-  if [[ ${domain_ip} == "${local_ipv4}" ]]; then
+  if [[ ${domain_ipv4} == "${local_ipv4}" ]]; then
     print_ok "域名通过 DNS 解析的 IP 地址与 本机 IPv4 地址匹配"
     sleep 2
-  elif [[ ${domain_ip} == "${local_ipv6}" ]]; then
+  elif [[ ${domain_ipv6} == "${local_ipv6}" ]]; then
     print_ok "域名通过 DNS 解析的 IP 地址与 本机 IPv6 地址匹配"
     sleep 2
   else
